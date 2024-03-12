@@ -1,20 +1,20 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
 export const mainSlice = createSlice({
-  name: 'main',
+  name: "main",
   initialState: {
-    lang: ''
+    lang: "en",
   },
   reducers: {
     setState: (state, action) => {
-      return { ...state, ...action.payload }
+      return { ...state, ...action.payload };
     },
     setLang: (state, action) => {
-      return { ...state, lang: action.payload }
-    }
-  }
-})
+      return { ...state, lang: action.payload };
+    },
+  },
+});
 
-export const { setState, setLang } = mainSlice.actions
+export const { setState, setLang } = mainSlice.actions;
 
-export default mainSlice.reducer
+export default mainSlice.reducer;
