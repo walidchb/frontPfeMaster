@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSharedPathnamesNavigation } from "next-intl/navigation";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
@@ -11,7 +11,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function NavBar() {
+function NavBar({ currentScreen }) {
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -19,12 +19,18 @@ function NavBar() {
     localePrefix,
   });
   const locale = useLocale();
-  const navigation = [
-    { name: "Home", href: `${locale}`, current: true },
+  const [navigation, setNavigation] = useState([
+    { name: "Home", href: `/${locale}`, current: true },
     { name: "Team", href: "#", current: false },
-    { name: "Contact", href: `${locale}/Contact`, current: false },
-    { name: "About", href: `${locale}/About`, current: false },
-  ];
+    { name: "Contact", href: `/${locale}/Contact`, current: false },
+    { name: "About", href: `/${locale}/About`, current: false },
+  ]);
+  const [curScreen, setCurScreen] = useState(currentScreen);
+  // useEffect(() => {
+  //   setCurScreen(currentScreen);
+  // }, []);
+
+  // const navigation = ;
   const [authenticated, setAuthenticated] = useState(false);
   const t = useTranslations("Index");
   const router = useRouter();
@@ -66,12 +72,12 @@ function NavBar() {
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
-                    {navigation.map((item) => (
+                    {navigation.map((item, index) => (
                       <a
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current
+                          index == curScreen
                             ? "bg-gray-900 text-white"
                             : "text-gray-300 hover:bg-gray-700 hover:text-white",
                           "rounded-md px-3 py-2 text-sm font-medium"
