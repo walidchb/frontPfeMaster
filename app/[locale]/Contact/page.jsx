@@ -5,6 +5,7 @@ import "./style.css";
 import NavBar from "@/components/NavBar";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
+import Footer from "@/components/Footer";
 
 function Contact() {
   return (
@@ -107,6 +108,7 @@ function Contact() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

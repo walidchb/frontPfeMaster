@@ -5,6 +5,7 @@ import "./aboutus.css";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 
 function About() {
   const t = useTranslations("Index");
@@ -124,6 +125,7 @@ function About() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
