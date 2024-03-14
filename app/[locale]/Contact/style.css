@@ -23,7 +23,7 @@
 }
 
 .contact-info{
-  /* color: #fff; */
+  color: #314155; 
   max-width: 500px;
   line-height: 65px;
   padding-left: 50px;
@@ -50,7 +50,7 @@
 }
 
 .contact-form h2{
-  /* color: #fff; */
+  color: #314155;
   text-align: center;
   font-size: 35px;
   text-transform: uppercase;
@@ -58,7 +58,7 @@
 }
 
 .contact-form .text-box{
-  background: #333;
+  background: #314155;
   color: #f0ecec;
   border: none;
   width: calc(50% - 10px);
@@ -76,8 +76,8 @@
 }
 
 .contact-form textarea{
-  background: #333;
-  /* color: #fff; */
+  background: #314155;
+  color: #f0ecec;
   border: none;
   width: 100%;
   padding: 12px;
@@ -93,7 +93,7 @@
 
 .contact-form .send-btn{
   float: right;
-  background: #333;
+  background: #314155;
   color: #f0ecec;
   border: none;
   width: 120px;
@@ -109,13 +109,12 @@
 }
 
 .contact-form .send-btn:hover{
-  background: #f0ecec;
-  color: #333;
+  background: blue;
 }
 
 @media screen and (max-width: 950px){
-  .contact-section{
-    flex-direction: column;
+  .contact-section {
+    flex-direction: column-reverse; /* Inverser l'ordre des éléments */
   }
 
   .contact-info, .contact-form{
