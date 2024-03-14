@@ -2,8 +2,11 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 
 function SectionOneLandingPage() {
+  const locale = useLocale();
+
   const router = useRouter();
   const [displayText, setDisplayText] = useState("");
   const titleText = "Simplify Your Task Management";
@@ -27,8 +30,7 @@ function SectionOneLandingPage() {
   return (
     <section
       className="bg-[url('/BG.jpeg')] text-black flex flex-col md:flex-row justify-around items-center mx-auto py-20"
-      style={{ minHeight: "100vh" }}
-    >
+      style={{ minHeight: "100vh" }}>
       <div className="w-5/12 flex flex-col justify-center items-center mb-8 md:mb-0">
         <img
           src="/images/accueil.jpeg"
@@ -55,10 +57,9 @@ function SectionOneLandingPage() {
         </p>
         <button
           onClick={() => {
-            router.push(`/Up`);
+            router.push(`${locale}/Up`);
           }}
-          className="bg-gray-800 hover:bg-blue-700 text-white font-semibold py-2 px-4 border border-gray-800 hover:border-transparent rounded transition duration-300"
-        >
+          className="bg-gray-800 hover:bg-blue-700 text-white font-semibold py-2 px-4 border border-gray-800 hover:border-transparent rounded transition duration-300">
           Get Started
         </button>
       </div>
