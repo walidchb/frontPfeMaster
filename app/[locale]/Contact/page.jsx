@@ -63,11 +63,11 @@ function Contact() {
                     placeholder="Your Name"
                     required
                   />
-                  {
-                    //     errors.name && touched.name ? (
-                    //     <div className="input-feedback">{errors.name}</div>
-                    //   ) : null
-                  }
+                  {errors.name && touched.name ? (
+                    <div className="input-feedback text-red-600">
+                      {errors.name}
+                    </div>
+                  ) : null}
 
                   <Field
                     name="email"

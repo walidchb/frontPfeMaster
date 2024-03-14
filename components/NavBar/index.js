@@ -63,7 +63,7 @@ function NavBar({ currentScreen }) {
                 </Disclosure.Button>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex flex-shrink-0 items-center">
+                <div className="flex flex-shrink-0 items-center ml-10 sm:ml-0">
                   <img
                     className="h-8 w-auto"
                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
@@ -92,7 +92,7 @@ function NavBar({ currentScreen }) {
               <div className="flex justify-center items-center">
                 <button
                   href="#"
-                  className="flex justify-center items-center mr-10 text-sm font-medium underline text-gray-400 hover:no-underline"
+                  className="hidden sm:flex justify-center items-center sm:mr-10 text-sm font-medium underline text-gray-400 hover:no-underline"
                   onClick={() => {
                     handleChangeLanguage(locale);
                   }}>
@@ -113,7 +113,7 @@ function NavBar({ currentScreen }) {
                   {locale == "fr" ? "EN" : "FR"}
                 </button>
                 {authenticated ? (
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
                     <button
                       type="button"
                       className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -196,13 +196,13 @@ function NavBar({ currentScreen }) {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
-              {navigation.map((item) => (
+              {navigation.map((item, index) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current
+                    index == curScreen
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
                     "block rounded-md px-3 py-2 text-base font-medium"
