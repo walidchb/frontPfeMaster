@@ -31,3 +31,10 @@ body {
     text-wrap: balance;
   }
 }
+.dragging {
+  opacity: 1; /* Ajustez l'opacité selon vos préférences */
+  transition: opacity 0.2s ease; /* Ajoutez une transition pour une animation fluide si nécessaire */
+}
+.active {
+  @apply bg-blue-500 text-white;
+}

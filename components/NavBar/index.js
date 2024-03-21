@@ -24,6 +24,7 @@ function NavBar({ currentScreen }) {
     { name: "Team", href: "#", current: false },
     { name: "Contact", href: `/${locale}/Contact`, current: false },
     { name: "About", href: `/${locale}/About`, current: false },
+    { name: "Documentation", href: `/${locale}/Documentation`, current: false },
   ]);
   const [curScreen, setCurScreen] = useState(currentScreen);
   // useEffect(() => {

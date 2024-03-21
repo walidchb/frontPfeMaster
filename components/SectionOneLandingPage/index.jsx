@@ -12,11 +12,13 @@ function SectionOneLandingPage() {
     <section className="bg-[url('/BG.jpeg')]  text-black flex justify-around items-center  mx-auto py-20 ">
       {/* <Image src={image} alt="Task Management App" className="home-page__image" width={500} height={300} /> */}
       <div className="w-5/12  flex flex-col justify-center items-center">
-        <img
+        <Image
           src="/images/accueil.jpeg"
           alt=""
-          srcset=""
+          srcSet=""
           className="  w-4/6 "
+          width={384}
+          height={384}
           style={{
             borderRadius: "5px",
             transition: "transform 0.3s",
