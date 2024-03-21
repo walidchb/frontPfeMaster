@@ -15,6 +15,7 @@ function Employee() {
       <NavBarAuth
         className="flex-none"
         auth={true}
+        showOrganisation={true}
         sideBarShow={sideBarShow}
         setSideBarShow={setSideBarShow}
       />
