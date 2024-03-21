@@ -1,0 +1,21 @@
+.projectCard{
+    /* min-height: 10rem;
+    min-width: 20%; */
+box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+/* cursor: pointer; */
+/* @media (max-width: 600px) {
+    
+    width: 95%; 
+    
+  }
+  @media (max-width: 450px) {
+    width: 80%; 
+    
+  } */
+}
+
+
+
+.projectCard:hover{
+    transform: scale(1.02);
+}

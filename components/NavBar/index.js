@@ -31,7 +31,7 @@ function NavBar({ currentScreen }) {
   // }, []);
 
   // const navigation = ;
-  const [authenticated, setAuthenticated] = useState(false);
+  const [auth, setauth] = useState(false);
   const t = useTranslations("Index");
   const router = useRouter();
   const pathname = usePathname();
@@ -112,7 +112,7 @@ function NavBar({ currentScreen }) {
 
                   {locale == "fr" ? "EN" : "FR"}
                 </button>
-                {authenticated ? (
+                {auth ? (
                   <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
                     <button
                       type="button"
@@ -184,10 +184,12 @@ function NavBar({ currentScreen }) {
                     </Menu>
                   </div>
                 ) : (
-                  <Link className="hidden sm:block" href={`${locale}/In`}>
-                    <h1 className="text-sm font-medium underline text-blue-400 hover:no-underline">
-                      sign in
-                    </h1>
+                  <Link
+                    className="text-sm font-medium underline text-blue-400 hover:no-underline hidden sm:block"
+                    href={`/${locale}/In`}>
+                    {/* <h1 className="text-sm font-medium underline text-blue-400 hover:no-underline"> */}
+                    sign in
+                    {/* </h1> */}
                   </Link>
                 )}
               </div>
@@ -211,10 +213,10 @@ function NavBar({ currentScreen }) {
                   {item.name}
                 </Disclosure.Button>
               ))}
-              <Link href={`${locale}/In`}>
-                <h1 className=" px-3 py-2 text-sm font-medium underline text-blue-400 hover:no-underline">
-                  sign in
-                </h1>
+              <Link
+                className=" px-3 py-2 text-sm font-medium underline text-blue-400 hover:no-underline"
+                href={`/${locale}/In`}>
+                sign in
               </Link>
             </div>
           </Disclosure.Panel>

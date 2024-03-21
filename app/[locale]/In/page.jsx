@@ -2,6 +2,8 @@
 import Link from "next/link";
 import "./style.css";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { useTranslations, useLocale } from "next-intl";
 import { FaGoogle } from "react-icons/fa";
 import { IoEyeSharp, IoPersonSharp } from "react-icons/io5";
@@ -12,6 +14,8 @@ import { Formik } from "formik";
 function SignIn() {
   const t = useTranslations("Index");
   const locale = useLocale();
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setErrorCred] = useState("");
   const togglePasswordVisibility = () => {
@@ -39,7 +43,7 @@ function SignIn() {
           onSubmit={(values, { setSubmitting }) => {
             setTimeout(async () => {
               alert(JSON.stringify(values, null, 2));
-
+              router.push(`/${locale}/Employee`);
               setSubmitting(false);
             }, 400);
           }}>
