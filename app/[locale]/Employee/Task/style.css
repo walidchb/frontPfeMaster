@@ -1,0 +1,13 @@
+.costumScrollBar {
+    scrollbar-color: #6969dd #e0e0e0;
+  scrollbar-width: thin;
+  
+    
+}
+.TaskContainer{
+    /* background-color: white; */
+box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;}
+
+.download:hover{
+  transform: scale(1.2);
+}

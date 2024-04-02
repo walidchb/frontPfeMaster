@@ -4,7 +4,12 @@ import { notFound } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import { NextIntlClientProvider } from "next-intl";
 import "./globals.css";
+// import { pdfjs } from "react-pdf";
 
+// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+//   "pdfjs-dist/build/pdf.worker.min.js",
+//   import.meta.url
+// ).toString();
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

@@ -5,10 +5,12 @@ import "./style.css";
 import { Fragment, useState, useEffect } from "react";
 import MainProject from "@/components/Employee/Project/Main";
 import SideBarProject from "@/components/Employee/Project/SideBar";
+import CalendrierView from "@/components/Calendrier";
+import KanbanBoard from "@/components/Employee/Project/Main/Kanban";
 import MainEmployee from "@/components/Employee/Main";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 
-function Project() {
+function Scheduler() {
   const [showSideBar, setShowSideBar] = useState(true);
 
   return (
@@ -22,11 +24,13 @@ function Project() {
         setShowSideBar={setShowSideBar}
       />
       <div style={{ height: "90vh" }} className=" flex flex-shrink-0 ">
-        {showSideBar ? <SideBarProject /> : null}
-        <MainProject showSideBar={showSideBar} />
+        {showSideBar ? <SideBarProject currentPage="Scheduler" /> : null}
+        {/* <MainProject showSideBar={showSideBar} /> */}
+
+        <CalendrierView />
       </div>
     </div>
   );
 }
 
-export default Project;
+export default Scheduler;

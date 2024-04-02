@@ -1,9 +1,16 @@
 import React from "react";
 import "./style.css";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 
 function TaskListElement() {
+  const locale = useLocale();
+  const router = useRouter();
+
   return (
-    <div className="TaskListElementContainer rounded-xl py-2 my-2 px-4  flex justify-between items-center">
+    <div
+      onClick={() => router.push(`/${locale}/Employee/Task`)}
+      className="TaskListElementContainer cursor-pointer rounded-xl py-2 my-2 px-4  flex justify-between items-center">
       <div className="flex justify-start items-center w-8/12">
         <img
           className="h-8 mr-2 w-auto"

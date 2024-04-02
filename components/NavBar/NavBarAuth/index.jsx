@@ -10,6 +10,18 @@ import {
   MdArrowDropDown,
   MdOutlinePassword,
 } from "react-icons/md";
+import "./style.css";
+import {
+  FaTrash,
+  FaBell,
+  FaTimes,
+  FaRegEnvelope,
+  FaCalendarAlt,
+  FaClipboardList,
+  FaTasks,
+  FaUserFriends,
+  FaChartBar,
+} from "react-icons/fa";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
@@ -51,6 +63,109 @@ function NavBarAuth({
     }
     router.replace(`/${loc + pathname}`);
   };
+  const [windowSize, setWindowSize] = useState({
+    width: undefined,
+    height: undefined,
+  });
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Add event listener when component mounts
+    window.addEventListener("resize", handleResize);
+
+    // Remove event listener when component unmounts
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  const notifications = [
+    {
+      id: 1,
+      date: new Date("2021-12-25T10:30:00"),
+      content:
+        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+      type: "project",
+      isRead: false,
+    },
+    {
+      id: 2,
+      date: new Date("2021-12-20T14:00:00"),
+      content: "Meeting Agenda for Monday",
+      type: "task",
+      isRead: true,
+    },
+    {
+      id: 3,
+      date: new Date("2021-12-19T09:15:00"),
+      content: "Weekly update from project team",
+      type: "reminder",
+      isRead: false,
+    },
+    {
+      id: 4,
+      date: new Date("2021-12-25T10:30:00"),
+      content:
+        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+      type: "message",
+      isRead: false,
+    },
+    {
+      id: 1,
+      date: new Date("2021-12-25T10:30:00"),
+      content:
+        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+      type: "project",
+      isRead: false,
+    },
+    {
+      id: 2,
+      date: new Date("2021-12-20T14:00:00"),
+      content: "Meeting Agenda for Monday",
+      type: "task",
+      isRead: true,
+    },
+    {
+      id: 3,
+      date: new Date("2021-12-19T09:15:00"),
+      content: "Weekly update from project team",
+      type: "reminder",
+      isRead: false,
+    },
+    {
+      id: 4,
+      date: new Date("2021-12-25T10:30:00"),
+      content:
+        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+      type: "message",
+      isRead: false,
+    },
+    {
+      id: 5,
+      date: new Date("2021-12-20T14:00:00"),
+      content: "Meeting Agenda for Monday",
+      type: "event",
+      isRead: true,
+    },
+    {
+      id: 6,
+      date: new Date("2021-12-19T09:15:00"),
+      content: "Weekly update from project team",
+      type: "team",
+      isRead: false,
+    },
+    {
+      id: 7,
+      date: new Date("2021-12-19T09:15:00"),
+      content: "Weekly update from project team",
+      type: "report",
+      isRead: false,
+    },
+  ];
   return (
     <Disclosure style={{ height: "10vh" }} as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -71,13 +186,6 @@ function NavBarAuth({
                 ) : null}
               </div>
               <div className=" flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
-                <div className="hidden sm:flex  items-center  sm:ml-0">
-                  <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                    alt="Your Company"
-                  />
-                </div>
                 {showOrganisation ? (
                   <Menu
                     as="div"
@@ -167,15 +275,130 @@ function NavBarAuth({
 
                   {locale == "fr" ? "EN" : "FR"}
                 </button>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
-                  <button
-                    type="button"
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                <div className=" absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
+                  <Menu as="div" className=" relative ml-3">
+                    <div>
+                      <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <span className="absolute -inset-1.5" />
+                        <span className="sr-only">View notifications</span>
+                        <BellIcon
+                          color="white"
+                          className="h-6 w-6"
+                          aria-hidden="true"
+                        />
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95">
+                      <Menu.Items
+                        style={{
+                          right: -50,
+                          width: windowSize.width <= 550 ? "80vw" : "60vw",
+                          maxHeight: "80vh",
+                        }}
+                        className=" costumScrollBar absolute  z-10 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="flex justify-between items-center p-2">
+                          <p className="font-semibold text-xl">
+                            All notifications ({notifications.length}) :
+                          </p>
+                          <a
+                            href={`/${locale}/Employee/Notification`}
+                            className="underline text-blue-600 hover:no-underline">
+                            View all notifications
+                          </a>
+                        </div>
+                        {notifications.map((notification, index) => (
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                key={notification.id}
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
 
+                                  "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
+                                )}>
+                                <div className="flex ">
+                                  <div
+                                    style={{
+                                      minWidth:
+                                        windowSize.width <= 450
+                                          ? "20vw"
+                                          : windowSize.width <= 650
+                                          ? "15vw"
+                                          : windowSize.width <= 850
+                                          ? "12vw"
+                                          : "8vw",
+                                    }}
+                                    className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                    {notification.type === "message" && (
+                                      <FaRegEnvelope className="" />
+                                    )}
+                                    {notification.type === "event" && (
+                                      <FaCalendarAlt className="" />
+                                    )}
+                                    {notification.type === "reminder" && (
+                                      <FaBell className="" />
+                                    )}
+                                    {notification.type === "project" && (
+                                      <FaClipboardList className="" />
+                                    )}
+                                    {notification.type === "task" && (
+                                      <FaTasks className="" />
+                                    )}
+                                    {notification.type === "team" && (
+                                      <FaUserFriends className="" />
+                                    )}
+                                    {notification.type === "report" && (
+                                      <FaChartBar className="" />
+                                    )}
+                                    {notification.type}
+                                  </div>
+                                  <div
+                                    style={{
+                                      width:
+                                        windowSize.width <= 550
+                                          ? "50vw"
+                                          : windowSize.width <= 850
+                                          ? "40vw"
+                                          : "50vw",
+                                    }}
+                                    className="">
+                                    <div className="truncate text-sm text-gray-600 mb-2">
+                                      {new Date(
+                                        notification.date
+                                      ).toLocaleString()}
+                                    </div>
+                                    <div
+                                      className={`truncate    text-sm ${
+                                        notification.isRead
+                                          ? "text-gray-600"
+                                          : "text-gray-800 font-semibold"
+                                      }`}>
+                                      {notification.content}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              // <a
+                              //   href="#"
+                              //   className={classNames(
+                              //     active ? "bg-gray-100" : "",
+                              //     "block px-4 py-2 text-sm text-gray-700"
+                              //   )}>
+                              //   Your Profile
+                              // </a>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                   <Menu as="div" className="relative ml-3">
                     <div>
                       <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
