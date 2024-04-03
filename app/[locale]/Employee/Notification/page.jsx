@@ -12,7 +12,6 @@ import {
   FaChartBar,
 } from "react-icons/fa";
 import "./style.css";
-import UserNotifications from "@/components/UserNotifications";
 import NotificationListElement from "@/components/NotificationListElement";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import React, { useState } from "react";
@@ -121,47 +120,7 @@ const Notification = () => {
           <NotificationListElement key={index} notification={notification} />
         ))}
       </div>
-      {/*
-      {notificationToDelete !== null && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 relative">
-            <button
-              type="button"
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:outline-none"
-              onClick={() => setNotificationToDelete(null)}>
-              <FaTimes />
-            </button>
-            <div className="mb-4 text-lg font-semibold">Confirmation</div>
-            <div className="mb-4">
-              Êtes-vous sûr de vouloir supprimer cette notification ?
-            </div>
-            <div className="flex justify-end space-x-2">
-              <button
-                type="button"
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                onClick={() => setNotificationToDelete(null)}>
-                Annuler
-              </button>
-              <button
-                type="button"
-                className="bg-[#314155] text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-600"
-                onClick={() => {
-                  onDeleteNotification(notificationToDelete);
-                  setNotificationToDelete(null);
-                }}>
-                <FaTrash className="mr-1" /> Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
-    // <div className="container bg-red-400  mx-auto">
-    //   <UserNotifications
-    //     notifications={notificationsList}
-    //     onDeleteNotification={handleDeleteNotification}
-    //   />
-    // </div>
   );
 };
 

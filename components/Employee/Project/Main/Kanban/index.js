@@ -285,7 +285,7 @@ const KanbanBoard = () => {
   return (
     <div
       style={{ height: "90vh" }}
-      className="flex flex-col lg:flex-row w-full bg-red-300o overflow-auto costumScrollBar">
+      className="flex flex-col lg:flex-row w-full  overflow-auto costumScrollBar">
       <div className="w-full lg:ml-50 p-4">
         <h1 className="text-3xl font-bold mb-4">Tasks</h1>
         <div className="flex flex-wrap -mx-4">
