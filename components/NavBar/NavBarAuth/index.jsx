@@ -4,6 +4,7 @@ import { Fragment, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSharedPathnamesNavigation } from "next-intl/navigation";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { IoPersonCircle, IoSettings, IoLogOutSharp } from "react-icons/io5";
 import {
   MdAlternateEmail,
   MdBusinessCenter,
@@ -36,6 +37,7 @@ function NavBarAuth({
   showSideBar,
   setShowSideBar,
 }) {
+  const organisation = [1, 2, 4, 5];
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -173,7 +175,14 @@ function NavBarAuth({
       isRead: false,
     },
   ];
-
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
   return (
     <Disclosure style={{ height: "10vh" }} as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -223,43 +232,37 @@ function NavBarAuth({
                     leave="transition ease-in duration-75"
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95">
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
-                            )}>
-                            Your Profile
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
-                            )}>
-                            Settings
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href=""
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
-                            )}>
-                            Sign out
-                          </a>
-                        )}
-                      </Menu.Item>
+                    <Menu.Items
+                      style={{
+                        width:
+                          windowSize.width <= 700
+                            ? "60vw"
+                            : windowSize.width <= 1000
+                            ? "40vw"
+                            : "30vw",
+                      }}
+                      className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      {organisation.map((item, index) => {
+                        let textColor = getRandomColor();
+                        return (
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                style={{ color: textColor }}
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
+                                  "cursor-pointer px-4 py-2 text-sm text-gray-700 flex justify-center items-center"
+                                )}>
+                                <MdBusinessCenter className={`h-5 w-5 mr-2 `} />
+
+                                <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                  walid chwejefjweifu isjdfsdf{" "}
+                                </span>
+                              </div>
+                            )}
+                          </Menu.Item>
+                        );
+                      })}
                     </Menu.Items>
                   </Transition>
                 </Menu>
@@ -437,9 +440,10 @@ function NavBarAuth({
                             href="#"
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
+                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center "
                             )}>
-                            Your Profile
+                            <IoPersonCircle className="h-6 w-6 mr-2" />
+                            <span> Your Profile</span>
                           </a>
                         )}
                       </Menu.Item>
@@ -449,9 +453,10 @@ function NavBarAuth({
                             href="#"
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
+                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
                             )}>
-                            Settings
+                            <IoSettings className="h-6 w-6 mr-2" />
+                            <span> Settings</span>
                           </a>
                         )}
                       </Menu.Item>
@@ -461,9 +466,10 @@ function NavBarAuth({
                             href=""
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
+                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
                             )}>
-                            Sign out
+                            <IoLogOutSharp className="h-6 w-6 mr-2" />
+                            <span>Sign out</span>
                           </a>
                         )}
                       </Menu.Item>

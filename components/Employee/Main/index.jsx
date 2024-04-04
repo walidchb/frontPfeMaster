@@ -3,13 +3,18 @@ import { Fragment, useState, useEffect } from "react";
 import ProjectCard from "../components/ProjectCard";
 import "./style.css";
 import Select from "react-select";
-
+import {
+  IoMdArrowDropdown,
+  IoMdArrowDropright,
+  IoMdAddCircle,
+} from "react-icons/io";
 import {
   MdAlternateEmail,
   MdBusinessCenter,
   MdArrowDropDown,
   MdOutlinePassword,
 } from "react-icons/md";
+import { RiArrowGoBackFill } from "react-icons/ri";
 import TaskListElement from "../components/TaskListElement";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -22,6 +27,7 @@ function classNames(...classes) {
 function MainEmployee() {
   const projects = [1, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7];
   const [settings, setSettings] = useState({});
+  const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
   useEffect(() => {
     function handleResize() {
       // Adjust the number of slides to show based on screen width
@@ -144,7 +150,7 @@ function MainEmployee() {
     { name: "Starred", href: `#`, current: false },
   ]);
   const [curScreen, setCurScreen] = useState(1);
-  // const settings =
+  const [showAddProjectFrom, setShowAddProjectFrom] = useState(false);
   return (
     <div
       style={{ height: "90vh" }}
@@ -160,19 +166,20 @@ function MainEmployee() {
             {/* &nbsp;&nbsp; &#x276F; &nbsp;&nbsp; departement &nbsp;&nbsp;
           &#x276F; &nbsp;&nbsp; project Name{" "} */}
           </h1>
-          <button className="underline text-blue-600 hover:no-underline">
+          <button
+            onClick={() => {
+              setShowAddProjectFrom(false);
+              setSeeAllProjectsModal(true);
+            }}
+            className="underline text-blue-600 hover:no-underline">
             See all projects
           </button>
         </div>
 
         <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
-          {/* <Slider {...settings}> */}
           {projects.map((child, index) => (
             <ProjectCard key={index} />
-
-            // <div key={index}>{child}</div>
           ))}
-          {/* </Slider> */}
         </div>
       </div>
       <div className="px-4 sm:px-10 ">
@@ -223,6 +230,101 @@ function MainEmployee() {
           {navigation.map((item, index) => (
             <TaskListElement key={index} />
           ))}
+        </div>
+      </div>
+
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          backdropFilter: "blur(2px)",
+          backgroundColor: "rgba(255, 255, 255, 0)",
+        }}
+        className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+          seeAllProjectsModal ? "opacity-100 visible" : "opacity-0 invisible"
+        } `}>
+        <div
+          style={{ width: "90vw", height: "90vh" }}
+          className="myShadow relative mx-auto   rounded-lg shadow-md bg-white">
+          <div className="flex justify-between items-center px-5 border-b border-gray-200">
+            {!showAddProjectFrom ? (
+              <div className="flex justify-center items-center">
+                {" "}
+                <h3
+                  style={{ height: "10vh" }}
+                  className="hidden  mr-4 text-xl font-medium text-gray-900 sm:flex items-center">
+                  All Projects (50)
+                </h3>
+                <button
+                  onClick={() => setShowAddProjectFrom(true)}
+                  className=" flex jus items-center my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
+                  type="submit">
+                  <IoMdAddCircle className="w-6 h-6 mr-2" />
+                  <span> Add Project</span>
+                </button>
+              </div>
+            ) : (
+              <RiArrowGoBackFill
+                onClick={() => setShowAddProjectFrom(false)}
+                className="ml-2 cursor-pointer text-blue-600 h-5 w-5 mr-2hover:transform hover:scale-110"
+              />
+            )}
+
+            {showAddProjectFrom ? (
+              <div className="flex justify-center items-center">
+                {" "}
+                <h3
+                  style={{ height: "10vh" }}
+                  className="text-xl sm:text-3xl font-medium text-gray-900 flex items-center">
+                  Add Project{" "}
+                </h3>
+              </div>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setSeeAllProjectsModal(false)}
+              className="text-gray-400 hover:text-gray-500 focus:outline-none">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+          {!showAddProjectFrom ? (
+            <div>
+              <h3 className="sm:hidden pl-4 pt-2  text-xl font-medium text-gray-900 flex items-center">
+                All Projects (50)
+              </h3>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap", // Elements wrap to new line when they overflow
+                  justifyContent: "center", // Centers the items horizontally
+                  gap: "20px", // Spacing between items
+                  height: "77vh",
+                  overflowY: "auto", // Enables vertical scrollbar if needed
+                }}
+                className="p-6 costumScrollBar overflow-y-auto">
+                {projects.map((child, index) => (
+                  <ProjectCard key={index} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center", // Centers the items horizontally
+                height: "78vh",
+                overflowY: "auto", // Enables vertical scrollbar if needed
+              }}
+              className="p-6 costumScrollBar overflow-y-auto">
+              form
+            </div>
+          )}
         </div>
       </div>
     </div>

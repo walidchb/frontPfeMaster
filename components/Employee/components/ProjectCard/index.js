@@ -12,7 +12,7 @@ function ProjectCard() {
   return (
     <div
       onClick={() => router.push(`/${locale}/Employee/Project/Board`)}
-      className=" min-w-56 min-h-44  projectCard rounded-xl px-2 pt-4 pb-1 m-4 flex flex-col cursor-pointer  justify-between ">
+      className=" min-w-56 max-w-56 min-h-44 max-h-44  projectCard rounded-xl px-2 pt-4 pb-1 m-4 flex flex-col cursor-pointer  justify-between ">
       <div className="flex ">
         <img
           className="h-8 mr-2 mt-2 w-auto"
