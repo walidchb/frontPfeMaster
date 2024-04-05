@@ -176,11 +176,17 @@ function MainEmployee() {
           </button>
         </div>
 
-        <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
-          {projects.map((child, index) => (
-            <ProjectCard key={index} />
-          ))}
-        </div>
+        {projects.length > 0 ? (
+          <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
+            {projects.map((child, index) => (
+              <ProjectCard key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-2 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
+            No Project
+          </div>
+        )}
       </div>
       <div className="px-4 sm:px-10 ">
         <div className="hidden sm:flex border-b-2">
@@ -200,7 +206,6 @@ function MainEmployee() {
           ))}
         </div>
         <div className="w-12/12 sm:hidden flex flex-row-reverse">
-          {/* <p className="text-l">Gender :</p> */}
           <div className="w-8/12 border-2 flex justify-start items-center px-2 input rounded-xl h-10 ">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -226,11 +231,17 @@ function MainEmployee() {
           </div>
         </div>
 
-        <div className="">
-          {navigation.map((item, index) => (
-            <TaskListElement key={index} />
-          ))}
-        </div>
+        {navigation.length > 0 ? (
+          <div className="">
+            {navigation.map((item, index) => (
+              <TaskListElement key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className=" w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+            your Task list is emptry
+          </div>
+        )}
       </div>
 
       <div
@@ -266,7 +277,7 @@ function MainEmployee() {
             ) : (
               <RiArrowGoBackFill
                 onClick={() => setShowAddProjectFrom(false)}
-                className="ml-2 cursor-pointer text-blue-600 h-5 w-5 mr-2hover:transform hover:scale-110"
+                className="ml-2 cursor-pointer text-blue-600 h-5 w-5 mr-2 hover:transform hover:scale-110"
               />
             )}
 
@@ -298,20 +309,26 @@ function MainEmployee() {
               <h3 className="sm:hidden pl-4 pt-2  text-xl font-medium text-gray-900 flex items-center">
                 All Projects (50)
               </h3>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap", // Elements wrap to new line when they overflow
-                  justifyContent: "center", // Centers the items horizontally
-                  gap: "20px", // Spacing between items
-                  height: "77vh",
-                  overflowY: "auto", // Enables vertical scrollbar if needed
-                }}
-                className="p-6 costumScrollBar overflow-y-auto">
-                {projects.map((child, index) => (
-                  <ProjectCard key={index} />
-                ))}
-              </div>
+              {projects.length > 0 ? (
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap", // Elements wrap to new line when they overflow
+                    justifyContent: "center", // Centers the items horizontally
+                    gap: "20px", // Spacing between items
+                    height: "77vh",
+                    overflowY: "auto", // Enables vertical scrollbar if needed
+                  }}
+                  className="p-6 costumScrollBar overflow-y-auto">
+                  {projects.map((child, index) => (
+                    <ProjectCard key={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="m-10 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
+                  No Project
+                </div>
+              )}
             </div>
           ) : (
             <div

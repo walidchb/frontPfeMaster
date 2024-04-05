@@ -13,7 +13,7 @@ const Documentation = () => {
   const scrollTo = searchParams.get("To");
   return (
     <div>
-      <NavBar />
+      <NavBar currentScreen={1} />
       <DocumentationComponent scrollTo={scrollTo} />
       <Footer />
     </div>

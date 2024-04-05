@@ -112,13 +112,19 @@ const Notification = () => {
 
       <div
         style={{ height: "90vh" }}
-        className="flex-1 bg-white overflow-auto costumScrollBar shadow-md  px-4">
-        <div className="text-black text-2xl px-4 my-4  font-semibold">
+        className="flex flex-col items-center bg-white  overflow-auto costumScrollBar shadow-md  px-4">
+        <div className=" w-full text-black text-2xl px-4 my-4  font-semibold">
           Notifications :
         </div>
-        {notifications.map((notification, index) => (
-          <NotificationListElement key={index} notification={notification} />
-        ))}
+        {notifications.length > 0 ? (
+          notifications.map((notification, index) => (
+            <NotificationListElement key={index} notification={notification} />
+          ))
+        ) : (
+          <div className="w-full rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center text-gray-500 border-gray-600  border-2 border-dashed">
+            your notifications list is emptry
+          </div>
+        )}
       </div>
     </div>
   );

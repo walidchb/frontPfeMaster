@@ -69,15 +69,21 @@ const Column = ({ title, tasks, onDrop, onDragOver, status }) => {
 
       {/* Afficher les tâches */}
       <div style={{ height: "65vh" }} className="overflow-auto costumScrollBar">
-        {tasks.map((task, index) => (
-          <TaskCard
-            key={task.id}
-            {...task}
-            onDragOver={(e) => {
-              e.preventDefault();
-            }}
-          />
-        ))}
+        {tasks.length > 0 ? (
+          tasks.map((task, index) => (
+            <TaskCard
+              key={task.id}
+              {...task}
+              onDragOver={(e) => {
+                e.preventDefault();
+              }}
+            />
+          ))
+        ) : (
+          <div className="w-full min-h-32 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+            no task
+          </div>
+        )}
       </div>
     </div>
   );

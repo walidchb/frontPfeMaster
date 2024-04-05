@@ -33,6 +33,7 @@ import {
   MdArrowDropDown,
   MdOutlinePassword,
 } from "react-icons/md";
+import { FaShare } from "react-icons/fa";
 import { useTranslations, useLocale } from "next-intl";
 import { IoMdArrowDropdown, IoMdArrowDropright } from "react-icons/io";
 import Loader from "@/components/Loader";
@@ -223,7 +224,22 @@ const TaskPage = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
+  function getColor(letter) {
+    switch (letter.toLowerCase()) {
+      case "a":
+        return "red";
+      case "b":
+        return "blue";
+      case "c":
+        return "green";
+      case "d":
+        return "yellow";
+      case "e":
+        return "purple";
+      default:
+        return "black"; // default color if the input is not one of the specified letters
+    }
+  }
   if (loading) {
     return <Loader />;
   } else {
@@ -463,114 +479,117 @@ const TaskPage = () => {
                     <div
                       style={{ height: "75vh", width: "98vw" }}
                       className=" w-full bg-white p-2 overflow-y-auto costumScrollBar">
-                      <Menu as="div" className=" relative w-min ">
-                        <div>
-                          <Menu.Button
-                            style={{ height: "5vh" }}
-                            className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
-                            <div
-                              href="#"
-                              className={classNames(
-                                "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
-                              )}>
-                              <img
-                                className="w-6 h-6 "
-                                src="/images/list.png"
-                                alt=""
-                                srcset=""
-                              />{" "}
-                              <span className="mx-2"> To Do</span>
-                            </div>
-                            <MdArrowDropDown
-                              color="white"
-                              className="h-6 w-6 "
-                            />
-                          </Menu.Button>
-                        </div>
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-100"
-                          enterFrom="transform opacity-0 scale-95"
-                          enterTo="transform opacity-100 scale-100"
-                          leave="transition ease-in duration-75"
-                          leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95">
-                          <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/list.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  To Do
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/development.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Progress
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/code-review.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Review
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/checkbox.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  Done
-                                </div>
-                              )}
-                            </Menu.Item>
-                          </Menu.Items>
-                        </Transition>
-                      </Menu>
+                      <div className="flex justify-between items-center">
+                        <Menu as="div" className=" relative w-min ">
+                          <div>
+                            <Menu.Button
+                              style={{ height: "5vh" }}
+                              className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
+                              <div
+                                href="#"
+                                className={classNames(
+                                  "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
+                                )}>
+                                <img
+                                  className="w-6 h-6 "
+                                  src="/images/list.png"
+                                  alt=""
+                                  srcset=""
+                                />{" "}
+                                <span className="mx-2"> To Do</span>
+                              </div>
+                              <MdArrowDropDown
+                                color="white"
+                                className="h-6 w-6 "
+                              />
+                            </Menu.Button>
+                          </div>
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95">
+                            <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    href="#"
+                                    className={classNames(
+                                      active ? "bg-blue-300" : "",
+                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                    )}>
+                                    <img
+                                      className="w-6 h-6 mr-2"
+                                      src="/images/list.png"
+                                      alt=""
+                                      srcset=""
+                                    />{" "}
+                                    To Do
+                                  </div>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    href="#"
+                                    className={classNames(
+                                      active ? "bg-blue-300" : "",
+                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                    )}>
+                                    <img
+                                      className="w-6 h-6 mr-2"
+                                      src="/images/development.png"
+                                      alt=""
+                                      srcset=""
+                                    />{" "}
+                                    In Progress
+                                  </div>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    href="#"
+                                    className={classNames(
+                                      active ? "bg-blue-300" : "",
+                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                    )}>
+                                    <img
+                                      className="w-6 h-6 mr-2"
+                                      src="/images/code-review.png"
+                                      alt=""
+                                      srcset=""
+                                    />{" "}
+                                    In Review
+                                  </div>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    href="#"
+                                    className={classNames(
+                                      active ? "bg-blue-300" : "",
+                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                    )}>
+                                    <img
+                                      className="w-6 h-6 mr-2"
+                                      src="/images/checkbox.png"
+                                      alt=""
+                                      srcset=""
+                                    />{" "}
+                                    Done
+                                  </div>
+                                )}
+                              </Menu.Item>
+                            </Menu.Items>
+                          </Transition>
+                        </Menu>
+                        <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
+                      </div>
                       <div
                         onClick={() => setShowDetails(!ShowDetails)}
                         className={`mt-2 ${
@@ -707,7 +726,12 @@ const TaskPage = () => {
                             )}
                           </div>
                           <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Priority </p> <p>value</p>
+                            <p className="w-6/12">Priority </p>{" "}
+                            <p
+                              style={{ backgroundColor: getColor("e") }}
+                              className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
+                              A
+                            </p>
                           </div>
                           <div className="my-2 flex justify-start">
                             <p className="w-6/12">Created </p> <p>value</p>
@@ -951,111 +975,117 @@ const TaskPage = () => {
                   </div>
 
                   <div className=" w-5/12 lg:w-4/12 bg-white p-2 overflow-y-auto costumScrollBar">
-                    <Menu as="div" className=" relative w-min ">
-                      <div>
-                        <Menu.Button
-                          style={{ height: "7vh" }}
-                          className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
-                          <div
-                            href="#"
-                            className={classNames(
-                              "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
-                            )}>
-                            <img
-                              className="w-6 h-6 "
-                              src="/images/list.png"
-                              alt=""
-                              srcset=""
-                            />{" "}
-                            <span className="mx-2"> To Do</span>
-                          </div>
-                          <MdArrowDropDown color="white" className="h-6 w-6 " />
-                        </Menu.Button>
-                      </div>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95">
-                        <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-blue-300" : "",
-                                  " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                )}>
-                                <img
-                                  className="w-6 h-6 mr-2"
-                                  src="/images/list.png"
-                                  alt=""
-                                  srcset=""
-                                />{" "}
-                                To Do
-                              </div>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-blue-300" : "",
-                                  " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                )}>
-                                <img
-                                  className="w-6 h-6 mr-2"
-                                  src="/images/development.png"
-                                  alt=""
-                                  srcset=""
-                                />{" "}
-                                In Progress
-                              </div>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-blue-300" : "",
-                                  " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                )}>
-                                <img
-                                  className="w-6 h-6 mr-2"
-                                  src="/images/code-review.png"
-                                  alt=""
-                                  srcset=""
-                                />{" "}
-                                In Review
-                              </div>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-blue-300" : "",
-                                  " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                )}>
-                                <img
-                                  className="w-6 h-6 mr-2"
-                                  src="/images/checkbox.png"
-                                  alt=""
-                                  srcset=""
-                                />{" "}
-                                Done
-                              </div>
-                            )}
-                          </Menu.Item>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
+                    <div className="flex justify-between items-center">
+                      <Menu as="div" className=" relative w-min ">
+                        <div>
+                          <Menu.Button
+                            style={{ height: "7vh" }}
+                            className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
+                            <div
+                              href="#"
+                              className={classNames(
+                                "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
+                              )}>
+                              <img
+                                className="w-6 h-6 "
+                                src="/images/list.png"
+                                alt=""
+                                srcset=""
+                              />{" "}
+                              <span className="mx-2"> To Do</span>
+                            </div>
+                            <MdArrowDropDown
+                              color="white"
+                              className="h-6 w-6 "
+                            />
+                          </Menu.Button>
+                        </div>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95">
+                          <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  href="#"
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}>
+                                  <img
+                                    className="w-6 h-6 mr-2"
+                                    src="/images/list.png"
+                                    alt=""
+                                    srcset=""
+                                  />{" "}
+                                  To Do
+                                </div>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  href="#"
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}>
+                                  <img
+                                    className="w-6 h-6 mr-2"
+                                    src="/images/development.png"
+                                    alt=""
+                                    srcset=""
+                                  />{" "}
+                                  In Progress
+                                </div>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  href="#"
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}>
+                                  <img
+                                    className="w-6 h-6 mr-2"
+                                    src="/images/code-review.png"
+                                    alt=""
+                                    srcset=""
+                                  />{" "}
+                                  In Review
+                                </div>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  href="#"
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}>
+                                  <img
+                                    className="w-6 h-6 mr-2"
+                                    src="/images/checkbox.png"
+                                    alt=""
+                                    srcset=""
+                                  />{" "}
+                                  Done
+                                </div>
+                              )}
+                            </Menu.Item>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                      <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
+                    </div>
                     <div
                       onClick={() => setShowDetails(!ShowDetails)}
                       className={`mt-2 ${
@@ -1188,8 +1218,13 @@ const TaskPage = () => {
                             </div>
                           )}
                         </div>
-                        <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Priority </p> <p>value</p>
+                        <div className="my-2 flex justify-start items-center">
+                          <p className="w-6/12">Priority </p>{" "}
+                          <p
+                            style={{ backgroundColor: getColor("e") }}
+                            className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
+                            A
+                          </p>
                         </div>
                         <div className="my-2 flex justify-start">
                           <p className="w-6/12">Created </p> <p>value</p>

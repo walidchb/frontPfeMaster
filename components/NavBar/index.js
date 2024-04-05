@@ -21,7 +21,7 @@ function NavBar({ currentScreen }) {
   const locale = useLocale();
   const [navigation, setNavigation] = useState([
     { name: "Home", href: `/${locale}`, current: true },
-    { name: "Team", href: "#", current: false },
+    { name: "Documentaion", href: `/${locale}/Documentation`, current: false },
     { name: "Contact", href: `/${locale}/Contact`, current: false },
     { name: "About", href: `/${locale}/About`, current: false },
   ]);

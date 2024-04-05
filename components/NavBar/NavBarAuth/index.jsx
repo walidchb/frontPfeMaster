@@ -317,9 +317,10 @@ function NavBarAuth({
                         right: -50,
                         width: windowSize.width <= 640 ? "90vw" : "60vw",
                         maxHeight: "80vh",
+                        minHeight: "60vh",
                       }}
-                      className=" costumScrollBar absolute  z-10 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="text-sm flex justify-between items-center p-2">
+                      className="px-2 flex flex-col items-center costumScrollBar absolute  z-10 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="w-full text-sm flex justify-between items-center p-2">
                         <p className="text-black font-semibold text-xl">
                           All notifications ({notifications.length}) :
                         </p>
@@ -329,89 +330,95 @@ function NavBarAuth({
                           View all notifications
                         </a>
                       </div>
-                      {notifications.map((notification, index) => (
-                        <Menu.Item>
-                          {({ active }) => (
-                            <div
-                              key={notification.id}
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
+                      {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                key={notification.id}
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
 
-                                "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
-                              )}>
-                              <div className="flex ">
-                                <div
-                                  style={{
-                                    minWidth:
-                                      windowSize.width <= 450
-                                        ? "20vw"
-                                        : windowSize.width <= 650
-                                        ? "15vw"
-                                        : windowSize.width <= 850
-                                        ? "12vw"
-                                        : "8vw",
-                                  }}
-                                  className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-                                  {notification.type === "message" && (
-                                    <FaRegEnvelope className="" />
-                                  )}
-                                  {notification.type === "event" && (
-                                    <FaCalendarAlt className="" />
-                                  )}
-                                  {notification.type === "reminder" && (
-                                    <FaBell className="" />
-                                  )}
-                                  {notification.type === "project" && (
-                                    <FaClipboardList className="" />
-                                  )}
-                                  {notification.type === "task" && (
-                                    <FaTasks className="" />
-                                  )}
-                                  {notification.type === "team" && (
-                                    <FaUserFriends className="" />
-                                  )}
-                                  {notification.type === "report" && (
-                                    <FaChartBar className="" />
-                                  )}
-                                  {notification.type}
-                                </div>
-                                <div
-                                  style={{
-                                    width:
-                                      windowSize.width <= 550
-                                        ? "50vw"
-                                        : windowSize.width <= 850
-                                        ? "40vw"
-                                        : "50vw",
-                                  }}
-                                  className="">
-                                  <div className="truncate text-sm text-gray-600 mb-2">
-                                    {new Date(
-                                      notification.date
-                                    ).toLocaleString()}
+                                  "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
+                                )}>
+                                <div className="flex ">
+                                  <div
+                                    style={{
+                                      minWidth:
+                                        windowSize.width <= 450
+                                          ? "20vw"
+                                          : windowSize.width <= 650
+                                          ? "15vw"
+                                          : windowSize.width <= 850
+                                          ? "12vw"
+                                          : "8vw",
+                                    }}
+                                    className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                    {notification.type === "message" && (
+                                      <FaRegEnvelope className="" />
+                                    )}
+                                    {notification.type === "event" && (
+                                      <FaCalendarAlt className="" />
+                                    )}
+                                    {notification.type === "reminder" && (
+                                      <FaBell className="" />
+                                    )}
+                                    {notification.type === "project" && (
+                                      <FaClipboardList className="" />
+                                    )}
+                                    {notification.type === "task" && (
+                                      <FaTasks className="" />
+                                    )}
+                                    {notification.type === "team" && (
+                                      <FaUserFriends className="" />
+                                    )}
+                                    {notification.type === "report" && (
+                                      <FaChartBar className="" />
+                                    )}
+                                    {notification.type}
                                   </div>
                                   <div
-                                    className={`truncate    text-sm ${
-                                      notification.isRead
-                                        ? "text-gray-600"
-                                        : "text-gray-800 font-semibold"
-                                    }`}>
-                                    {notification.content}
+                                    style={{
+                                      width:
+                                        windowSize.width <= 550
+                                          ? "50vw"
+                                          : windowSize.width <= 850
+                                          ? "40vw"
+                                          : "50vw",
+                                    }}
+                                    className="">
+                                    <div className="truncate text-sm text-gray-600 mb-2">
+                                      {new Date(
+                                        notification.date
+                                      ).toLocaleString()}
+                                    </div>
+                                    <div
+                                      className={`truncate    text-sm ${
+                                        notification.isRead
+                                          ? "text-gray-600"
+                                          : "text-gray-800 font-semibold"
+                                      }`}>
+                                      {notification.content}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                            // <a
-                            //   href="#"
-                            //   className={classNames(
-                            //     active ? "bg-gray-100" : "",
-                            //     "block px-4 py-2 text-sm text-gray-700"
-                            //   )}>
-                            //   Your Profile
-                            // </a>
-                          )}
-                        </Menu.Item>
-                      ))}
+                              // <a
+                              //   href="#"
+                              //   className={classNames(
+                              //     active ? "bg-gray-100" : "",
+                              //     "block px-4 py-2 text-sm text-gray-700"
+                              //   )}>
+                              //   Your Profile
+                              // </a>
+                            )}
+                          </Menu.Item>
+                        ))
+                      ) : (
+                        <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+                          your notifications list is emptry
+                        </div>
+                      )}
                     </Menu.Items>
                   </Transition>
                 </Menu>

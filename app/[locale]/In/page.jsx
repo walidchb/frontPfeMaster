@@ -15,7 +15,6 @@ function SignIn() {
   const t = useTranslations("Index");
   const locale = useLocale();
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
   const [error, setErrorCred] = useState("");
   const togglePasswordVisibility = () => {
@@ -115,10 +114,21 @@ function SignIn() {
                 </p>
               </div>
               <button
-                className=" w-full my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
+                className={`w-full  my-4 rounded border-b-4  px-4 py-2 font-bold text-white ${
+                  isSubmitting
+                    ? "border-violet-500 bg-violet-400"
+                    : "border-violet-700 bg-violet-500 hover:border-violet-500 hover:bg-violet-400"
+                }  `}
                 type="submit"
                 disabled={isSubmitting}>
-                Login
+                {!isSubmitting ? (
+                  "Login"
+                ) : (
+                  <div className="flex justify-center items-center">
+                    <span className="text-sm">Loading</span>
+                    <div className="h-6 w-6 loader ml-2 "></div>{" "}
+                  </div>
+                )}
               </button>
               <p className=" mb-4 text-red-500"> {error}</p>
             </form>
