@@ -16,6 +16,7 @@ import {
 } from "react-icons/md";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import TaskListElement from "../components/TaskListElement";
+import AddProjectForm from "../Project/AddProjectForm";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -338,8 +339,8 @@ function MainEmployee() {
                 height: "78vh",
                 overflowY: "auto", // Enables vertical scrollbar if needed
               }}
-              className="p-6 costumScrollBar overflow-y-auto">
-              form
+              className="w-full  costumScrollBar py-10 overflow-y-auto">
+              <AddProjectForm />
             </div>
           )}
         </div>

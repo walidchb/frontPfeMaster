@@ -42,7 +42,7 @@ function SignIn() {
           onSubmit={(values, { setSubmitting }) => {
             setTimeout(async () => {
               alert(JSON.stringify(values, null, 2));
-              router.push(`/${locale}/Employee`);
+              router.push(`/${locale}/Employee/BoardEmployee`);
               setSubmitting(false);
             }, 400);
           }}>
