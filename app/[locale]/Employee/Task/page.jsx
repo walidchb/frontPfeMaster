@@ -42,6 +42,8 @@ import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import React from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { pdfjs, Document, Page } from "react-pdf";
+import { GrValidate } from "react-icons/gr";
+
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -86,7 +88,93 @@ const TaskPage = () => {
       thumbnail: "/walid.pdf",
     },
   ];
-
+  const people = [
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    {
+      name: "Leslie Alexander",
+      role: "Co-Founder / CEO",
+      imageUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    },
+    // More people...
+  ];
   const [Details, setDetails] = useState(false);
   const Status = [
     { value: "male", label: "Male" },
@@ -109,7 +197,7 @@ const TaskPage = () => {
   const taskDetails = searchParams.get("taskDetails");
   const [Assigned, setAssigned] = useState(false);
   const [ShowDetails, setShowDetails] = useState(true);
-
+  const [sent, setSent] = useState(true);
   // Décoder les données de la tâche à partir de l'URL
   const task = taskDetails ? JSON.parse(decodeURIComponent(taskDetails)) : null;
 
@@ -191,11 +279,13 @@ const TaskPage = () => {
   const [ShowDescription, setShowDescription] = useState(true);
   const [ShowComments, setShowComments] = useState(true);
   const [MobileScreen, setMobileScreen] = useState(false);
+  const [ShowShareModal, setShowShareModal] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
   });
   const [loading, setLoading] = useState(true);
+  const [showAssigneeModal, setShowAssigneeModal] = useState(false);
   useEffect(() => {
     async function setWindowDim() {
       setWindowSize({
@@ -588,7 +678,10 @@ const TaskPage = () => {
                             </Menu.Items>
                           </Transition>
                         </Menu>
-                        <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
+                        <FaShare
+                          onClick={() => setShowShareModal(true)}
+                          className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
+                        />
                       </div>
                       <div
                         onClick={() => setShowDetails(!ShowDetails)}
@@ -621,110 +714,51 @@ const TaskPage = () => {
                                   <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
                                   <p>Unassigned</p>
                                 </div>
-                                <Menu as="div" className=" relative w-min ">
-                                  <div>
-                                    <Menu.Button
-                                      style={{ height: "5vh" }}
-                                      className="h-full w-full flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
-                                      <div
-                                        href="#"
-                                        className={classNames(
-                                          "whitespace-nowrap  px-4 py-2 text-sm  flex justify-start items-center"
-                                        )}>
-                                        <span className="mx-2 ">
-                                          {" "}
-                                          Assign it{" "}
-                                        </span>
-                                      </div>
-                                    </Menu.Button>
-                                  </div>
-                                  <Transition
-                                    as={Fragment}
-                                    enter="transition ease-out duration-100"
-                                    enterFrom="transform opacity-0 scale-95"
-                                    enterTo="transform opacity-100 scale-100"
-                                    leave="transition ease-in duration-75"
-                                    leaveFrom="transform opacity-100 scale-100"
-                                    leaveTo="transform opacity-0 scale-95">
-                                    <Menu.Items className="absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                      <Menu.Item>
-                                        {({ active }) => (
-                                          <div
-                                            href="#"
-                                            className={classNames(
-                                              active ? "bg-blue-300" : "",
-                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                            )}>
-                                            <img
-                                              className="w-6 h-6 mr-2"
-                                              src="/images/list.png"
-                                              alt=""
-                                              srcset=""
-                                            />{" "}
-                                            To Do
-                                          </div>
-                                        )}
-                                      </Menu.Item>
-                                      <Menu.Item>
-                                        {({ active }) => (
-                                          <div
-                                            href="#"
-                                            className={classNames(
-                                              active ? "bg-blue-300" : "",
-                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                            )}>
-                                            <img
-                                              className="w-6 h-6 mr-2"
-                                              src="/images/development.png"
-                                              alt=""
-                                              srcset=""
-                                            />{" "}
-                                            In Progress
-                                          </div>
-                                        )}
-                                      </Menu.Item>
-                                      <Menu.Item>
-                                        {({ active }) => (
-                                          <div
-                                            href="#"
-                                            className={classNames(
-                                              active ? "bg-blue-300" : "",
-                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                            )}>
-                                            <img
-                                              className="w-6 h-6 mr-2"
-                                              src="/images/code-review.png"
-                                              alt=""
-                                              srcset=""
-                                            />{" "}
-                                            In Review
-                                          </div>
-                                        )}
-                                      </Menu.Item>
-                                      <Menu.Item>
-                                        {({ active }) => (
-                                          <div
-                                            href="#"
-                                            className={classNames(
-                                              active ? "bg-blue-300" : "",
-                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                            )}>
-                                            <img
-                                              className="w-6 h-6 mr-2"
-                                              src="/images/checkbox.png"
-                                              alt=""
-                                              srcset=""
-                                            />{" "}
-                                            Done
-                                          </div>
-                                        )}
-                                      </Menu.Item>
-                                    </Menu.Items>
-                                  </Transition>
-                                </Menu>
+                                {!showAssigneeModal ? (
+                                  <p
+                                    onClick={() => setShowAssigneeModal(true)}
+                                    className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
+                                    Assign it
+                                  </p>
+                                ) : (
+                                  <p
+                                    onClick={() => setShowAssigneeModal(false)}
+                                    className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
+                                    Close
+                                  </p>
+                                )}
                               </div>
                             )}
                           </div>
+                          {showAssigneeModal ? (
+                            <div className="px-2 w-full h-[38vh]  overflow-auto costumScrollBar">
+                              {people.map((person) => (
+                                <li key={person.name}>
+                                  <div
+                                    style={{ width: "95%" }}
+                                    className=" rounded-md pl-2 py-2 cursor-pointer hover:bg-blue-300 flex items-center justify-between mb-2 gap-x-6">
+                                    <div className="flex items-center">
+                                      <img
+                                        className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
+                                        src={person.imageUrl}
+                                        alt=""
+                                      />
+                                      <div className="flex flex-col justify-center">
+                                        <h3 className="text-base font-semibold  tracking-tight text-gray-900">
+                                          {person.name}
+                                        </h3>
+                                        <p
+                                          style={{ width: "80%" }}
+                                          className="text-sm md:font-semibold truncate   text-indigo-600">
+                                          walidchebbab2001@gmail.com
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              ))}
+                            </div>
+                          ) : null}
                           <div className="my-2 flex justify-start">
                             <p className="w-6/12">Priority </p>{" "}
                             <p
@@ -1084,7 +1118,10 @@ const TaskPage = () => {
                           </Menu.Items>
                         </Transition>
                       </Menu>
-                      <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
+                      <FaShare
+                        onClick={() => setShowShareModal(true)}
+                        className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
+                      />
                     </div>
                     <div
                       onClick={() => setShowDetails(!ShowDetails)}
@@ -1097,8 +1134,8 @@ const TaskPage = () => {
                       <MdArrowDropDown className="h-6 w-6 " />
                     </div>
                     {ShowDetails ? (
-                      <div className="p-4 border-2 rounded-b-md w-full ">
-                        <div className="my-2 flex justify-start">
+                      <div className=" p-4 border-2 rounded-b-md w-full relative">
+                        <div className=" relative my-2 flex justify-start">
                           <p className="w-6/12">Assignee</p>
                           {Assigned ? (
                             <div className="flex">
@@ -1112,112 +1149,56 @@ const TaskPage = () => {
                               <p>value</p>
                             </div>
                           ) : (
-                            <div>
-                              <div className="flex">
+                            <div className="">
+                              <div className="flex ">
                                 <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
                                 <p>Unassigned</p>
                               </div>
-                              <Menu as="div" className=" relative w-min ">
-                                <div>
-                                  <Menu.Button
-                                    style={{ height: "5vh" }}
-                                    className="h-full w-full flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
-                                    <div
-                                      href="#"
-                                      className={classNames(
-                                        "whitespace-nowrap  px-4 py-2 text-sm  flex justify-start items-center"
-                                      )}>
-                                      <span className="mx-2 "> Assign it </span>
-                                    </div>
-                                  </Menu.Button>
-                                </div>
-                                <Transition
-                                  as={Fragment}
-                                  enter="transition ease-out duration-100"
-                                  enterFrom="transform opacity-0 scale-95"
-                                  enterTo="transform opacity-100 scale-100"
-                                  leave="transition ease-in duration-75"
-                                  leaveFrom="transform opacity-100 scale-100"
-                                  leaveTo="transform opacity-0 scale-95">
-                                  <Menu.Items className="absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    <Menu.Item>
-                                      {({ active }) => (
-                                        <div
-                                          href="#"
-                                          className={classNames(
-                                            active ? "bg-blue-300" : "",
-                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                          )}>
-                                          <img
-                                            className="w-6 h-6 mr-2"
-                                            src="/images/list.png"
-                                            alt=""
-                                            srcset=""
-                                          />{" "}
-                                          To Do
-                                        </div>
-                                      )}
-                                    </Menu.Item>
-                                    <Menu.Item>
-                                      {({ active }) => (
-                                        <div
-                                          href="#"
-                                          className={classNames(
-                                            active ? "bg-blue-300" : "",
-                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                          )}>
-                                          <img
-                                            className="w-6 h-6 mr-2"
-                                            src="/images/development.png"
-                                            alt=""
-                                            srcset=""
-                                          />{" "}
-                                          In Progress
-                                        </div>
-                                      )}
-                                    </Menu.Item>
-                                    <Menu.Item>
-                                      {({ active }) => (
-                                        <div
-                                          href="#"
-                                          className={classNames(
-                                            active ? "bg-blue-300" : "",
-                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                          )}>
-                                          <img
-                                            className="w-6 h-6 mr-2"
-                                            src="/images/code-review.png"
-                                            alt=""
-                                            srcset=""
-                                          />{" "}
-                                          In Review
-                                        </div>
-                                      )}
-                                    </Menu.Item>
-                                    <Menu.Item>
-                                      {({ active }) => (
-                                        <div
-                                          href="#"
-                                          className={classNames(
-                                            active ? "bg-blue-300" : "",
-                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                          )}>
-                                          <img
-                                            className="w-6 h-6 mr-2"
-                                            src="/images/checkbox.png"
-                                            alt=""
-                                            srcset=""
-                                          />{" "}
-                                          Done
-                                        </div>
-                                      )}
-                                    </Menu.Item>
-                                  </Menu.Items>
-                                </Transition>
-                              </Menu>
+                              {!showAssigneeModal ? (
+                                <p
+                                  onClick={() => setShowAssigneeModal(true)}
+                                  className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
+                                  Assign it
+                                </p>
+                              ) : (
+                                <p
+                                  onClick={() => setShowAssigneeModal(false)}
+                                  className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
+                                  Close
+                                </p>
+                              )}
                             </div>
                           )}
                         </div>
+                        {showAssigneeModal ? (
+                          <div className="px-2 w-full h-[38vh]  overflow-auto costumScrollBar">
+                            {people.map((person) => (
+                              <li key={person.name}>
+                                <div
+                                  style={{ width: "95%" }}
+                                  className=" rounded-md pl-2 py-2 cursor-pointer hover:bg-blue-300 flex items-center justify-between mb-2 gap-x-6">
+                                  <div className="flex items-center">
+                                    <img
+                                      className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
+                                      src={person.imageUrl}
+                                      alt=""
+                                    />
+                                    <div className="flex flex-col justify-center">
+                                      <h3 className="text-base font-semibold  tracking-tight text-gray-900">
+                                        {person.name}
+                                      </h3>
+                                      <p
+                                        style={{ width: "80%" }}
+                                        className="text-sm md:font-semibold truncate   text-indigo-600">
+                                        walidchebbab2001@gmail.com
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </div>
+                        ) : null}
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p
@@ -1265,6 +1246,68 @@ const TaskPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "100vw",
+            height: "100vh",
+            backdropFilter: "blur(2px)",
+            backgroundColor: "rgba(255, 255, 255, 0)",
+          }}
+          className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+            ShowShareModal ? "opacity-100 visible" : "opacity-0 invisible"
+          } `}>
+          <div className="myShadow sm:w-[60vw] w-[90vw] h-[90vh] relative mx-auto   rounded-lg shadow-md bg-white">
+            <div className="h-[10vh] flex justify-between items-center px-5 border-b border-gray-200">
+              <span className="text-black font-semibold text-2xl">
+                Share task
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowShareModal(false)}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="px-2 w-full h-[80vh]  overflow-auto costumScrollBar">
+              {people.map((person) => (
+                <li key={person.name}>
+                  <div className=" rounded-md px-2 py-2 cursor-pointer  flex items-center justify-between mb-2 gap-x-6">
+                    <div className="flex items-center">
+                      <img
+                        className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
+                        src={person.imageUrl}
+                        alt=""
+                      />
+                      <div className="flex flex-col justify-center">
+                        <h3 className="text-base font-semibold  tracking-tight text-gray-900">
+                          {person.name}
+                        </h3>
+                        <p className="text-sm md:font-semibold truncate   text-indigo-600">
+                          walidchebbab2001@gmail.com
+                        </p>
+                      </div>
+                    </div>
+                    {sent ? (
+                      <GrValidate className="text-green-400 h-6 w-6" />
+                    ) : (
+                      <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
+                    )}
+                  </div>
+                </li>
+              ))}
             </div>
           </div>
         </div>
