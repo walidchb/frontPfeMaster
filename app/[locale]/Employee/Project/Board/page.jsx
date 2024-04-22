@@ -9,24 +9,30 @@ import BoardMain from "@/components/Employee/Project/Main/BoardMain/index";
 import KanbanBoard from "@/components/Employee/Project/Main/Kanban";
 import MainEmployee from "@/components/Employee/Main";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
+import SideBarEmployee from "@/components/Employee/SideBarEmployee";
+import MenuProject from "@/components/Employee/Project/MenuProjet";
 
 function Board() {
-  const [showSideBar, setShowSideBar] = useState(true);
+  const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
 
   return (
     <div className=" bg-white text-black ">
       <NavBarAuth
         className="flex-none"
         auth={true}
-        showOrganisation={false}
-        isShowSideBar={true}
-        showSideBar={showSideBar}
-        setShowSideBar={setShowSideBar}
+        showOrganisation={true}
+        isShowSideBarEmployee={true}
+        sideBarEmployeeShow={sideBarEmployeeShow}
+        setSideBarEmployeeShow={setSideBarEmployeeShow}
       />
       <div style={{ height: "90vh" }} className=" flex flex-shrink-0 ">
-        {showSideBar ? <SideBarProject currentPage="Board" /> : null}
-
-        <BoardMain />
+        {sideBarEmployeeShow ? <SideBarEmployee /> : null}
+        <div className="w-full">
+          <MenuProject activePageIndex={0} />
+          <BoardMain />
+        </div>
+        
+        
       </div>
     </div>
   );

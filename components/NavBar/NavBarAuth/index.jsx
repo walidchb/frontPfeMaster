@@ -217,7 +217,7 @@ function NavBarAuth({
               {showOrganisation ? (
                 <Menu
                   as="div"
-                  className=" relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
+                  className="z-20 relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
                   <div>
                     <Menu.Button
                       style={{
@@ -305,7 +305,7 @@ function NavBarAuth({
 
                 {locale == "fr" ? "EN" : "FR"}
               </button>
-              <div className="  flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
+              <div className=" z-20 flex items-center pr-2 sm:static sm:inset-auto sm:ml-2 sm:pr-0">
                 <Menu as="div" className=" relative ml-3">
                   <div>
                     <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
