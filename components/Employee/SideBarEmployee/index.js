@@ -65,8 +65,8 @@ function SideBarEmployee({ currentPage }) {
             />
             Scheduler
           </li>
-          {/* <li
-            onClick={() => router.push(`/${locale}/Employee/Project/Kanban`)}
+           <li
+            onClick={() => router.push(`/${locale}/Employee/KanbanEmployee`)}
             className={`flex justify-center cursor-pointer items-center flex-col
                 py-4  ${
                   currentPage == "Kanban"
@@ -79,7 +79,7 @@ function SideBarEmployee({ currentPage }) {
               className="w-7 h-7"
             />
             Kanban
-          </li> */}
+          </li> 
         </ul>
       </div>
       <li
