@@ -1,9 +1,12 @@
 import { Inter } from "next/font/google";
 import { Providers } from "../../store/provider";
 import { notFound } from "next/navigation";
+import { ClerkProvider } from "@clerk/nextjs";
 import NavBar from "@/components/NavBar";
+import { AuthProvider } from "./context/AuthContext";
 import { NextIntlClientProvider } from "next-intl";
 import "./globals.css";
+
 // import { pdfjs } from "react-pdf";
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -27,7 +30,12 @@ export default async function RootLayout({ children, params: { locale } }) {
     <html lang={locale}>
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers>
+            {" "}
+            {/* <ClerkProvider> */}
+            <AuthProvider>{children}</AuthProvider>
+            {/* </ClerkProvider> */}
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

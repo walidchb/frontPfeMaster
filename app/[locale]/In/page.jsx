@@ -2,16 +2,30 @@
 import Link from "next/link";
 import "./style.css";
 import React, { useEffect, useState } from "react";
+import Loader from "@/components/Loader";
 import { useRouter } from "next/navigation";
+// import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+// import { loginRequest, logout } from "../../../store/sagas/authSaga/index";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { loginRequest } from "../../../store/features/auth/authSlice";
+import { auth } from "../firebase/config";
+import { useAuth } from "../context/AuthContext";
 
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslations, useLocale } from "next-intl";
 import { FaGoogle } from "react-icons/fa";
 import { IoEyeSharp, IoPersonSharp } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa6";
 import { MdOutlinePassword } from "react-icons/md";
 import { Formik } from "formik";
+
 // import { useTranslations } from "next-intl";
 function SignIn() {
+  const { user, loading, login } = useAuth();
+  // const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  // const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const t = useTranslations("Index");
   const locale = useLocale();
   const router = useRouter();
@@ -20,126 +34,166 @@ function SignIn() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  return (
-    <div className="bg-[url('/BG.jpeg')]  flex items-center justify-center  text-black max-w-screen min-h-screen">
-      <div className="loginDiv my-4 w-11/12 flex md:w-8/12 lg:w-5/12 flex-col items-center justify-center bg-white rounded-2xl py-12 md:p-12">
-        {/* <img src="/BG.jpeg" alt="sdfhsf" srcset="" /> */}
-        <img
-          src="https://static.wixstatic.com/media/23fb1b_684b7f2399ae47e4beea5f5987c613f0~mv2.jpg/v1/fill/w_137,h_120,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/logo_tekkolab.jpg"
-          alt=""
-          srcset=""
-        />
-        <h1 className="mb-4 text-xl">Log in to continue</h1>
+  useEffect(() => {
+    if (user) {
+      router.push(`/${locale}/Employee/BoardEmployee`);
+    }
+  }, [user, loading]);
 
-        <Formik
-          className=" md:w-5/6"
-          initialValues={{ email: "", password: "" }}
-          validate={(values) => {
-            const errors = {};
+  if (loading) {
+    return <Loader />;
+  } else if (!user) {
+    return (
+      <div className="bg-[url('/BG.jpeg')]  flex items-center justify-center  text-black max-w-screen min-h-screen">
+        <div className="loginDiv my-4 w-11/12 flex md:w-8/12 lg:w-5/12 flex-col items-center justify-center bg-white rounded-2xl py-12 md:p-12">
+          {/* <img src="/BG.jpeg" alt="sdfhsf" srcset="" /> */}
+          <img
+            src="https://static.wixstatic.com/media/23fb1b_684b7f2399ae47e4beea5f5987c613f0~mv2.jpg/v1/fill/w_137,h_120,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/logo_tekkolab.jpg"
+            alt=""
+            srcSet=""
+          />
+          <h1 className="mb-4 text-xl">Log in to continue</h1>
 
-            return errors;
-          }}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(async () => {
-              alert(JSON.stringify(values, null, 2));
-              router.push(`/${locale}/Employee/BoardEmployee`);
-              setSubmitting(false);
-            }, 400);
-          }}>
-          {({
-            values,
+          <Formik
+            className=" md:w-5/6"
+            initialValues={{ email: "", password: "" }}
+            validate={(values) => {
+              const errors = {};
 
-            errors,
+              return errors;
+            }}
+            onSubmit={(values, { setSubmitting }) => {
+              setTimeout(async () => {
+                await login(values.email, values.password);
+                // dispatch(
+                //   loginRequest({
+                //     email: values.email,
+                //     password: values.password,
+                //   })
+                // );
 
-            touched,
+                // router.push(`/${locale}/Employee/BoardEmployee`);
 
-            handleChange,
+                // try {
+                //   signInWithEmailAndPassword(auth, values.email, values.password)
+                //     .then((userCredential) => {
+                //       console.log("sucess");
+                //       sessionStorage.setItem("user", true);
+                //       localStorage.setItem("user", true);
+                //       // console.log(userCredential);
+                // router.push(`/${locale}/Employee/BoardEmployee`);
+                //     })
+                //     .catch((error) => {
+                //       // ..
+                //       console.error("Error signing in:", { error: error.code });
+                //       //  setErrors({ userExist: error.code });
+                //     });
+                //   // User signed up successfully
+                // } catch (error) {
+                //   console.error("Error:", error);
+                // }
+                setSubmitting(false);
+              }, 400);
+            }}>
+            {({
+              values,
 
-            handleBlur,
+              errors,
 
-            handleSubmit,
+              touched,
 
-            isSubmitting,
+              handleChange,
 
-            /* and other goodies */
-          }) => (
-            <form
-              className=" flex w-5/6  flex-col items-center justify-center "
-              onSubmit={handleSubmit}>
-              <div className="w-full">
-                <p className="text-xl">Email :</p>
-                <div className="flex justify-start items-center px-2 input rounded-xl h-10 ">
-                  <IoPersonSharp className="h-5 w-5" />
+              handleBlur,
 
-                  <input
-                    className="px-4 w-full focus:outline-none"
-                    type="email"
-                    name="email"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.email}
-                  />
-                </div>
-                <p className="mb-4 text-red-500">
-                  {" "}
-                  {errors.email && touched.email && errors.email}
-                </p>
-              </div>
-              <div className="w-full">
-                <p className="text-xl">Password :</p>
-                <div className=" flex justify-start items-center px-2 input rounded-xl h-10 ">
-                  <MdOutlinePassword className="h-5 w-5" />
+              handleSubmit,
 
-                  <input
-                    className="w-full  px-4 focus:outline-none"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.password}
-                  />
-                  <span
-                    className="cursor-pointer"
-                    onClick={togglePasswordVisibility}>
-                    {showPassword ? (
-                      <FaEyeSlash className="w-5 h-5" />
-                    ) : (
-                      <IoEyeSharp className="w-5 h-5" />
-                    )}
-                  </span>
-                </div>
-                <p className=" mb-4 text-red-500">
-                  {" "}
-                  {errors.password && touched.password && errors.password}
-                </p>
-              </div>
-              <button
-                className={`w-full  my-4 rounded border-b-4  px-4 py-2 font-bold text-white ${
-                  isSubmitting
-                    ? "border-violet-500 bg-violet-400"
-                    : "border-violet-700 bg-violet-500 hover:border-violet-500 hover:bg-violet-400"
-                }  `}
-                type="submit"
-                disabled={isSubmitting}>
-                {!isSubmitting ? (
-                  "Login"
-                ) : (
-                  <div className="flex justify-center items-center">
-                    <span className="text-sm">Loading</span>
-                    <div className="h-6 w-6 loader ml-2 "></div>{" "}
+              isSubmitting,
+
+              /* and other goodies */
+            }) => (
+              <form
+                className=" flex w-5/6  flex-col items-center justify-center "
+                onSubmit={handleSubmit}>
+                <div className="w-full">
+                  <p className="text-xl">Email :</p>
+                  <div className="flex justify-start items-center px-2 input rounded-xl h-10 ">
+                    <IoPersonSharp className="h-5 w-5" />
+
+                    <input
+                      className="px-4 w-full focus:outline-none"
+                      type="email"
+                      name="email"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.email}
+                    />
                   </div>
-                )}
-              </button>
-              <p className=" mb-4 text-red-500"> {error}</p>
-            </form>
-          )}
-        </Formik>
-        <h1 className="mb-4 text-xl">or continue with :</h1>
-        <button
-          type="button"
-          class="w-5/6   text-white   bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between dark:focus:ring-[#4285F4]/55 mr-2 mb-2">
-          {/* <svg
-            class="mr-2 -ml-1 w-4 h-4"
+                  <p className="mb-4 text-red-500">
+                    {" "}
+                    {errors.email && touched.email && errors.email}
+                  </p>
+                </div>
+                <div className="w-full">
+                  <p className="text-xl">Password :</p>
+                  <div className=" flex justify-start items-center px-2 input rounded-xl h-10 ">
+                    <MdOutlinePassword className="h-5 w-5" />
+
+                    <input
+                      className="w-full  px-4 focus:outline-none"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.password}
+                    />
+                    <span
+                      className="cursor-pointer"
+                      onClick={togglePasswordVisibility}>
+                      {showPassword ? (
+                        <FaEyeSlash className="w-5 h-5" />
+                      ) : (
+                        <IoEyeSharp className="w-5 h-5" />
+                      )}
+                    </span>
+                  </div>
+                  <p className=" mb-4 text-red-500">
+                    {" "}
+                    {errors.password && touched.password && errors.password}
+                  </p>
+                </div>
+                <button
+                  className={`w-full  my-4 rounded border-b-4  px-4 py-2 font-bold text-white ${
+                    isSubmitting
+                      ? "border-violet-300 bg-violet-200 cursor-no-drop "
+                      : "border-violet-700 bg-violet-500 hover:border-violet-500 hover:bg-violet-400"
+                  }  `}
+                  type="submit"
+                  disabled={isSubmitting}>
+                  {!isSubmitting ? (
+                    "Login"
+                  ) : (
+                    <div className="flex justify-center items-center">
+                      <span
+                        className={`text-sm ${
+                          isSubmitting ? "text-white" : "text-white"
+                        }`}>
+                        Loading
+                      </span>
+                      <div className="h-6 w-6 loaderDots ml-2 "></div>{" "}
+                    </div>
+                  )}
+                </button>
+                <p className=" mb-4 text-red-500"> {error}</p>
+              </form>
+            )}
+          </Formik>
+          <h1 className="mb-4 text-xl">or continue with :</h1>
+          <button
+            type="button"
+            className="w-5/6   text-white   bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between dark:focus:ring-[#4285F4]/55 mr-2 mb-2">
+            {/* <svg
+            className="mr-2 -ml-1 w-4 h-4"
             aria-hidden="true"
             focusable="false"
             data-prefix="fab"
@@ -151,38 +205,39 @@ function SignIn() {
               fill="currentColor"
               d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
           </svg> */}
-          <FaGoogle class="mr-2 -ml-1 w-4 h-4" />
-          Sign up with Google<div></div>
-        </button>
-        <div className=" py-2.5 mb-4 text-l flex justify-center items-center">
-          <Link
-            className="font-medium underline text-blue-400 hover:no-underline"
-            rel="stylesheet"
-            href={`/${locale}/Up`}>
-            Create an account
-          </Link>
+            <FaGoogle className="mr-2 -ml-1 w-4 h-4" />
+            Sign up with Google<div></div>
+          </button>
+          <div className=" py-2.5 mb-4 text-l flex justify-center items-center">
+            <Link
+              className="font-medium underline text-blue-400 hover:no-underline"
+              rel="stylesheet"
+              href={`/${locale}/Up`}>
+              Create an account
+            </Link>
+          </div>
+
+          <div className="border-t-2 border-blue-700 my-4 w-8/12 "></div>
+
+          <p className="w-8/12 text-gray-600 text-center ">
+            This page is protected by the Google{" "}
+            <Link
+              href={"#"}
+              className="text-blue-700 hover:underline cursor-pointer">
+              Privacy Policy
+            </Link>{" "}
+            and &nbsp;
+            <Link
+              href={"#"}
+              className="text-blue-700 hover:underline cursor-pointer">
+              Terms of Service
+            </Link>{" "}
+            apply.
+          </p>
         </div>
-
-        <div className="border-t-2 border-blue-700 my-4 w-8/12 "></div>
-
-        <p className="w-8/12 text-gray-600 text-center ">
-          This page is protected by the Google{" "}
-          <Link
-            href={"#"}
-            className="text-blue-700 hover:underline cursor-pointer">
-            Privacy Policy
-          </Link>{" "}
-          and &nbsp;
-          <Link
-            href={"#"}
-            className="text-blue-700 hover:underline cursor-pointer">
-            Terms of Service
-          </Link>{" "}
-          apply.
-        </p>
       </div>
-    </div>
-  );
+    );
+  }
   5;
 }
 

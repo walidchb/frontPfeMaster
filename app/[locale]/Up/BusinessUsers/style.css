@@ -16,7 +16,7 @@ box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2
     border: 0cap;
 }
 
-.loader {
+.loaderDots {
   width: 20px;
   aspect-ratio: 2;
   --_g: no-repeat radial-gradient(circle closest-side,#ffffff 90%,#0000);

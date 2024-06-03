@@ -4,13 +4,32 @@ import "./style.css";
 
 import { Fragment, useState, useEffect } from "react";
 import SideBarEmployee from "@/components/Employee/SideBarEmployee";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import MainEmployee from "@/components/Employee/Main";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useAuth } from "../../context/AuthContext";
+import { auth } from "@/app/[locale]/firebase/config";
 
 function BoardEmployee() {
   const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
+  // const [user] = useAuthState(auth);
+  const { user, loading } = useAuth();
+  useEffect(() => {
+    const tokenGetter = async () => {
+      const idToken = await user.getIdToken();
+      // console.log("Bearer Token:", idToken);
+    };
+    tokenGetter();
+  }, []);
 
+  // console.log("user from context");
+
+  // console.log(clientUser);
+  // console.log("user loged in ");
+  // console.log(user);
   return (
+    // <ProtectedRoute>
     <div className=" bg-white text-black ">
       <NavBarAuth
         className="flex-none"
@@ -28,7 +47,9 @@ function BoardEmployee() {
         />
       </div>
     </div>
+    // </ProtectedRoute>
   );
 }
+// export default BoardEmployee;
 
-export default BoardEmployee;
+export default ProtectedRoute(BoardEmployee);

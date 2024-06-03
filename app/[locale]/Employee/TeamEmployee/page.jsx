@@ -3,6 +3,8 @@ import React, { useRef } from "react";
 import "./style.css";
 
 import { Fragment, useState, useEffect } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import SideBarEmployee from "@/components/Employee/SideBarEmployee";
 import TeamPage from "@/components/Employee/TeamPage";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";

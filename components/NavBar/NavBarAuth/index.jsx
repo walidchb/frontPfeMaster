@@ -12,6 +12,9 @@ import {
   MdOutlinePassword,
 } from "react-icons/md";
 import "./style.css";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/app/[locale]/firebase/config";
+import { signOut } from "firebase/auth";
 import {
   FaTrash,
   FaBell,
@@ -23,6 +26,7 @@ import {
   FaUserFriends,
   FaChartBar,
 } from "react-icons/fa";
+import { useAuth } from "@/app/[locale]/context/AuthContext";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
@@ -56,6 +60,13 @@ function NavBarAuth({
   ]);
   const [curScreen, setCurScreen] = useState(currentScreen);
 
+  // if (typeof window !== "undefined") {
+  //   // const userSession
+  //   // Code that interacts with sessionStorage
+  //   // For example:
+  //   const userSession = sessionStorage.getItem("user");
+  // }
+  // sessionStorage.getItem("user");
   const t = useTranslations("Index");
   const router = useRouter();
   const pathname = usePathname();
@@ -68,6 +79,8 @@ function NavBarAuth({
     }
     router.replace(`/${loc + pathname}`);
   };
+  const { logout } = useAuth();
+
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
@@ -186,6 +199,14 @@ function NavBarAuth({
     }
     return color;
   };
+
+  // if (!user) {
+  //   router.push("/");
+  // }
+
+  // console.log("user");
+
+  // console.log(user);
   return (
     <Disclosure style={{ height: "10vh" }} as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -259,7 +280,7 @@ function NavBarAuth({
                       {organisation.map((item, index) => {
                         let textColor = getRandomColor();
                         return (
-                          <Menu.Item>
+                          <Menu.Item key={index}>
                             {({ active }) => (
                               <div
                                 style={{ color: textColor }}
@@ -346,10 +367,9 @@ function NavBarAuth({
                       </div>
                       {notifications.length > 0 ? (
                         notifications.map((notification, index) => (
-                          <Menu.Item>
+                          <Menu.Item key={index}>
                             {({ active }) => (
                               <div
-                                key={notification.id}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
 
@@ -483,15 +503,21 @@ function NavBarAuth({
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href=""
+                          <p
+                            onClick={async () => {
+                              await logout();
+                              // await signOut(auth);
+
+                              // router.push("/");
+                            }}
+                            // href=""
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center cursor-pointer"
                             )}>
                             <IoLogOutSharp className="h-6 w-6 mr-2" />
                             <span>Sign out</span>
-                          </a>
+                          </p>
                         )}
                       </Menu.Item>
                     </Menu.Items>

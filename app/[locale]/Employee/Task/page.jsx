@@ -20,6 +20,8 @@ import {
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
 import "./style.css";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import "react-image-gallery/styles/css/image-gallery.css";
@@ -1316,4 +1318,4 @@ const TaskPage = () => {
   }
 };
 
-export default TaskPage;
+export default ProtectedRoute(TaskPage);

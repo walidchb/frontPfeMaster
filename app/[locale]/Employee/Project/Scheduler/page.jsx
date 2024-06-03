@@ -5,10 +5,14 @@ import "./style.css";
 import { Fragment, useState, useEffect } from "react";
 import MainProject from "@/components/Employee/Project/Main";
 import SideBarProject from "@/components/Employee/Project/SideBar";
+import SideBarEmployee from "@/components/Employee/SideBarEmployee";
 import CalendrierView from "@/components/Calendrier";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import KanbanBoard from "@/components/Employee/Project/Main/Kanban";
 import MainEmployee from "@/components/Employee/Main";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
+import MenuProject from "@/components/Employee/Project/MenuProject";
 
 function Scheduler() {
   const [showSideBar, setShowSideBar] = useState(true);
@@ -24,13 +28,17 @@ function Scheduler() {
         setShowSideBar={setShowSideBar}
       />
       <div style={{ height: "90vh" }} className=" flex flex-shrink-0 ">
-        {showSideBar ? <SideBarProject currentPage="Scheduler" /> : null}
+        {showSideBar ? <SideBarEmployee currentPage="Project" /> : null}
         {/* <MainProject showSideBar={showSideBar} /> */}
-
-        <CalendrierView />
+        <div
+          style={{ height: "90vh" }}
+          className="w-full overflow-auto costumScrollBar">
+          <MenuProject activePageIndex={2} />
+          <CalendrierView />
+        </div>
       </div>
     </div>
   );
 }
 
-export default Scheduler;
+export default ProtectedRoute(Scheduler);

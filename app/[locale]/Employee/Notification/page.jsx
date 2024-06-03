@@ -12,6 +12,8 @@ import {
   FaChartBar,
 } from "react-icons/fa";
 import "./style.css";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import NotificationListElement from "@/components/NotificationListElement";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import React, { useState } from "react";
@@ -130,4 +132,4 @@ const Notification = () => {
   );
 };
 
-export default Notification;
+export default ProtectedRoute(Notification);

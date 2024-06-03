@@ -11,6 +11,8 @@ import {
   FaBars,
   FaEdit,
 } from "react-icons/fa";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import { MdSettings } from "react-icons/md";
 import { Formik } from "formik";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
@@ -315,4 +317,4 @@ const ProfileSettings = () => {
   );
 };
 
-export default ProfileSettings;
+export default ProtectedRoute(ProfileSettings);

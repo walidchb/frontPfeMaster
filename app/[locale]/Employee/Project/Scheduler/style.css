@@ -3,3 +3,10 @@
   width: auto;
   background-color: red;
 }
+
+.costumScrollBar {
+    scrollbar-color: #6969dd #e0e0e0;
+  scrollbar-width: thin;
+  
+    
+}

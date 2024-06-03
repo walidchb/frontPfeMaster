@@ -3,6 +3,8 @@ import Link from "next/link";
 import "./style.css";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
+import axios from "axios";
+
 import { FaGoogle } from "react-icons/fa";
 import { FaLocationArrow, FaCity } from "react-icons/fa";
 import { IoEyeSharp, IoPersonSharp } from "react-icons/io5";
@@ -933,7 +935,7 @@ function BusinessUsers() {
     // console.log(value);
   }
   const [selectedCountry, setSelectedCountry] = useState(false);
-  const [error, setErrorCred] = useState("");
+  const [error, setErrorCred] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleChangeCountry = (selectedOption) => {
@@ -990,10 +992,62 @@ function BusinessUsers() {
     },
     validationSchema: validationSchema,
     onSubmit: (values, actions) => {
-      alert(JSON.stringify(values, null, 2));
-      actions.resetForm();
-      setValue("");
-      setSelectedCountry(null);
+      console.log(JSON.stringify(values, null, 2));
+
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      //  // Function to send the POST request
+      const sendUserData = async (values) => {
+        try {
+          const response = await axiosInstance.post("/user/users", {
+            businessName: values.businessName,
+            country: values.country,
+            province: values.state,
+            street: values.city,
+            nom: values.firstName,
+            prenom: values.lastName,
+            email: values.email,
+            role: "orgBoss",
+            phoneNumber: values.phoneNumber,
+            gender: values.gender,
+            password: values.password,
+          });
+          console.log(response.data);
+          signUPFireBase(values);
+        } catch (error) {
+          console.error("Error from backend:");
+          console.log(error);
+          // setErrorCred({ userExist: error.response.data.error });
+        }
+      };
+      const signUPFireBase = (values) => {
+        try {
+          createUserWithEmailAndPassword(auth, values.email, values.password)
+            .then((res) => {
+              console.log("sucess");
+              localStorage.setItem("user", true);
+
+              console.log(res);
+              router.push(`/${locale}/Employee/BoardEmployee`);
+            })
+            .catch((error) => {
+              handleDelete(values.email);
+              console.error("Error signing up firebase:", error.code);
+              console.log(error);
+              // setErrorCred({ userExist: error.code });
+            });
+          // User signed up successfully
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+      sendUserData(values);
+      // setSubmitting(false);
     },
   });
   return (
@@ -1301,7 +1355,7 @@ function BusinessUsers() {
             <button
               className={`w-full  my-4 rounded border-b-4  px-4 py-2 font-bold text-white ${
                 formik.isSubmitting
-                  ? "border-violet-500 bg-violet-400"
+                  ? "border-violet-300 bg-violet-200 cursor-no-drop"
                   : "border-violet-700 bg-violet-500 hover:border-violet-500 hover:bg-violet-400"
               }  `}
               type="submit"
@@ -1310,12 +1364,15 @@ function BusinessUsers() {
                 "Sign Up"
               ) : (
                 <div className="flex justify-center items-center">
-                  <span className="text-sm">Loading</span>
-                  <div className="h-6 w-6 loader ml-2 "></div>{" "}
+                  <span className="text-sm text-white">Loading</span>
+                  <div className="h-6 w-6 loaderDots ml-2 "></div>{" "}
                 </div>
               )}
             </button>
-            <p className=" mb-4 text-red-500"> {error}</p>
+            <p className=" mb-4 text-red-500">
+              {" "}
+              {error?.userExist ? error?.userExist : null}
+            </p>
           </form>
         </div>
         <h1 className="mb-4 text-l">or continue with :</h1>

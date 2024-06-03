@@ -8,6 +8,8 @@ import { FaLocationArrow, FaCity } from "react-icons/fa";
 import { IoEyeSharp, IoPersonSharp } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa6";
 import * as Yup from "yup";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import axios from "axios";
 import Select from "react-select";
 import {
   MdAlternateEmail,
@@ -19,8 +21,40 @@ import { useTranslations, useLocale } from "next-intl";
 import AccountTypeCard from "@/components/AccountTypeCard";
 import { Formik } from "formik";
 import { useFormik } from "formik";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase/config";
+import { useRouter } from "next/navigation";
+
+const deleteUser = async (email) => {
+  try {
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await axiosInstance.delete(`/user/users?email=${email}`, {
+      // Optional headers (e.g., authentication tokens)
+    });
+
+    if (response.status === 200) {
+      console.log("User deleted successfully");
+      // Handle successful deletion (e.g., update UI, redirect)
+    } else {
+      console.error("Error deleting user:", response.data.message);
+      // Handle errors appropriately (e.g., display error message)
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    // Handle unexpected errors
+  }
+};
 
 function Individuals() {
+  const router = useRouter();
+
+  // const [createUserWithEmailAndPassword] =
+  //   useCreateUserWithEmailAndPassword(auth);
   const handleChangeGender = (selectedOption) => {
     //  setSelectedCountry(selectedOption);
     formik.setFieldValue("gender", JSON.stringify(selectedOption));
@@ -33,6 +67,7 @@ function Individuals() {
   const [view, setView] = useState(1);
   const t = useTranslations("Index");
   const locale = useLocale();
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [value, setValue] = useState();
@@ -43,7 +78,7 @@ function Individuals() {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const [error, setErrorCred] = useState("");
+  const [error, setErrorCred] = useState();
   const validationSchema = Yup.object().shape({
     firstName: Yup.string()
       .min(2, "Too Short!")
@@ -66,6 +101,13 @@ function Individuals() {
       .oneOf([Yup.ref("password"), null], "Passwords must match")
       .required("Required"),
   });
+
+  const handleDelete = async (email) => {
+    console.log("email li raho yosel lahna");
+    console.log(email);
+    await deleteUser(email);
+  };
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -77,15 +119,63 @@ function Individuals() {
       confirmPassword: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values, actions) => {
-      alert(JSON.stringify(values, null, 2));
-      actions.resetForm();
-      setValue("");
-      setSelectedCountry(null);
+    onSubmit: async (values, actions) => {
+      // alert(JSON.stringify(values, null, 2));
+      // console.log(JSON.stringify(values, null, 2));
+      // Create an instance of Axios with default headers
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Function to send the POST request
+      const sendUserData = async (values) => {
+        try {
+          const response = await axiosInstance.post("/user/users", {
+            nom: values.firstName,
+            prenom: values.lastName,
+            email: values.email,
+            role: "employee",
+            phoneNumber: values.phoneNumber,
+            gender: values.gender,
+            password: values.password,
+          });
+          console.log(response.data);
+          signUPFireBase(values);
+        } catch (error) {
+          console.error("Error:", error.response.data.error);
+          setErrorCred({ userExist: error.response.data.error });
+        }
+      };
+      const signUPFireBase = (values) => {
+        try {
+          createUserWithEmailAndPassword(auth, values.email, values.password)
+            .then((res) => {
+              console.log("sucess");
+              localStorage.setItem("user", true);
+
+              console.log(res);
+              router.push(`/${locale}/Employee/BoardEmployee`);
+            })
+            .catch((error) => {
+              handleDelete(values.email);
+              console.error("Error signing up:", error.code);
+              console.log(error.message);
+              setErrorCred({ userExist: error.code });
+            });
+          // User signed up successfully
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+      sendUserData(values);
     },
   });
   function handleChangePhoneNumber(value) {
     // setValue(e);
+    console.log(value);
     formik.setFieldValue("phoneNumber", value);
     // console.log(value);
   }
@@ -150,13 +240,11 @@ function Individuals() {
             </div>
             <div className=" hidden px-4 sm:flex justify-center items-center w-full mb-2">
               <p className=" text-red-500 w-2/4">
-                {" "}
                 {formik.errors.firstName &&
                   formik.touched.firstName &&
                   formik.errors.firstName}
               </p>
               <p className=" text-red-500 w-2/4">
-                {" "}
                 {formik.errors.lastName &&
                   formik.touched.lastName &&
                   formik.errors.lastName}
@@ -186,6 +274,7 @@ function Individuals() {
             <div className="w-full">
               <p className="text-l">Phone Number :</p>
               <PhoneInput
+                defaultCountry="DZ"
                 className="w-full h-10 focus:outline-none input rounded-xl px-4"
                 placeholder="Enter phone number"
                 value={value}
@@ -292,7 +381,7 @@ function Individuals() {
             <button
               className={`w-full  my-4 rounded border-b-4  px-4 py-2 font-bold text-white ${
                 formik.isSubmitting
-                  ? "border-violet-500 bg-violet-400"
+                  ? "border-violet-300 bg-violet-200 cursor-no-drop"
                   : "border-violet-700 bg-violet-500 hover:border-violet-500 hover:bg-violet-400"
               }  `}
               type="submit"
@@ -301,12 +390,15 @@ function Individuals() {
                 "Sign Up"
               ) : (
                 <div className="flex justify-center items-center">
-                  <span className="text-sm">Loading</span>
-                  <div className="h-6 w-6 loader ml-2 "></div>{" "}
+                  <span className="text-sm text-white">Loading</span>
+                  <div className="h-6 w-6 loaderDots ml-2 "></div>{" "}
                 </div>
               )}
             </button>
-            <p className=" mb-4 text-red-500"> {error}</p>
+            <p className=" mb-4 text-red-500">
+              {" "}
+              {error?.userExist ? error?.userExist : null}
+            </p>
           </form>
         </div>
 

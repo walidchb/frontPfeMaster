@@ -3,6 +3,8 @@ import React, { useRef } from "react";
 import "./style.css";
 
 import { Fragment, useState, useEffect } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import MainProject from "@/components/Employee/Project/Main";
 import SideBarEmployee from "@/components/Employee/SideBarEmployee";
 import CalendrierView from "@/components/Calendrier";
@@ -35,4 +37,4 @@ function SchedulerEmployee() {
   );
 }
 
-export default SchedulerEmployee;
+export default ProtectedRoute(SchedulerEmployee);

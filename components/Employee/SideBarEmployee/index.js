@@ -65,6 +65,21 @@ function SideBarEmployee({ currentPage }) {
             />
             Scheduler
           </li>
+          <li
+            // onClick={() => router.push(`/${locale}/Employee/BoardEmployee`)}
+            className={`flex justify-center cursor-pointer items-center flex-col
+                py-4  ${
+                  currentPage == "Project"
+                    ? "border-purple-500 text-purple-500 font-bold border-l-4"
+                    : "text-gray-500"
+                }  `}>
+            <img
+              src="/images/project_management.png"
+              alt="Project"
+              className="w-8 h-8"
+            />
+            Project
+          </li>
           {/* <li
             onClick={() => router.push(`/${locale}/Employee/Project/Kanban`)}
             className={`flex justify-center cursor-pointer items-center flex-col
