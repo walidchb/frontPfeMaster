@@ -4,10 +4,33 @@ import { FaMapMarkedAlt, FaEnvelope, FaPhone, FaClock } from "react-icons/fa";
 import "./style.css";
 import NavBar from "@/components/NavBar";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import Footer from "@/components/Footer";
+import axios from "axios";
 
 function Contact() {
+  const handleSubmit = async (values, actions) => {
+    try {
+      const { name, email, message } = values;
+      const subject = `Message de votre application`;
+
+      const response = await axios.post("http://localhost:1937/send-email", {
+        name,
+        email,
+        subject,
+        message,
+      });
+
+      console.log(response.data);
+      alert("Votre message a été envoyé avec succès !");
+      actions.resetForm();
+    } catch (error) {
+      console.error(error);
+      alert("Une erreur s'est produite lors de l'envoi du message.");
+    }
+    actions.setSubmitting(false);
+  };
+
   return (
     <div>
       <NavBar currentScreen={2} />
@@ -50,38 +73,33 @@ function Contact() {
                   .max(500, "Too Long!")
                   .required("Required"),
               })}
-              onSubmit={(values, actions) => {
-                console.log(values);
-                alert("Form submitted!");
-                actions.setSubmitting(false);
-              }}>
+              onSubmit={handleSubmit}
+            >
               {({ errors, touched, isSubmitting }) => (
                 <Form>
-                  <Field
-                    name="name"
-                    type="text"
-                    className="text-box"
-                    placeholder="Your Name"
-                    required
-                  />
-                  {errors.name && touched.name ? (
-                    <div className="input-feedback text-red-600">
-                      {errors.name}
+                  <div className="input-row">
+                    <div className="field-container">
+                      <Field
+                        name="name"
+                        type="text"
+                        className="text-box"
+                        placeholder="Your Name"
+                        required
+                      />
+                      <ErrorMessage name="name" component="div" className="input-feedback" />
                     </div>
-                  ) : null}
 
-                  <Field
-                    name="email"
-                    type="email"
-                    className="text-box"
-                    placeholder="Your Email"
-                    required
-                  />
-                  {
-                    //     errors.email && touched.email ? (
-                    //     <div className="input-feedback">{errors.email}</div>
-                    //   ) : null
-                  }
+                    <div className="field-container">
+                      <Field
+                        name="email"
+                        type="email"
+                        className="text-box"
+                        placeholder="Your Email"
+                        required
+                      />
+                      <ErrorMessage name="email" component="div" className="input-feedback" />
+                    </div>
+                  </div>
 
                   <Field
                     name="message"
@@ -90,16 +108,13 @@ function Contact() {
                     placeholder="Your Message"
                     required
                   />
-                  {
-                    //     errors.message && touched.message ? (
-                    //     <div className="input-feedback">{errors.message}</div>
-                    //   ) : null
-                  }
+                  <ErrorMessage name="message" component="div" className="input-feedback" />
 
                   <button
                     type="submit"
                     className="send-btn"
-                    disabled={isSubmitting}>
+                    disabled={isSubmitting}
+                  >
                     Send
                   </button>
                 </Form>
