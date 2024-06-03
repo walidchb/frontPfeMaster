@@ -15,13 +15,13 @@ function BoardEmployee() {
   const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
   // const [user] = useAuthState(auth);
   const { user, loading } = useAuth();
-  useEffect(() => {
-    const tokenGetter = async () => {
-      const idToken = await user.getIdToken();
-      // console.log("Bearer Token:", idToken);
-    };
-    tokenGetter();
-  }, []);
+  // useEffect(() => {
+  //   const tokenGetter = async () => {
+  //     const idToken = await user.getIdToken();
+  //     // console.log("Bearer Token:", idToken);
+  //   };
+  //   tokenGetter();
+  // }, []);
 
   // console.log("user from context");
 

@@ -10,6 +10,11 @@ const authSlice = createSlice({
     error: null,
   },
   reducers: {
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     loginRequest: (state, action) => {
       state.loading = true;
       state.error = null;

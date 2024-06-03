@@ -108,19 +108,19 @@ function TeamPage() {
           </button>
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center">
-          <div class="bg-gray-800 w-fit h-fit lg:mr-6 mb-4  rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10 ">
+          <div className="bg-gray-800 w-fit h-fit lg:mr-6 mb-4  rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10 ">
             <img
               className="h-24 w-24 rounded-full"
               src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
               alt=""
             />
-            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">
+            <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
               Bonnie Green
             </h5>
-            <span class="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               Team Leader
             </span>
-            <div class="text-white">Walidchebbab2001@gmail.com</div>
+            <div className="text-white">Walidchebbab2001@gmail.com</div>
           </div>
 
           <ul

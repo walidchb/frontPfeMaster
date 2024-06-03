@@ -405,8 +405,8 @@ function Individuals() {
         <h1 className="mb-4 text-l">or continue with :</h1>
         <button
           type="button"
-          class="w-5/6   text-white   bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between dark:focus:ring-[#4285F4]/55 mr-2 mb-2">
-          <FaGoogle class="mr-2 -ml-1 w-4 h-4" />
+          className="w-5/6   text-white   bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between dark:focus:ring-[#4285F4]/55 mr-2 mb-2">
+          <FaGoogle className="mr-2 -ml-1 w-4 h-4" />
           Sign up with Google<div></div>
         </button>
         <p className="w-8/12 text-gray-600 text-center ">
