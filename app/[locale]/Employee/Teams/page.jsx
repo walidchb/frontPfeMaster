@@ -5,14 +5,11 @@ import "./style.css";
 import { Fragment, useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-import MainProject from "@/components/Employee/Project/Main";
 import SideBarEmployee from "@/components/Employee/SideBarEmployee";
-import CalendrierView from "@/components/Calendrier";
-import KanbanBoard from "@/components/Employee/Project/Main/Kanban";
-import MainEmployee from "@/components/Employee/Main";
+import Teams from "@/components/Employee/Teams";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 
-function SchedulerEmployee() {
+function TeamsEmployee() {
   const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
 
   return (
@@ -20,21 +17,20 @@ function SchedulerEmployee() {
       <NavBarAuth
         className="flex-none"
         auth={true}
-        showOrganisation={false}
+        showOrganisation={true}
         isShowSideBarEmployee={true}
         sideBarEmployeeShow={sideBarEmployeeShow}
         setSideBarEmployeeShow={setSideBarEmployeeShow}
       />
       <div style={{ height: "90vh" }} className=" flex flex-shrink-0 ">
         {sideBarEmployeeShow ? (
-          <SideBarEmployee currentPage="Scheduler" fromEmployee={true} />
+          <SideBarEmployee currentPage="Team" fromEmployee={true} />
         ) : null}
-        {/* <MainProject sideBarEmployeeShow={sideBarEmployeeShow} /> */}
 
-        <CalendrierView />
+        <Teams />
       </div>
     </div>
   );
 }
 
-export default ProtectedRoute(SchedulerEmployee);
+export default TeamsEmployee;

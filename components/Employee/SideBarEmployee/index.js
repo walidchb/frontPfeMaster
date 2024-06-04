@@ -18,9 +18,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function SideBarEmployee({ currentPage }) {
+function SideBarEmployee({ fromEmployee, currentPage }) {
   const locale = useLocale();
   const router = useRouter();
+  const [userType, setuserType] = useState(2);
 
   return (
     <div
@@ -65,21 +66,23 @@ function SideBarEmployee({ currentPage }) {
             />
             Scheduler
           </li>
-          <li
-            // onClick={() => router.push(`/${locale}/Employee/BoardEmployee`)}
-            className={`flex justify-center cursor-pointer items-center flex-col
+          {!fromEmployee ? (
+            <li
+              // onClick={() => router.push(`/${locale}/Employee/BoardEmployee`)}
+              className={`flex justify-center cursor-pointer items-center flex-col
                 py-4  ${
                   currentPage == "Project"
                     ? "border-purple-500 text-purple-500 font-bold border-l-4"
                     : "text-gray-500"
                 }  `}>
-            <img
-              src="/images/project_management.png"
-              alt="Project"
-              className="w-8 h-8"
-            />
-            Project
-          </li>
+              <img
+                src="/images/project_management.png"
+                alt="Project"
+                className="w-8 h-8"
+              />
+              Project
+            </li>
+          ) : null}
           {/* <li
             onClick={() => router.push(`/${locale}/Employee/Project/Kanban`)}
             className={`flex justify-center cursor-pointer items-center flex-col
@@ -97,17 +100,31 @@ function SideBarEmployee({ currentPage }) {
           </li> */}
         </ul>
       </div>
-      <li
-        onClick={() => router.push(`/${locale}/Employee/TeamEmployee`)}
-        className={`flex justify-center cursor-pointer items-center flex-col
+      {userType == 1 ? (
+        <li
+          onClick={() => router.push(`/${locale}/Employee/TeamEmployee`)}
+          className={`flex justify-center cursor-pointer items-center flex-col
                 py-4  ${
                   currentPage == "Team"
                     ? "border-purple-500 text-purple-500 font-bold border-l-4"
                     : "text-gray-500"
                 }  `}>
-        <img src="/images/partners.png" alt="gear" className="w-7 h-7" />
-        My Team
-      </li>
+          <img src="/images/partners.png" alt="gear" className="w-7 h-7" />
+          My Team
+        </li>
+      ) : (
+        <li
+          onClick={() => router.push(`/${locale}/Employee/Teams`)}
+          className={`flex justify-center cursor-pointer items-center flex-col
+                py-4  ${
+                  currentPage == "Team"
+                    ? "border-purple-500 text-purple-500 font-bold border-l-4"
+                    : "text-gray-500"
+                }  `}>
+          <img src="/images/partners.png" alt="gear" className="w-7 h-7" />
+          Teams
+        </li>
+      )}
     </div>
   );
 }

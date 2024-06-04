@@ -40,7 +40,9 @@ function BoardEmployee() {
         setSideBarEmployeeShow={setSideBarEmployeeShow}
       />
       <div style={{ height: "90vh" }} className=" flex flex-shrink-0 ">
-        {sideBarEmployeeShow ? <SideBarEmployee currentPage="Board" /> : null}
+        {sideBarEmployeeShow ? (
+          <SideBarEmployee currentPage="Board" fromEmployee={true} />
+        ) : null}
         <MainEmployee
           fromEmployee={true}
           sideBarEmployeeShow={sideBarEmployeeShow}
