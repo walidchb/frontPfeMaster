@@ -1,0 +1,134 @@
+.react-gantt {
+    --react-gantt-color-primary: #1b9e77;
+    --react-gantt-color-secondary: #dfdde0;
+    --react-gantt-color-text-primary: #1b9e77;
+    --react-gantt-color-text-secondary: #868686;
+    --react-gantt-color-border: #e0e0e0;
+    --react-gantt-color-horizontal-line: #e0e0e0;
+  }
+  
+  .react-gantt .gantt-header {
+    display: flex;
+    height: 40px;
+    padding: 0 10px;
+    font-weight: bold;
+    align-items: center;
+    background: #dfdde0;
+  }
+  
+  .react-gantt .gantt-header .header-text {
+    flex-grow: 1;
+  }
+  
+  .react-gantt .gantt-body {
+    position: relative;
+    overflow: auto;
+    font-size: 12px;
+  }
+  
+  .react-gantt .gantt-body .grid-body {
+    display: flex;
+    position: relative;
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-row {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    border-bottom: 1px solid var(--react-gantt-color-border);
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-row:last-child {
+    border-bottom: none;
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-row > div {
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-column {
+    display: flex;
+    border-right: 1px solid var(--react-gantt-color-border);
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-column > div {
+    flex: 1;
+    padding: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .react-gantt .gantt-body .grid-body .grid-column:last-child {
+    border-right: none;
+  }
+  
+  .react-gantt .gantt-body .grid-body .task {
+    color: var(--react-gantt-color-text-primary);
+    background: var(--react-gantt-color-primary);
+    border-radius: 2px;
+    margin-right: 3px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    height: 23px;
+  }
+  
+  .react-gantt .gantt-body .grid-body .task .task-content {
+    margin-left: 5px;
+    font-weight: 700;
+  }
+  
+  .react-gantt
+    .gantt-body
+    .grid-body
+    .task.progress
+    .task-content:after {
+    content: "";
+    display: inline-block;
+    border: 5px solid #1b9e77;
+    border-color: var(--react-gantt-color-primary) transparent transparent
+      transparent;
+    border-radius: 2px;
+    margin-left: 5px;
+  }
+  
+  .react-gantt .gantt-body .grid-body .dependency .line {
+    position: absolute;
+    border: 1px solid #08806b;
+    width: 1px;
+    background-color: var(--react-gantt-color-border);
+  }
+  
+  .react-gantt .gantt-body .grid-body .dependency .bottom,
+  .react-gantt .gantt-body .grid-body .dependency .top {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    background-color: var(--react-gantt-color-primary);
+    border-radius: 50%;
+    border: 1px solid var(--react-gantt-color-border);
+  }
+  
+  .react-gantt .gantt-body .grid-body .dependency .arrow {
+    transform: rotate(-45deg);
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--react-gantt-color-border);
+    background-color: var(--react-gantt-color-secondary);
+    position: absolute;
+  }
+  
+  .react-gantt .gantt-body .grid-column-after {
+    border-left: 1px solid var(--react-gantt-color-border);
+    position: absolute;
+    width: 15px;
+    top: 0;
+    bottom: 0;
+    background-color: var(--react-gantt-color-secondary);
+  }
