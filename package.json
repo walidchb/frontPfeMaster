@@ -19,7 +19,7 @@
     "@heroicons/react": "^2.1.1",
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.14",
-    "@mui/x-date-pickers": "^7.1.0",
+    "@mui/x-date-pickers": "^5.0.15",
     "@react-pdf/renderer": "^3.4.1",
     "@reduxjs/toolkit": "^2.2.1",
     "axios": "^1.7.1",
