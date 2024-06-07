@@ -9,6 +9,7 @@ import TaskListElement from "@/components/Employee/components/TaskListElement";
 import "./style.css";
 import { Formik } from "formik";
 import { IoSearchCircle } from "react-icons/io5";
+import UpdateTaskForm from "../../UpdateTaskForm";
 function BoardMain() {
   const [status, setStatus] = useState([
     { image: "list", number: false },

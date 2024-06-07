@@ -86,6 +86,7 @@ const AddProjectForm = () => {
         Description: values.description,
         dateDebutEstim: values.startDate,
         dateFinEstim: values.dueDate,
+        organization: organizationId,
         boss: values.projectManager,
         teams: values.teams
       });

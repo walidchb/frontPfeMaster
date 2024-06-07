@@ -45,36 +45,63 @@ const axiosInstance = axios.create({
       const [availableUsers, setAvailableUsers] = useState([]);
       const [showPopup, setShowPopup] = useState(false);
       const [popupMessage, setPopupMessage] = useState("");
-      const [projectData, setProjectData] = useState(null);
+      const [projectData, setProjectData] = useState({});
     
       const showPopupMessage = (message) => {
         setPopupMessage(message);
         setShowPopup(true);
       };
+      useEffect(() => {
+       
+        formik.setFieldValue("projectName", projectData.Name);
+        formik.setFieldValue("description", projectData.Description);
+        formik.setFieldValue("startDate", projectData.dateDebutEstim);
+        formik.setFieldValue("dueDate", projectData.dateFinEstim);
+        if(projectData.boss){formik.setFieldValue("projectManager", projectData.boss._id)};
+        if (projectData.teams) {
+          formik.setFieldValue("teams", projectData.teams);
+          console.log("teams = ",projectData.teams)
+        }
+       
+
+
+
+        console.log(projectData)
+      }, [projectData]);
     
       const organizationId = "66609ae2a974839772c60e7b";
-      const projectId = "6660bb1bfda48d94c6dbdaff";
+      const projectId = "6663141bfcde5505d8f2cbb9";
   
       const fetchProjectToUpdate = async (projectId) => {
         try {
           const response = await axiosInstance.get(`/project/projects?_id=${projectId}`);
-          const project = response.data;
-          setProjectData(project);
+          // const project = response.data[0];
+          console.log(response.data[0])
+          setProjectData(response.data[0])
+          // return project;
         } catch (error) {
           console.error('Erreur lors de la récupération du projet :', error);
+          // return null;
+        }
+      };
+
+      const fetchAllData = async () => {
+        try {
+          const [teams, users] = await Promise.all([
+            fetchTeams(organizationId),
+            fetchUsers(organizationId),
+          ]);
+          setAvailableTeams(teams);
+          setAvailableUsers(users);
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données :', error);
         }
       };
   
-      const fetchData = async () => {
-        await fetchProjectToUpdate(projectId);
-        const teams = await fetchTeams(organizationId);
-        const users = await fetchUsers(organizationId);
-        setAvailableTeams(teams);
-        setAvailableUsers(users);
-      };
-  
       useEffect(() => {
-        fetchData();
+        fetchAllData();
+        fetchProjectToUpdate(projectId)
+
       }, []);
 
       const sendProjectData = async (values, setSubmitting) => {
@@ -104,36 +131,9 @@ const axiosInstance = axios.create({
         boxShadow:
           "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
       };
-
-      const mapProjectToFormValues = (project) => {
-        return {
-          projectName: project.Name || "",
-          description: project.Description || "",
-          startDate: project.dateDebutEstim ? new Date(project.dateDebutEstim) : "",
-          dueDate: project.dateFinEstim ? new Date(project.dateFinEstim) : "",
-          projectManager: project.boss || "",
-          teams: project.teams || []
-        };
-      };
-
-      const [formValues, setFormValues] = useState({
-        projectName: "",
-        description: "",
-        startDate: "",
-        dueDate: "",
-        projectManager: "",
-        teams: []
-      });
-    
-      useEffect(() => {
-        if (projectData) {
-          const formVal = mapProjectToFormValues(projectData);
-          setFormValues(formVal);
-        }
-      }, [projectData]);
     
       const formik = useFormik({
-        initialValues: formValues,
+        initialValues: projectData,
         enableReinitialize: true,
         validationSchema: Yup.object().shape({
           projectName: Yup.string().required("Required"),
@@ -245,7 +245,7 @@ const axiosInstance = axios.create({
                   name="startDate"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.startDate}
+                  value={formik.values.startDate ? new Date(formik.values.startDate).toISOString().split('T')[0] : ''}
                 />
               </div>
               <p className="mb-4 text-red-500">
@@ -273,7 +273,7 @@ const axiosInstance = axios.create({
                   name="dueDate"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.dueDate}
+                  value={formik.values.dueDate ? new Date(formik.values.dueDate).toISOString().split('T')[0] : ''}
                 />
               </div>
               <p className="mb-4 text-red-500">
@@ -298,20 +298,20 @@ const axiosInstance = axios.create({
                 />
             </svg>
             <select
-                value={formik.values.projectManager}
-                name="projectManager"
-                className="px-4 w-full focus:outline-none bg-white"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+              value={formik.values.projectManager}
+              name="projectManager"
+              className="px-4 w-full focus:outline-none bg-white"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
             >
-                <option value="" disabled>
+              <option value="" disabled>
                 Select a project manager
+              </option>
+              {availableUsers.map((user) => (
+                <option key={user._id} value={user._id} selected={user._id === projectData.boss}>
+                  {user.nom} {user.prenom}
                 </option>
-                {availableUsers.map((user) => (
-                <option key={user._id} value={user._id}>
-                    {user.nom} {user.prenom}
-                </option>
-                ))}
+              ))}
             </select>
             </div>
             <p className="mb-4 text-red-500">
@@ -360,31 +360,31 @@ const axiosInstance = axios.create({
         </div>
         <div className="max-h-25 overflow-y-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {availableTeams.map((team) => (
-              <div
-                key={team._id}
-                className="flex justify-center sm:justify-start items-center"
-              >
-                <input
-                  type="checkbox"
-                  id={`team-${team._id}`}
-                  value={team._id}
-                  checked={formik.values.teams && formik.values.teams.includes(team._id)}
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    const checkedTeams = isChecked
-                      ? [...(formik.values.teams || []), team._id]
-                      : (formik.values.teams || []).filter((id) => id !== team._id);
-                    formik.setFieldValue("teams", checkedTeams);
-                  }}
-                  className="mr-2"
-                />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5 mr-2"
-                >
+  {availableTeams.map((team) => (
+    <div
+      key={team._id}
+      className="flex justify-center sm:justify-start items-center"
+    >
+    <input
+    type="checkbox"
+    id={`team-${team._id}`}
+    value={team._id}
+    checked={formik.values.teams && formik.values.teams.includes(team._id)}
+        onChange={(e) => {
+      const isChecked = e.target.checked;
+      const checkedTeams = isChecked
+        ? [...(formik.values.teams || []), team._id]
+        : (formik.values.teams || []).filter((id) => id !== team._id);
+      formik.setFieldValue("teams", checkedTeams);
+    }}
+    className="mr-2"
+  />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="w-5 h-5 mr-2"
+      >
                   <path
                     fillRule="evenodd"
                     d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-4.38z"
@@ -440,4 +440,4 @@ const axiosInstance = axios.create({
   );
   };
   
-  export default UpdateProjectForm; 
+  export default UpdateProjectForm;  

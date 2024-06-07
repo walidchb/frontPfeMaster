@@ -21,16 +21,42 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import UpdateProjectForm from "../Project/UpdateProjectForm";
+import axios from "axios";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 function MainEmployee() {
-  const projects = [1, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7];
+  const [projects , setProjects] = useState([]);
   const [settings, setSettings] = useState({});
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  
+  const organizationId = "66609ae2a974839772c60e7b";
+  
+  const fetchProject = async (organizationId) => {
+    try {
+      const response = await axiosInstance.get(`/project/projects?organization=${organizationId}`);
+      console.log("responseData = ", response.data)
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes :', error);
+    }
+  };
+
   useEffect(() => {
+    
+    fetchProject(organizationId);
+  }, []);
+
+  useEffect(() => {
+    
     function handleResize() {
       // Adjust the number of slides to show based on screen width
       const screenWidth = window.innerWidth;
@@ -181,7 +207,7 @@ function MainEmployee() {
         {projects.length > 0 ? (
           <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
             {projects.map((child, index) => (
-              <ProjectCard key={index} />
+              <ProjectCard key={index} project={child}/>
             ))}
           </div>
         ) : (
@@ -323,7 +349,7 @@ function MainEmployee() {
                   }}
                   className="p-6 costumScrollBar overflow-y-auto">
                   {projects.map((child, index) => (
-                    <ProjectCard key={index} />
+                    <ProjectCard key={index} project={child}/>
                   ))}
                 </div>
               ) : (
