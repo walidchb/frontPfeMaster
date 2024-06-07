@@ -3,7 +3,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/features/auth/authSlice"; // Assuming you have a userSlice.js file
+import { setUserInfo } from "@/store/features/auth/authSlice";
+import { setOrganization } from "@/store/features/organization/organizationSlice";
+// Assuming you have a userSlice.js file
 import { auth } from "../firebase/config";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -39,7 +41,6 @@ export const AuthProvider = ({ children }) => {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("signed is");
       console.log(email);
-      const axios = require("axios");
       const axiosInstance = axios.create({
         baseURL: "http://localhost:1937",
         headers: {
@@ -49,18 +50,44 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await axiosInstance.get("/user/me", {
           params: {
-            email: "walidchb@gmail.com",
+            email: email,
           },
         });
-        console.log(response.data);
-        dispatch(setUser(response.data)); // Dispatch action with fetched data
-      } catch (error) {
-        console.error("Error:", error.response.data.error);
-      }
+        console.log("user to dispatch");
 
-      sessionStorage.setItem("user", true);
-      localStorage.setItem("user", true);
-      router.push(`/${locale}/Employee/BoardEmployee`);
+        console.log(response.data);
+        let user = response.data;
+        localStorage.setItem("userInfo", JSON.stringify(user));
+        dispatch(setUserInfo(user)); // Dispatch action with fetched data
+        try {
+          const response = await axiosInstance.get(
+            "/organization/organizations",
+            {
+              params: {
+                Boss: user._id,
+              },
+            }
+          );
+          console.log("organization to dispatch");
+
+          console.log(response.data[0]);
+          dispatch(setOrganization(response.data[0]));
+          localStorage.setItem(
+            "organization",
+            JSON.stringify(response.data[0])
+          );
+          // Dispatch action with fetched data
+
+          sessionStorage.setItem("user", true);
+          localStorage.setItem("user", true);
+          router.push(`/${locale}/Employee/BoardEmployee`);
+          // dispatch(setUser(response.data)); // Dispatch action with fetched data
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     } catch (error) {
       // Handle error (e.g., show error message to the user)
       console.error("Error logging in:", error);

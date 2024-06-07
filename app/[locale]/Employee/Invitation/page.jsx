@@ -1,34 +1,133 @@
 "use client";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useTranslations, useLocale } from "next-intl";
+import axios from "axios";
+import "./style.css";
+
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
-import React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 const Invitation = () => {
+  const router = useRouter();
+  // const [searchParams] = useSearchParams();
+  // const invitation = JSON.parse(searchParams.get("invitation"));
+  const locale = useLocale();
+
+  const searchParams = useSearchParams();
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [submitting, setSubmitting] = useState(false);
+  const invitation = JSON.parse(searchParams.get("invitation"));
+
+  // const data = router.query.invitation;
+  console.log("invitation");
+  console.log(invitation);
+
+  const accepteInvitation = async () => {
+    setSubmitting(true);
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(0);
+
+    try {
+      console.log(1);
+      const response = await axiosInstance.patch(
+        `/user/users?id=${userInfo._id}`,
+        {
+          team: invitation.team._id, // New team value to be pushed
+          organizations: invitation.organisation._id,
+        }
+      );
+      console.log(3);
+
+      console.log("User updated successfully:", response.data);
+    } catch (error) {
+      console.log(4);
+
+      console.error(
+        "Error updating user:",
+        error.response?.data || error.message
+      );
+    }
+
+    try {
+      const response = await axiosInstance.patch(
+        `/invitation/invitations/${invitation._id}`,
+        {
+          accepted: true,
+        }
+      );
+      console.log("Invitation updated successfully:", response.data);
+      router.push(`/${locale}/Employee/BoardEmployee`);
+    } catch (error) {
+      console.error(
+        "Error updating invitation:",
+        error.response?.data || error.message
+      );
+    }
+    // setSubmitting(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
-      <NavBarAuth />
+      {/* <NavBarAuth /> */}
       <div className="flex-grow flex items-center justify-center bg-[url('/BG.jpeg')]">
         <div className="bg-white p-6 rounded shadow max-w-lg mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">Invitation à rejoindre l'organisation</h2>
-          <p className="text-gray-600 mb-2">Cher(e) [Nom de l'individu],</p>
-          <p className="text-gray-700 mb-6">
-            Vous avez été invité(e) par [Nom du chef d'organisation] à rejoindre l'organisation "[Nom de l'organisation]" dans notre application de gestion des tâches. En acceptant cette invitation, vous pourrez collaborer avec les membres de l'organisation et vous verrez attribuer un rôle spécifique. Pour accepter l'invitation, veuillez cliquer sur le lien ci-dessous.
+          <h2 className="text-2xl font-bold mb-4">
+            Invitation à rejoindre l'organisation
+          </h2>
+          <p className="text-gray-600 mb-2">
+            Cher(e) {userInfo.prenom} {userInfo.nom},
           </p>
-          <a
-            href="#"
-            className="inline-block bg-orange-500 text-white font-bold py-3 px-6 rounded hover:bg-orange-600 mb-6"
-          >
-            Accepter l'invitation →
-          </a>
+          <p className="text-gray-700 mb-6">
+            Vous avez été invité(e) par "{invitation.sendby.prenom}{" "}
+            {invitation.sendby.nom} "à rejoindre l'organisation "
+            {invitation.organisation.Name}" dans notre application de gestion
+            des tâches. En acceptant cette invitation, vous pourrez collaborer
+            avec les membres de l'organisation et vous verrez attribuer un rôle
+            spécifique. Pour accepter l'invitation, veuillez cliquer sur le lien
+            ci-dessous.
+          </p>
+          {!invitation.accepted ? (
+            <button
+              onClick={() => accepteInvitation()}
+              className="inline-block bg-orange-500 text-white font-bold py-3 px-6 rounded hover:bg-orange-600 mb-6">
+              {!submitting ? (
+                "Accepter l'invitation →"
+              ) : (
+                <div className="flex justify-center items-center">
+                  <span
+                    className={`text-sm ${
+                      submitting ? "text-white" : "text-white"
+                    }`}>
+                    Loading
+                  </span>
+                  <div className="h-6 w-6 loaderDots ml-2 "></div>{" "}
+                </div>
+              )}
+            </button>
+          ) : (
+            <button
+              disabled={true}
+              className=" cursor-not-allowed inline-block bg-green-500 text-white font-bold py-3 px-6 rounded hover:bg-green-600 mb-6">
+              Accepted
+            </button>
+          )}
           <p className="text-gray-700 mb-4">
-            Notre application de gestion des tâches permet aux organisations de gérer efficacement leurs projets, d'attribuer des tâches aux membres et de suivre l'avancement des travaux.
+            Notre application de gestion des tâches permet aux organisations de
+            gérer efficacement leurs projets, d'attribuer des tâches aux membres
+            et de suivre l'avancement des travaux.
           </p>
           <p className="text-gray-700">
-            Pour en savoir plus sur notre application, veuillez visiter notre site web :{" "}
+            Pour en savoir plus sur notre application, veuillez visiter notre
+            site web :{" "}
             <a
               href="https://www.votre-app.com"
-              className="text-green-600 underline"
-            >
+              className="text-green-600 underline">
               www.votre-app.com
             </a>
           </p>

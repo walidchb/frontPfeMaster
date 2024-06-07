@@ -13,15 +13,27 @@ import {
   ChartSquareBarIcon,
   CogIcon,
 } from "@heroicons/react/outline";
+import { useSelector, useDispatch } from "react-redux";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 function SideBarEmployee({ fromEmployee, currentPage }) {
+  const [user, setUser] = useState({});
+
+  console.log(user);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    console.log("user");
+
+    console.log(user);
+    setUser(user);
+  }, []);
+
   const locale = useLocale();
   const router = useRouter();
-  const [userType, setuserType] = useState(2);
+  // const [userType, setuserType] = useState(2);
 
   return (
     <div
@@ -100,7 +112,7 @@ function SideBarEmployee({ fromEmployee, currentPage }) {
           </li> */}
         </ul>
       </div>
-      {userType == 1 ? (
+      {user?.role != "orgBoss" ? (
         <li
           onClick={() => router.push(`/${locale}/Employee/TeamEmployee`)}
           className={`flex justify-center cursor-pointer items-center flex-col

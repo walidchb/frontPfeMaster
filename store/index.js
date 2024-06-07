@@ -1,6 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import mainReducer from "./features/main/mainSlice";
 import authReducer from "./features/auth/authSlice";
+import organizationReducer from "./features/organization/organizationSlice";
+
 import createSagaMiddleware from "redux-saga";
 import rootSaga from "./sagas";
 
@@ -12,6 +14,7 @@ const store = configureStore({
   reducer: {
     main: mainReducer,
     auth: authReducer,
+    organization: organizationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(sagaMiddleware), // Add sagaMiddleware while preserving default middleware

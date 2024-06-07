@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style.css";
-import { IoSearchCircle } from "react-icons/io5";
+import {
+  IoSearchCircle,
+  IoAddCircleSharp,
+  IoCloseCircleSharp,
+} from "react-icons/io5";
+
 import {
   FaEdit,
   FaChevronDown,
@@ -17,12 +22,141 @@ import {
   FaClock,
   FaClipboardCheck,
 } from "react-icons/fa";
+import { GrValidate } from "react-icons/gr";
+import axios from "axios";
+import { Formik, Form, Field } from "formik";
 import {
   IoMdArrowDropdown,
   IoMdArrowDropright,
   IoMdAddCircle,
 } from "react-icons/io";
+
 function TeamsPage() {
+  const [allPeople, setAllPeople] = useState([]);
+  const [personFetched, setPersonFetched] = useState(false);
+
+  const organization = JSON.parse(localStorage.getItem("organization"));
+  const [reload, setReload] = useState(false); // State to trigger rerender
+  const [invitaions, setInvitaions] = useState([]);
+  // get invitations
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            organisation: organization._id,
+          },
+        });
+        console.log("invitaions");
+
+        console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, []);
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            organisation: organization._id,
+          },
+        });
+        console.log("invitaions");
+
+        console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, [reload]);
+
+  //  get jsp
+  useEffect(() => {
+    const getTeams = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/team/teams", {
+          params: {
+            Organization: organization._id,
+          },
+        });
+        console.log("teams");
+
+        console.log(response.data);
+        setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getTeams();
+  }, []);
+  useEffect(() => {
+    const getTeams = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/team/teams", {
+          params: {
+            Organization: organization._id,
+          },
+        });
+        console.log("teams");
+
+        console.log(response.data);
+        setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getTeams();
+  }, [reload]);
   const people = [
     {
       name: "Leslie Alexander",
@@ -110,17 +244,149 @@ function TeamsPage() {
     },
     // More people...
   ];
+  useEffect(() => {
+    const getPeople = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      try {
+        const response = await axiosInstance.get("/user/users");
+        console.log("people");
+
+        console.log(response.data);
+        setAllPeople(response.data);
+        // setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        // const newShowTeam = new Array(response.data.length).fill(false);
+        // setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getPeople();
+  }, []);
+  useEffect(() => {
+    const getPeople = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      try {
+        const response = await axiosInstance.get("/user/users");
+        console.log("people");
+
+        console.log(response.data);
+        setAllPeople(response.data);
+        // setTeams(response.data);
+        // Create an array of false values with the same length as response.data
+        // const newShowTeam = new Array(response.data.length).fill(false);
+        // setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    if (!personFetched) {
+      getPeople();
+    }
+  }, [personFetched]);
+
   const [teamLead, setTeamLead] = useState(true);
-  const [showTeam, setShowTeam] = useState([
-    false,
-    false,
-    false,
-    true,
-    false,
-    false,
-  ]);
-  const [teams, setTeams] = useState([1, 2, 3, 4, 5, 6]);
+  const [showTeam, setShowTeam] = useState([]);
+  const [team, setTeam] = useState({});
+
+  const [teams, setTeams] = useState([]);
   const [showInvitePeopleModal, setShowInvitePeopleModal] = useState(false);
+  const [showCreateNewTeam, setShowCreateNewTeam] = useState(false);
+  const initialValues = { teamName: "" };
+  function invitationSent(array, value) {
+    return array.some((item) => item.sendto._id === value);
+  }
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    try {
+      const response = await axiosInstance.post("/team/teams", {
+        Name: values.teamName,
+        OrganizationId: organization._id,
+      });
+      console.log("team created");
+      setShowCreateNewTeam(false);
+      console.log(response.data);
+      setReload(!reload);
+      // window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    // Handle form submission logic here
+    console.log("Form submitted with values:", values);
+    setSubmitting(false);
+  };
+
+  const initialValuesSearchPerson = { email: "" };
+  const handleSubmitSearchPerson = async (values, { setSubmitting }) => {
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    try {
+      const response = await axiosInstance.get("/user/users", {
+        params: {
+          email: values.email,
+        },
+      });
+      // console.log("team created");
+      setAllPeople(response.data);
+      setPersonFetched(true);
+      console.log(response.data);
+      // setReload(!reload);
+      // window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    // Handle form submission logic here
+    console.log("Form submitted with values:", values);
+    setSubmitting(false);
+  };
+
+  const sendInvitaion = async (person) => {
+    console.log(organization);
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    try {
+      const response = await axiosInstance.post("/invitation/invitations", {
+        sendby: organization.Boss,
+        sendto: person._id,
+        roleinvitedto: "employee",
+        team: team._id,
+        organisation: organization._id,
+        accepted: false,
+      });
+
+      console.log(response.data);
+      setReload(!reload);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   return (
     <div
       style={{ height: "90vh" }}
@@ -132,7 +398,7 @@ function TeamsPage() {
           &#x276F; &nbsp;&nbsp; project Name{" "} */}
         </h1>
         <div
-          // onClick={() => setCreateIssueModal(true)}
+          onClick={() => setShowCreateNewTeam(true)}
           className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
           <IoMdAddCircle className="w-6 h-6" />{" "}
           <span className="mx-2 font-semibold ">Create new Team</span>
@@ -149,7 +415,7 @@ function TeamsPage() {
 
                   // Toggle the clicked element's state
                   updatedShowTeam[index] = !updatedShowTeam[index];
-
+                  setTeam(team);
                   // Update the state using the setter function
                   setShowTeam(updatedShowTeam);
                 }}
@@ -159,7 +425,7 @@ function TeamsPage() {
                 ) : (
                   <IoMdArrowDropright className=" h-6 w-6" />
                 )}{" "}
-                Team (A) : &nbsp;{" "}
+                {team.Name} : &nbsp;{" "}
                 {/* <span className="text-gray-400 font-normal text-sm">
               (50 issues)
             </span>{" "} */}
@@ -174,30 +440,30 @@ function TeamsPage() {
                   className="text-2xl underline text-blue-600 hover:no-underline">
                   Invite People
                 </button>
-              ) : teamLead ? (
-                <button className="ml-2 h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  WC
+              ) : team.Boss ? (
+                <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  {team.Boss.prenom[0].toUpperCase()}{" "}
+                  {team.Boss.nom[0].toUpperCase()}
                 </button>
               ) : (
-                <FaUserCircle className=" rounded-full w-10 h-10 mr-2" />
+                <FaUserCircle className=" rounded-full w-8 h-8 mr-2" />
               )}
             </div>
             {showTeam[index] ? (
               <div className="flex flex-col lg:flex-row justify-center items-center">
-                {teamLead ? (
+                {team.Boss ? (
                   <div className="bg-gray-800 w-fit h-fit lg:mr-6 mb-4  rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10 ">
-                    <img
-                      className="h-24 w-24 rounded-full"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                    <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-                      Bonnie Green
+                    <button className="my-2 text-2xl h-14 w-14 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      {team.Boss.prenom[0].toUpperCase()}{" "}
+                      {team.Boss.nom[0].toUpperCase()}
+                    </button>
+                    <h5 className="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">
+                      {team.Boss.prenom} {team.Boss.nom}
                     </h5>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       Team Leader
                     </span>
-                    <div className="text-white">Walidchebbab2001@gmail.com</div>
+                    <div className="text-white">{team.Boss.email}</div>
                   </div>
                 ) : null}
 
@@ -205,8 +471,8 @@ function TeamsPage() {
                   style={{ height: "73vh" }}
                   role="list"
                   className=" mb-8 w-full overflow-auto costumScrollBar grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
-                  {people.map((person) => (
-                    <li key={person.name}>
+                  {people.map((person, index) => (
+                    <li key={index}>
                       <div className="flex items-center gap-x-6 ">
                         <img
                           className="h-16 w-16 rounded-full"
@@ -220,7 +486,7 @@ function TeamsPage() {
                           <p className="text-sm font-semibold leading-6 text-indigo-600">
                             {person.role}
                           </p>
-                          {!teamLead ? (
+                          {!team.Boss ? (
                             <button
                               className="px-2 py-1 
                            rounded-md font-medium bg-green-400 text-center text-white shadow-sm flex justify-between">
@@ -248,6 +514,7 @@ function TeamsPage() {
         </div>
       )}
 
+      {/* invite people */}
       <div
         style={{
           width: "100vw",
@@ -282,54 +549,133 @@ function TeamsPage() {
 
             <h1 className="text-3xl pb-6">Invite people to your team</h1>
             <div className="w-10/12">
-              <div className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10 ">
-                <input
-                  className="px-4 w-full focus:outline-none"
-                  type="text"
-                  name="taskName"
-                  placeholder="Search"
-                />
-                <button type="submit">
-                  <IoSearchCircle className=" text-blue-600 h-6 w-6" />
-                </button>
-              </div>
+              <Formik
+                initialValues={initialValuesSearchPerson}
+                onSubmit={handleSubmitSearchPerson}>
+                {({ isSubmitting }) => (
+                  <Form className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10">
+                    <Field
+                      className="px-4 w-full focus:outline-none"
+                      type="text"
+                      name="email"
+                      placeholder="Email"
+                    />
+                    {!personFetched ? (
+                      <button type="submit" disabled={isSubmitting}>
+                        <IoSearchCircle className="text-blue-600 h-6 w-6" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevent default form submission
+                          setPersonFetched(false);
+                        }}>
+                        <IoCloseCircleSharp className=" text-blue-600 h-6 w-6" />
+                      </button>
+                    )}
+                  </Form>
+                )}
+              </Formik>
             </div>
 
             <div className="w-11/12 h-[50vh] overflow-auto costumScrollBar">
-              {people.map((person) => (
-                <div className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
-                  <div className="flex ">
-                    <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                    </div>
-                    <div className=" flex flex-col justify-center ml-4">
-                      <div className="truncate  text-sm text-gray-600 ">
-                        walid chebbab
+              {allPeople.length > 0 ? (
+                allPeople.map((person, index) => (
+                  <div
+                    key={index}
+                    className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
+                    <div className="flex ">
+                      <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                        <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          {person.prenom[0].toUpperCase()}{" "}
+                          {person.nom[0].toUpperCase()}
+                        </button>
                       </div>
-                      <div
-                        className={`truncate  text-gray-800 font-semibold  text-sm `}>
-                        Walidchebbab2001@gmail.com
+                      <div className=" flex flex-col justify-center ml-4">
+                        <div className="truncate  text-sm text-gray-600 ">
+                          {person.prenom} {person.nom}
+                        </div>
+                        <div
+                          className={`truncate  text-gray-800 font-semibold  text-sm `}>
+                          {person.email}{" "}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className=" flex justify-center items-center">
-                    <button
-                      type="button"
-                      className="text-gray-600  hover:text-blue-500 focus:outline-none "
-                      // onClick={() => setNotificationToDelete(1)}
-                    >
-                      {/* <FaTrash className="mr-1" /> */}
-                      send
-                    </button>
+                    <div className=" flex justify-center items-center">
+                      {!invitationSent(invitaions, person._id) ? (
+                        <button
+                          type="button"
+                          className="text-gray-600  hover:text-blue-500 focus:outline-none "
+                          onClick={() => sendInvitaion(person)}>
+                          {/* <FaTrash className="mr-1" /> */}
+                          send
+                        </button>
+                      ) : (
+                        <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                      )}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="w-full rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center text-gray-500 border-gray-600  border-2 border-dashed">
+                  your people list is emptry
                 </div>
-              ))}
+              )}
             </div>
+          </div>
+        </div>
+      </div>
+      {/* create team */}
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          backdropFilter: "blur(2px)",
+          backgroundColor: "rgba(255, 255, 255, 0)",
+        }}
+        className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+          showCreateNewTeam ? "opacity-100 visible" : "opacity-0 invisible"
+        } `}>
+        <div className="w-[90vw]  md:w-[60vw] h-[40vh] myShadow relative mx-auto overflow-hidden   rounded-lg shadow-md bg-white">
+          <div
+            style={{ height: "10vh" }}
+            className="flex justify-end items-center px-5 ">
+            <button
+              type="button"
+              onClick={() => setShowCreateNewTeam(false)}
+              className="text-gray-400 hover:text-gray-500 focus:outline-none">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            style={{ height: "80vh" }}
+            className=" flex flex-col justify-start items-center ">
+            {/* <h1 className="text-4xl font-bold py-6">Team A</h1> */}
+
+            <h1 className="text-3xl pb-6">Create New Team</h1>
+            <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+              {({ isSubmitting }) => (
+                <Form className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10">
+                  <Field
+                    className="px-4 w-full focus:outline-none"
+                    type="text"
+                    name="teamName"
+                    placeholder="Team Name"
+                  />
+                  <button type="submit" disabled={isSubmitting}>
+                    <IoAddCircleSharp className="text-blue-600 h-6 w-6" />
+                  </button>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       </div>

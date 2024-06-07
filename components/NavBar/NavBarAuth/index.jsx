@@ -12,9 +12,13 @@ import {
   MdOutlinePassword,
 } from "react-icons/md";
 import "./style.css";
+import { useDispatch } from "react-redux";
+
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/app/[locale]/firebase/config";
 import { signOut } from "firebase/auth";
+import { setOrganization } from "@/store/features/organization/organizationSlice";
+
 import {
   FaTrash,
   FaBell,
@@ -26,6 +30,8 @@ import {
   FaUserFriends,
   FaChartBar,
 } from "react-icons/fa";
+import axios from "axios";
+
 import { useAuth } from "@/app/[locale]/context/AuthContext";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslations, useLocale } from "next-intl";
@@ -44,7 +50,39 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
-  const organisation = [1, 2, 4, 5];
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const organization = JSON.parse(localStorage.getItem("organization"));
+  const dispatch = useDispatch();
+
+  const organisations = [1, 2, 4, 5];
+  const [invitaions, setInvitaions] = useState([]);
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // const organization = localStorage.getItem("organization");
+      const user = JSON.parse(localStorage.getItem("userInfo"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            sendto: user._id,
+          },
+        });
+        console.log("invitaions");
+
+        console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, []);
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -60,13 +98,6 @@ function NavBarAuth({
   ]);
   const [curScreen, setCurScreen] = useState(currentScreen);
 
-  // if (typeof window !== "undefined") {
-  //   // const userSession
-  //   // Code that interacts with sessionStorage
-  //   // For example:
-  //   const userSession = sessionStorage.getItem("user");
-  // }
-  // sessionStorage.getItem("user");
   const t = useTranslations("Index");
   const router = useRouter();
   const pathname = usePathname();
@@ -80,7 +111,7 @@ function NavBarAuth({
     router.replace(`/${loc + pathname}`);
   };
   const { logout } = useAuth();
-
+  const [activePageIndex, setActivePageIndex] = useState(1);
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
@@ -200,13 +231,6 @@ function NavBarAuth({
     return color;
   };
 
-  // if (!user) {
-  //   router.push("/");
-  // }
-
-  // console.log("user");
-
-  // console.log(user);
   return (
     <Disclosure style={{ height: "10vh" }} as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -235,7 +259,7 @@ function NavBarAuth({
               </div>
             ) : null}
             <div className="  flex max-w-min items-center justify-start sm:items-stretch sm:justify-start">
-              {showOrganisation ? (
+              {userInfo.role != "orgBoss" ? (
                 <Menu
                   as="div"
                   className=" relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
@@ -254,7 +278,7 @@ function NavBarAuth({
                       <MdBusinessCenter className="h-5 w-5 mr-2" />
 
                       <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                        walid chwejefjweifu isjdfsdf{" "}
+                        {organization.Name}
                       </span>
                       <MdArrowDropDown className="h-5 w-5 " />
                     </Menu.Button>
@@ -277,12 +301,44 @@ function NavBarAuth({
                             : "30vw",
                       }}
                       className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {organisation.map((item, index) => {
+                      {userInfo.organizations.map((item, index) => {
                         let textColor = getRandomColor();
                         return (
                           <Menu.Item key={index}>
                             {({ active }) => (
                               <div
+                                onClick={async () => {
+                                  const axiosInstance = axios.create({
+                                    baseURL: "http://localhost:1937",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                  });
+                                  try {
+                                    const response = await axiosInstance.get(
+                                      "/organization/organizations",
+                                      {
+                                        params: {
+                                          _id: item._id,
+                                        },
+                                      }
+                                    );
+                                    console.log("organization to dispatch");
+
+                                    console.log(response.data[0]);
+                                    dispatch(setOrganization(response.data[0]));
+                                    localStorage.setItem(
+                                      "organization",
+                                      JSON.stringify(response.data[0])
+                                    );
+
+                                    // dispatch(setUser(response.data)); // Dispatch action with fetched data
+                                  } catch (error) {
+                                    console.error("Error:", error);
+                                  }
+                                  console.log("organization");
+                                  console.log(item);
+                                }}
                                 style={{ color: textColor }}
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
@@ -291,7 +347,7 @@ function NavBarAuth({
                                 <MdBusinessCenter className={`h-5 w-5 mr-2 `} />
 
                                 <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                  walid chwejefjweifu isjdfsdf{" "}
+                                  {item.Name}
                                 </span>
                               </div>
                             )}
@@ -301,7 +357,9 @@ function NavBarAuth({
                     </Menu.Items>
                   </Transition>
                 </Menu>
-              ) : null}
+              ) : (
+                <h1 className="text-3xl text-white">{organization?.Name}</h1>
+              )}
             </div>
             <div className=" flex justify-center items-center">
               <button
@@ -355,102 +413,219 @@ function NavBarAuth({
                         minHeight: "60vh",
                       }}
                       className="px-2 flex flex-col items-center costumScrollBar absolute  z-10 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="w-full text-sm flex justify-between items-center p-2">
-                        <p className="text-black font-semibold text-xl">
-                          All notifications ({notifications.length}) :
+                      <div className="sticky top-0 z-10 text-black flex  rounded-t-lg bg-white w-full">
+                        {/* {pages.map((page, index) => ( */}
+                        <p
+                          onClick={() => setActivePageIndex(1)}
+                          className={`py-2 placeholder:font-semibold cursor-pointer flex-1 border-r-2 border-b-2 flex justify-center items-center ${
+                            activePageIndex === 1
+                              ? "bg-blue-300 text-white"
+                              : ""
+                          }`}>
+                          notifications
                         </p>
-                        <a
-                          href={`/${locale}/Employee/Notification`}
-                          className=" underline text-blue-600 hover:no-underline">
-                          View all notifications
-                        </a>
+                        <p
+                          onClick={() => setActivePageIndex(2)}
+                          className={`py-2 placeholder:font-semibold cursor-pointer flex-1 border-r-2 border-b-2 flex justify-center items-center ${
+                            activePageIndex === 2
+                              ? "bg-blue-300 text-white"
+                              : ""
+                          }`}>
+                          invitations
+                        </p>
                       </div>
-                      {notifications.length > 0 ? (
-                        notifications.map((notification, index) => (
-                          <Menu.Item key={index}>
-                            {({ active }) => (
-                              <div
-                                className={classNames(
-                                  active ? "bg-gray-100" : "",
+                      {/* ))} */}
+                      {activePageIndex == 1 ? (
+                        <div>
+                          <div className="w-full text-sm flex justify-between items-center p-2">
+                            <p className="text-black font-semibold text-xl">
+                              All notifications ({notifications.length}) :
+                            </p>
+                            <a
+                              href={`/${locale}/Employee/Notification`}
+                              className=" underline text-blue-600 hover:no-underline">
+                              View all notifications
+                            </a>
+                          </div>
+                          {notifications.length > 0 ? (
+                            notifications.map((notification, index) => (
+                              <Menu.Item key={index}>
+                                {({ active }) => (
+                                  <div
+                                    className={classNames(
+                                      active ? "bg-gray-100" : "",
 
-                                  "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
-                                )}>
-                                <div className="flex ">
-                                  <div
-                                    style={{
-                                      minWidth:
-                                        windowSize.width <= 450
-                                          ? "20vw"
-                                          : windowSize.width <= 650
-                                          ? "15vw"
-                                          : windowSize.width <= 850
-                                          ? "12vw"
-                                          : "8vw",
-                                    }}
-                                    className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-                                    {notification.type === "message" && (
-                                      <FaRegEnvelope className="" />
-                                    )}
-                                    {notification.type === "event" && (
-                                      <FaCalendarAlt className="" />
-                                    )}
-                                    {notification.type === "reminder" && (
-                                      <FaBell className="" />
-                                    )}
-                                    {notification.type === "project" && (
-                                      <FaClipboardList className="" />
-                                    )}
-                                    {notification.type === "task" && (
-                                      <FaTasks className="" />
-                                    )}
-                                    {notification.type === "team" && (
-                                      <FaUserFriends className="" />
-                                    )}
-                                    {notification.type === "report" && (
-                                      <FaChartBar className="" />
-                                    )}
-                                    {notification.type}
-                                  </div>
-                                  <div
-                                    style={{
-                                      width:
-                                        windowSize.width <= 550
-                                          ? "50vw"
-                                          : windowSize.width <= 850
-                                          ? "40vw"
-                                          : "50vw",
-                                    }}
-                                    className="">
-                                    <div className="truncate text-sm text-gray-600 mb-2">
-                                      {new Date(
-                                        notification.date
-                                      ).toLocaleString()}
+                                      "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
+                                    )}>
+                                    <div className="flex ">
+                                      <div
+                                        style={{
+                                          minWidth:
+                                            windowSize.width <= 450
+                                              ? "20vw"
+                                              : windowSize.width <= 650
+                                              ? "15vw"
+                                              : windowSize.width <= 850
+                                              ? "12vw"
+                                              : "8vw",
+                                        }}
+                                        className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                        {notification.type === "message" && (
+                                          <FaRegEnvelope className="" />
+                                        )}
+                                        {notification.type === "event" && (
+                                          <FaCalendarAlt className="" />
+                                        )}
+                                        {notification.type === "reminder" && (
+                                          <FaBell className="" />
+                                        )}
+                                        {notification.type === "project" && (
+                                          <FaClipboardList className="" />
+                                        )}
+                                        {notification.type === "task" && (
+                                          <FaTasks className="" />
+                                        )}
+                                        {notification.type === "team" && (
+                                          <FaUserFriends className="" />
+                                        )}
+                                        {notification.type === "report" && (
+                                          <FaChartBar className="" />
+                                        )}
+                                        {notification.type}
+                                      </div>
+                                      <div
+                                        style={{
+                                          width:
+                                            windowSize.width <= 550
+                                              ? "50vw"
+                                              : windowSize.width <= 850
+                                              ? "40vw"
+                                              : "50vw",
+                                        }}
+                                        className="">
+                                        <div className="truncate text-sm text-gray-600 mb-2">
+                                          {new Date(
+                                            notification.date
+                                          ).toLocaleString()}
+                                        </div>
+                                        <div
+                                          className={`truncate    text-sm ${
+                                            notification.isRead
+                                              ? "text-gray-600"
+                                              : "text-gray-800 font-semibold"
+                                          }`}>
+                                          {notification.content}
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div
-                                      className={`truncate    text-sm ${
-                                        notification.isRead
-                                          ? "text-gray-600"
-                                          : "text-gray-800 font-semibold"
-                                      }`}>
-                                      {notification.content}
-                                    </div>
                                   </div>
-                                </div>
-                              </div>
-                              // <a
-                              //   href="#"
-                              //   className={classNames(
-                              //     active ? "bg-gray-100" : "",
-                              //     "block px-4 py-2 text-sm text-gray-700"
-                              //   )}>
-                              //   Your Profile
-                              // </a>
-                            )}
-                          </Menu.Item>
-                        ))
+                                  // <a
+                                  //   href="#"
+                                  //   className={classNames(
+                                  //     active ? "bg-gray-100" : "",
+                                  //     "block px-4 py-2 text-sm text-gray-700"
+                                  //   )}>
+                                  //   Your Profile
+                                  // </a>
+                                )}
+                              </Menu.Item>
+                            ))
+                          ) : (
+                            <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+                              your notifications list is emptry
+                            </div>
+                          )}
+                        </div>
                       ) : (
-                        <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
-                          your notifications list is emptry
+                        <div>
+                          <div className="w-full text-sm flex justify-between items-start p-2">
+                            <p className="text-black font-semibold text-xl">
+                              All invitations ({invitaions?.length}) :
+                            </p>
+                          </div>
+                          {invitaions.length > 0 ? (
+                            invitaions.map((invitation, index) => (
+                              <Menu.Item key={index}>
+                                {({ active }) => (
+                                  <div
+                                    onClick={
+                                      () =>
+                                        router.push(
+                                          `/${locale}/Employee/Invitation?invitation=${JSON.stringify(
+                                            invitation
+                                          )}`
+                                        )
+
+                                      // router.push({
+                                      //   pathname: `/${locale}/Employee/Invitation`,
+                                      //   // query: {
+                                      //   //   invitation:
+                                      //   //     JSON.stringify(invitation),
+                                      //   // },
+                                      // })
+                                    }
+                                    className={classNames(
+                                      !invitation?.accepted
+                                        ? "bg-blue-300 cursor-pointer"
+                                        : "",
+
+                                      " NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
+                                    )}>
+                                    <div className="flex ">
+                                      <div
+                                        style={{
+                                          minWidth:
+                                            windowSize.width <= 450
+                                              ? "20vw"
+                                              : windowSize.width <= 650
+                                              ? "15vw"
+                                              : windowSize.width <= 850
+                                              ? "12vw"
+                                              : "8vw",
+                                        }}
+                                        className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                        <MdBusinessCenter className="w-6 h-6" />
+                                      </div>
+                                      <div
+                                        style={{
+                                          width:
+                                            windowSize.width <= 550
+                                              ? "50vw"
+                                              : windowSize.width <= 850
+                                              ? "40vw"
+                                              : "50vw",
+                                        }}
+                                        className="">
+                                        <div className="truncate text-sm text-gray-600 mb-2">
+                                          {new Date(
+                                            invitation.createdAt
+                                          ).toLocaleString()}
+                                        </div>
+                                        <div
+                                          className={`truncate    text-sm ${
+                                            invitation?.isRead
+                                              ? "text-gray-600"
+                                              : "text-gray-800 font-semibold"
+                                          }`}>
+                                          Vous avez été invité(e) par{" "}
+                                          {invitation.sendby.prenom}{" "}
+                                          {invitation.sendby.nom} à rejoindre
+                                          l'organisation "
+                                          {invitation.organisation.Name}" dans
+                                          notre application de gestion des
+                                          tâches.
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </Menu.Item>
+                            ))
+                          ) : (
+                            <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+                              your invitaions list is emptry
+                            </div>
+                          )}
                         </div>
                       )}
                     </Menu.Items>

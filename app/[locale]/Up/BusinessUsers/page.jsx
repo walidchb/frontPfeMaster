@@ -4,7 +4,7 @@ import "./style.css";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import axios from "axios";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { FaGoogle } from "react-icons/fa";
 import { FaLocationArrow, FaCity } from "react-icons/fa";
@@ -24,7 +24,8 @@ import { Formik } from "formik";
 import Select from "react-select";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
-const deleteUser = async (email) => {
+const deleteUserfromDataBaseAndFireBase = async (email) => {
+  const user = auth.currentUser;
   try {
     const axiosInstance = axios.create({
       baseURL: "http://localhost:1937",
@@ -37,7 +38,19 @@ const deleteUser = async (email) => {
     });
 
     if (response.status === 200) {
+      formik.setSubmitting(false); // Formik manages this automatically
+
       console.log("User deleted successfully");
+      if (user) {
+        try {
+          await deleteUser(user);
+          // User deleted successfully, handle redirection or message
+        } catch (error) {
+          // Handle deletion error
+        }
+      } else {
+        // No user signed in
+      }
       // Handle successful deletion (e.g., update UI, redirect)
     } else {
       console.error("Error deleting user:", response.data.message);
@@ -961,6 +974,7 @@ function BusinessUsers() {
     formik.setFieldValue("phoneNumber", value);
     // console.log(value);
   }
+
   const [selectedCountry, setSelectedCountry] = useState(false);
   const [error, setErrorCred] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -1007,7 +1021,7 @@ function BusinessUsers() {
   const handleDelete = async (email) => {
     console.log("email li raho yosel lahna");
     console.log(email);
-    await deleteUser(email);
+    await deleteUserfromDataBaseAndFireBase(email);
   };
 
   const formik = useFormik({
@@ -1025,8 +1039,8 @@ function BusinessUsers() {
     },
     validationSchema: validationSchema,
     onSubmit: (values, actions) => {
-      console.log(JSON.stringify(values, null, 2));
-
+      // console.log(JSON.stringify(values, null, 2));
+      formik.setSubmitting(true);
       const axiosInstance = axios.create({
         baseURL: "http://localhost:1937",
         headers: {
@@ -1034,11 +1048,58 @@ function BusinessUsers() {
         },
       });
 
+      const checkuserExist = async (values) => {
+        try {
+          const response = await axiosInstance.post("/user/check-user-exists", {
+            email: values.email,
+            phoneNumber: values.phoneNumber,
+          });
+          if (response.data.exists) {
+            setErrorCred({
+              userExist: "user with this email or phone number exists",
+            });
+            formik.setSubmitting(false); // Formik manages this automatically
+          } else {
+            sendUserData(values);
+            console.log(" user do not exist");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+
+      const checkOrganizationExist = async (values) => {
+        try {
+          const response = await axiosInstance.get(
+            "/organization/organizations",
+            {
+              params: {
+                Name: values.businessName,
+              },
+            }
+          );
+          if (response.data.length === 0) {
+            checkuserExist(values);
+          } else {
+            setErrorCred({ userExist: "organization with this name exists" });
+            formik.setSubmitting(false); // Formik manages this automatically
+
+            // console.log("organization with this name exist");
+          }
+
+          // console.log(response.data);
+        } catch (error) {
+          console.error("Error:", error);
+          formik.setSubmitting(false); // Formik manages this automatically
+        }
+      };
+
+      checkOrganizationExist(values);
+
       // Function to send the POST request
       const sendUserData = async (values) => {
         try {
           const response = await axiosInstance.post("/user/users", {
-            businessName: values.businessName,
             country: values.country,
             province: values.state,
             street: values.city,
@@ -1050,13 +1111,23 @@ function BusinessUsers() {
             gender: values.gender,
             password: values.password,
           });
-          console.log(response.data);
-          
-          signUPFireBase(values);
-          await createOrganization(values); // Create organization before Firebase signup
+          console.log("user created successfuly in data base");
+
+          await signUPFireBase(values);
         } catch (error) {
-          console.error("Error from backend:");
-          console.log(error);
+          // console.error("Error from backend:");
+          if (error.response) {
+            const backendError = error.response.data.errors[0].message; // Assuming error data is in response.data
+            console.error("Error from backend:", backendError);
+
+            // Handle the error based on backendError content (e.g., display error message)
+            setErrorCred({ userExist: backendError }); // Assuming an error property in the response
+          } else {
+            // Handle other errors (e.g., network issues)
+            console.error("An unexpected error occurred:", error);
+          }
+          formik.setSubmitting(false); // Formik manages this automatically
+
           // setErrorCred({ userExist: error.response.data.error });
         }
       };
@@ -1064,14 +1135,22 @@ function BusinessUsers() {
       // Function to create an organization
       const createOrganization = async (values) => {
         try {
-          const organizationResponse = await axiosInstance.post("/organization/organizations", {
-            email: values.email, // Pass the user's email to the backend
-            Name: values.businessName,
-            Boss: "",
-          });
+          const organizationResponse = await axiosInstance.post(
+            "/organization/organizations",
+            {
+              email: values.email, // Pass the user's email to the backend
+              Name: values.businessName,
+              Boss: "",
+            }
+          );
           console.log("Organization created:", organizationResponse.data);
+          localStorage.setItem("user", true);
+
+          router.push(`/${locale}/Employee/BoardEmployee`);
         } catch (error) {
           console.error("Error creating organization:", error);
+          handleDelete(values.email); // Si vous avez une fonction handleDelete
+
           throw error; // Rethrow error to be caught in sendUserData function
         }
       };
@@ -1081,10 +1160,10 @@ function BusinessUsers() {
         try {
           createUserWithEmailAndPassword(auth, values.email, values.password)
             .then((res) => {
-              console.log("success");
-              localStorage.setItem("user", true);
-              console.log(res);
-              router.push(`/${locale}/Employee/BoardEmployee`);
+              console.log("user created successfuly in firebase");
+              createOrganization(values); // Create organization before Firebase signup
+
+              // console.log(res);
             })
             .catch((error) => {
               handleDelete(values.email); // Si vous avez une fonction handleDelete
@@ -1097,8 +1176,8 @@ function BusinessUsers() {
         }
       };
 
-      sendUserData(values);
-      // setSubmitting(false); // Formik manages this automatically
+      // sendUserData(values);
+      // formik.setSubmitting(false); // Formik manages this automatically
     },
   });
   return (

@@ -10,7 +10,8 @@ const authSlice = createSlice({
     error: null,
   },
   reducers: {
-    setUser: (state, action) => {
+    setUserInfo: (state, action) => {
+      console.log("user dispatched correctly");
       state.user = action.payload;
       state.loading = false;
       state.error = null;
@@ -47,6 +48,7 @@ const authSlice = createSlice({
 });
 
 export const {
+  setUserInfo,
   loginRequest,
   loginSuccess,
   loginFailure,
