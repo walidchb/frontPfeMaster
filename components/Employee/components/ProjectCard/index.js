@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { useTranslations, useLocale } from "next-intl";
 
-function ProjectCard() {
+function ProjectCard({project}) {
   const locale = useLocale();
   const router = useRouter();
+  const doneTasks = project.tasks.filter(task => task.status == "Done");
 
   return (
     <div
@@ -20,16 +21,16 @@ function ProjectCard() {
           alt="Your Company"
         />
         <div>
-          <p className="font-bold">project Name</p>
-          <p className="text-sm">Project Boss Name</p>
+          <p className="font-bold">{project.Name}</p>
+          <p className="text-sm">{`Boss ${project.boss.nom} ${project.boss.prenom}`}</p>
           <h3 className=" mt-2 mb-1 text-sm text-gray-400">QUICK divS</h3>
           <div className="flex text-xs justify-between">
             <p>My open issues</p>
-            <p>5</p>
+            <p>{project.tasks.length-doneTasks.length}</p>
           </div>
           <div className="flex text-xs justify-between">
             <p>Done issues</p>
-            <p>5</p>
+            <p>{doneTasks.length}</p>
           </div>
         </div>
       </div>

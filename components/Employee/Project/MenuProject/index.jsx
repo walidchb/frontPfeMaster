@@ -9,7 +9,7 @@ const MenuProject = ({ activePageIndex }) => {
     { name: "Project Board", lien: "Board" },
     { name: "Kanban", lien: "Kanban" },
     { name: "Scheduler", lien: "Scheduler" },
-    { name: "Gant", lien: "Gant" },
+    { name: "Gantt", lien: "Gantt" },
   ];
   const [navbarState, setNavbarState] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
