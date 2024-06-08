@@ -373,7 +373,7 @@ function TeamsPage() {
     });
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization.Boss,
+        sendby: organization.Boss._id,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,

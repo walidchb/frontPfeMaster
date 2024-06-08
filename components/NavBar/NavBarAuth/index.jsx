@@ -262,7 +262,7 @@ function NavBarAuth({
               {userInfo.role != "orgBoss" ? (
                 <Menu
                   as="div"
-                  className=" relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
+                  className="z-20 relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
                   <div>
                     <Menu.Button
                       style={{
