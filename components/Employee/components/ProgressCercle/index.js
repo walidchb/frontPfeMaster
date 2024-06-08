@@ -2,7 +2,7 @@ import React from 'react';
 import Circle from 'react-circle';
 
 const ProgressCircle = ({ completed, total }) => {
-  const percentage = ((completed / total) * 100).toFixed(2);
+  const percentage = (total === 0) ? "0.00" : ((completed / total) * 100).toFixed(2);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>

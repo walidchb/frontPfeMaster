@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import "./style.css";
 import { IoSearchCircle } from "react-icons/io5";
@@ -7,10 +8,40 @@ function TeamPage() {
   const findObjectById = (array, id) => {
     return array.find((obj) => obj.id === id);
   };
-  const org = JSON.parse(localStorage.getItem("organization"));
+  const [userInfo, setUserInfo] = useState({});
+  const [org, setOrg] = useState({});
+  const [team, setteam] = useState({});
 
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const team = userInfo.team.find((obj) => obj.Organization === org._id);
+
+  // Read from localStorage on component mount
+  useEffect(() => {
+  
+    if (typeof window !== 'undefined') {
+      const user = localStorage.getItem('userInfo');
+      console.log("nhy")
+      console.log(user)
+      if (user) {
+        console.log("fghjkljhgfgh")
+        console.log(JSON.parse(user))
+      
+
+       
+        setUserInfo(JSON.parse(user));
+        // setteam(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id))
+        console.log("team");
+        // console.log(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id));
+        console.log("qbdqt ");
+
+        
+      }
+      const orgq = localStorage.getItem('organization');
+      if (orgq) {
+        setOrg(JSON.parse(orgq));
+      }
+    }
+  }, []);
+ 
+  // const team = userInfo?.team.find((obj) => obj.Organization === org._id);
   const [teamInfos, setTeamInfos] = useState({});
   useEffect(() => {
     const getTeams = async (values) => {
@@ -38,8 +69,7 @@ function TeamPage() {
 
     getTeams();
   }, []);
-  console.log("team");
-  console.log(userInfo.team);
+ 
   const people = [
     {
       name: "Leslie Alexander",

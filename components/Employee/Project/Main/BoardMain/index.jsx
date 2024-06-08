@@ -10,7 +10,7 @@ import "./style.css";
 import { Formik } from "formik";
 import { IoSearchCircle } from "react-icons/io5";
 import UpdateTaskForm from "../../UpdateTaskForm";
-function BoardMain() {
+function BoardMain({project}) {
   const [status, setStatus] = useState([
     { image: "list", number: false },
     { image: "development", number: true },
@@ -109,8 +109,8 @@ function BoardMain() {
       ) : null}
       {showBoard ? (
         <div className="">
-          {status.map((item, index) => (
-            <TaskListElement key={index} />
+          {project.tasks.map((item, index) => (
+            <TaskListElement key={index} task={item}/>
           ))}
         </div>
       ) : null}

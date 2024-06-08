@@ -50,10 +50,16 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const organization = JSON.parse(localStorage.getItem("organization"));
+ 
   const dispatch = useDispatch();
+  let userInfo = null;
+  let organization = null;
 
+  if (typeof window !== 'undefined') {
+    // Code s'exécutant dans le navigateur
+    userInfo = JSON.parse(window.localStorage.getItem('userInfo')) || null;
+    organization = JSON.parse(window.localStorage.getItem('organization')) || null;
+  }
   const organisations = [1, 2, 4, 5];
   const [invitaions, setInvitaions] = useState([]);
   useEffect(() => {
@@ -259,7 +265,7 @@ function NavBarAuth({
               </div>
             ) : null}
             <div className="  flex max-w-min items-center justify-start sm:items-stretch sm:justify-start">
-              {userInfo.role != "orgBoss" ? (
+              {userInfo?.role != "orgBoss" ? (
                 <Menu
                   as="div"
                   className=" relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
@@ -278,7 +284,7 @@ function NavBarAuth({
                       <MdBusinessCenter className="h-5 w-5 mr-2" />
 
                       <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                        {organization.Name}
+                        {organization?.Name}
                       </span>
                       <MdArrowDropDown className="h-5 w-5 " />
                     </Menu.Button>
@@ -301,7 +307,7 @@ function NavBarAuth({
                             : "30vw",
                       }}
                       className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {userInfo.organizations.map((item, index) => {
+                      {userInfo?.organizations.map((item, index) => {
                         let textColor = getRandomColor();
                         return (
                           <Menu.Item key={index}>
