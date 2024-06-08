@@ -23,11 +23,16 @@ const fetchTeams = async (organizationId) => {
   }
 };
 
-const UpdateTaskForm = () => {
+const UpdateTaskForm = ({task, handleCachUpdateTaskForm}) => {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [taskData, setTaskData] = useState({});
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    handleCachUpdateTaskForm() // Masquer le composant AddTaskForm
+  };
 
   const showPopupMessage = (message) => {
     setPopupMessage(message);
@@ -35,15 +40,16 @@ const UpdateTaskForm = () => {
   };
 
   useEffect(() => {
-    formik.setFieldValue("taskName", taskData.Name);
-    formik.setFieldValue("description", taskData.Description);
-    formik.setFieldValue("startDate", taskData.dateDebutEstim);
-    formik.setFieldValue("dueDate", taskData.dateFinEstim);
-    formik.setFieldValue("priority", taskData.priorite);
-    if (taskData.team) {
-        formik.setFieldValue("assignedTo", taskData.team._id);
-      }
-  }, [taskData]);
+    if(task){
+      formik.setFieldValue("taskName", task.Name);
+      formik.setFieldValue("description", task.Description);
+      formik.setFieldValue("startDate", task.dateDebutEstim);
+      formik.setFieldValue("dueDate", task.dateFinEstim);
+      formik.setFieldValue("priority", task.priorite);
+      formik.setFieldValue("assignedTo", task.team?._id);
+    }
+    
+  }, [task]);
 
   const organizationId = "66609ae2a974839772c60e7b";
   const taskId = "66639f183f2a480100ca8d3a"; // Remplacez par l'ID de la tâche à mettre à jour
@@ -65,14 +71,14 @@ const UpdateTaskForm = () => {
     };
 
     fetchData();
-    fetchTaskToUpdate(taskId);
+    // fetchTaskToUpdate(taskId);
   }, []);
 
   const sendTaskData = async (values, setSubmitting) => {
     setSubmitting(true);
 
     try {
-      const response = await axiosInstance.patch(`/task/tasks/${taskId}`, {
+      const response = await axiosInstance.patch(`/task/tasks/${task?._id}`, {
         Name: values.taskName,
         Description: values.description,
         dateDebutEstim: values.startDate,
@@ -98,7 +104,7 @@ const UpdateTaskForm = () => {
   };
 
   const formik = useFormik({
-    initialValues: taskData,
+    initialValues: task,
     enableReinitialize: true,
     validationSchema: Yup.object().shape({
       taskName: Yup.string().required("Task Name is required"),
@@ -118,7 +124,7 @@ const UpdateTaskForm = () => {
       style={loginDiv}
       className="w-11/12 flex md:w-8/12 h-fit lg:w-6/12 flex-col items-center justify-center bg-white rounded-2xl py-12 md:py-8"
     >
-      {taskData ? (
+      {task ? (
         <Fragment>
           <h1 className="flex mb-6 text-2xl">
             <FaEdit className="mr-4" />
@@ -273,11 +279,11 @@ const UpdateTaskForm = () => {
                   <option value="" disabled>
                     Select a priority
                   </option>
-                  <option value="A" selected={taskData.priorite === "A"}>A : must do</option>
-                  <option value="B" selected={taskData.priorite === "B"}>B : should do</option>
-                  <option value="C" selected={taskData.priorite === "C"}>C : nice to do</option>
-                  <option value="D" selected={taskData.priorite === "D"}>D : to delegate</option>
-                  <option value="E" selected={taskData.priorite === "E"}>E : eliminate</option>
+                  <option value="A" selected={task.priorite === "A"}>A : must do</option>
+                  <option value="B" selected={task.priorite === "B"}>B : should do</option>
+                  <option value="C" selected={task.priorite === "C"}>C : nice to do</option>
+                  <option value="D" selected={task.priorite === "D"}>D : to delegate</option>
+                  <option value="E" selected={task.priorite === "E"}>E : eliminate</option>
                 </select>
               </div>
               <p className="mb-4 text-red-500">
@@ -310,9 +316,9 @@ const UpdateTaskForm = () => {
               <option value="" disabled>
                 Select a team
               </option>
-              {availableTeams.map((team, index) => (
-                <option key={index} value={team._id} selected={team._id === taskData.assignedTo}>
-                  {team.Name}
+              {availableTeams.map((child, index) => (
+                <option key={index} value={child._id} selected={child._id === task.team}>
+                  {child.Name}
                 </option>
               ))}
             </select>
@@ -343,7 +349,7 @@ const UpdateTaskForm = () => {
             <p>{popupMessage}</p>
             <button
               className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={() => setShowPopup(false)}
+              onClick={handlePopupClose}
             >
               OK
             </button>
