@@ -13,9 +13,36 @@ import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import MenuProject from "@/components/Employee/Project/MenuProject";
 import ProjectDetails from "@/components/Employee/Project/Main/DetailsMain";
 import ProgressCircle from "@/components/Employee/components/ProgressCercle";
+import Loader from "@/components/Loader";
+import axios from "axios";
 
 function Board() {
   const [showSideBar, setShowSideBar] = useState(true);
+  const [project, setProject] = useState({});
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const projectId = "666357fcb6ef230e0e262884";
+
+  const fetchProject = async (projectId) => {
+    try {
+      const response = await axiosInstance.get(`/project/projects?_id=${projectId}`);
+      const projectData = response.data[0];
+      console.log("project = ", response.data[0])
+      setProject(projectData);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes :', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProject(projectId);
+    
+  }, []);
 
   return (
     <div className="bg-white text-black">
@@ -31,9 +58,15 @@ function Board() {
         {showSideBar ? <SideBarEmployee currentPage="Project" /> : null}
         <div className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={0} />
-          
-          <ProjectDetails />
-          <BoardMain />
+          {/* Vérifier si project n'est pas vide avant de rendre les composants */}
+          {Object.keys(project).length > 0 ? (
+            <>
+              <ProjectDetails project={project} />
+              <BoardMain project={project} />
+            </>
+          ) : (
+            <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
+          )}
         </div>
       </div>
     </div>

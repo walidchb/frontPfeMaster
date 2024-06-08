@@ -25,12 +25,11 @@ const fetchTeams = async (organizationId) => {
 
 const fetchUsers = async (organizationId) => {
   try {
-    const response = await axiosInstance.post("/user/users", [
-      {
-        attribute: "organizations",
-        value: organizationId
+    const response = await axiosInstance.get("/user/users", {
+      params: {
+        organizations: organizationId
       }
-    ]);
+    });
     const users = response.data;
     return users;
   } catch (error) {
@@ -49,10 +48,11 @@ const AddProjectForm = () => {
     setPopupMessage(message);
     setShowPopup(true);
   };
+  const organizationId = '66609ae2a974839772c60e7b';
 
   useEffect(() => {
     const fetchData = async () => {
-      const organizationId = '66609ae2a974839772c60e7b';
+      
       const teams = await fetchTeams(organizationId);
       console.log("teams = ", teams);
       const users = await fetchUsers(organizationId);
@@ -90,7 +90,7 @@ const AddProjectForm = () => {
         boss: values.projectManager,
         teams: values.teams
       });
-      console.log(response.data);
+      console.log("sendproject", response.data);
       showPopupMessage('Project created successfully!'); // Afficher la pop-up de succès
       formik.resetForm(); // Réinitialiser les valeurs du formulaire
     } catch (error) {

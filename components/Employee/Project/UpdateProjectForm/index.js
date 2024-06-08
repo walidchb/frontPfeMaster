@@ -26,12 +26,12 @@ const axiosInstance = axios.create({
     
     const fetchUsers = async (organizationId) => {
       try {
-        const response = await axiosInstance.post("/user/users", [
-          {
-            attribute: "organizations",
-            value: organizationId
+        const response = await axiosInstance.get("/user/users", {
+          params: {
+            organizations: organizationId
           }
-        ]);
+        }
+        );
         const users = response.data;
         return users;
       } catch (error) {
@@ -52,31 +52,27 @@ const axiosInstance = axios.create({
         setShowPopup(true);
       };
       useEffect(() => {
-       
-        formik.setFieldValue("projectName", projectData.Name);
-        formik.setFieldValue("description", projectData.Description);
-        formik.setFieldValue("startDate", projectData.dateDebutEstim);
-        formik.setFieldValue("dueDate", projectData.dateFinEstim);
-        if(projectData.boss){formik.setFieldValue("projectManager", projectData.boss._id)};
-        if (projectData.teams) {
-          formik.setFieldValue("teams", projectData.teams);
-          console.log("teams = ",projectData.teams)
-        }
-       
-
-
-
+        
+          formik.setFieldValue("projectName", projectData.Name);
+          formik.setFieldValue("description", projectData.Description);
+          formik.setFieldValue("startDate", projectData.dateDebutEstim);
+          formik.setFieldValue("dueDate", projectData.dateFinEstim);
+          if(projectData.boss){formik.setFieldValue("projectManager", projectData.boss._id)};
+          if (projectData.teams) {
+            formik.setFieldValue("teams", projectData.teams);
+            console.log("teams = ",projectData.teams)
+          }
         console.log(projectData)
       }, [projectData]);
     
       const organizationId = "66609ae2a974839772c60e7b";
-      const projectId = "6663141bfcde5505d8f2cbb9";
+      const projectId = "6663a0343f2a480100ca8d6d";
   
       const fetchProjectToUpdate = async (projectId) => {
         try {
           const response = await axiosInstance.get(`/project/projects?_id=${projectId}`);
           // const project = response.data[0];
-          console.log(response.data[0])
+          console.log("response = ",response.data[0])
           setProjectData(response.data[0])
           // return project;
         } catch (error) {

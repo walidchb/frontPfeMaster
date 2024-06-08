@@ -48,6 +48,7 @@ import { GrValidate } from "react-icons/gr";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import UpdateTaskForm from "@/components/Employee/Project/UpdateTaskForm";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -282,6 +283,7 @@ const TaskPage = () => {
   const [ShowComments, setShowComments] = useState(true);
   const [MobileScreen, setMobileScreen] = useState(false);
   const [ShowShareModal, setShowShareModal] = useState(false);
+  const [updateIssueModal, setUpdateIssueModal] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
@@ -797,7 +799,7 @@ const TaskPage = () => {
                         </div>
                       ) : null}
                       <div className="flex justify-end px-2 py-1">
-                        <div className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                        <div onClick={() => setUpdateIssueModal(true)} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                           <MdEditDocument className="h-5 w-5 mr-1" />
                           <p>Edit</p>
                         </div>
@@ -1236,7 +1238,7 @@ const TaskPage = () => {
                       </div>
                     ) : null}
                     <div className="flex justify-end px-2 py-1">
-                      <div className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                      <div onClick={() => setUpdateIssueModal(true)} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                         <MdEditDocument className="h-5 w-5 mr-1" />
                         <p>Edit</p>
                       </div>
@@ -1310,6 +1312,52 @@ const TaskPage = () => {
                   </div>
                 </li>
               ))}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            width: "100vw",
+            height: "100vh",
+            backdropFilter: "blur(2px)",
+            backgroundColor: "rgba(255, 255, 255, 0)",
+          }}
+          className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+            updateIssueModal ? "opacity-100 visible" : "opacity-0 invisible"
+          } `}>
+          <div
+            style={{ width: "90vw", height: "90vh" }}
+            className="myShadow relative mx-auto   rounded-lg shadow-md bg-white">
+            <div className="flex justify-between items-center px-5 border-b border-gray-200">
+              <h3
+                style={{ height: "10vh" }}
+                className="text-xl sm:text-3xl font-medium text-gray-900 flex items-center">
+                Update Issue{" "}
+              </h3>
+
+              <button
+                type="button"
+                onClick={() => setUpdateIssueModal(false)}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center", // Centers the items horizontally
+                height: "78vh",
+                overflowY: "auto", // Enables vertical scrollbar if needed
+              }}
+              className="p-6 costumScrollBar overflow-y-auto">
+              <UpdateTaskForm />
             </div>
           </div>
         </div>
