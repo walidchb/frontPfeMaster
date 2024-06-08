@@ -21,6 +21,8 @@ import { useTranslations, useLocale } from "next-intl";
 import AccountTypeCard from "@/components/AccountTypeCard";
 import { Formik } from "formik";
 import { useFormik } from "formik";
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "@/store/features/auth/authSlice";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/config";
 import { useRouter } from "next/navigation";
@@ -53,12 +55,8 @@ const deleteUser = async (email) => {
 function Individuals() {
   const router = useRouter();
 
-  // const [createUserWithEmailAndPassword] =
-  //   useCreateUserWithEmailAndPassword(auth);
   const handleChangeGender = (selectedOption) => {
-    //  setSelectedCountry(selectedOption);
     formik.setFieldValue("gender", JSON.stringify(selectedOption));
-    // console.log("Selected option:", selectedOption);
   };
   const genders = [
     { value: "male", label: "Male" },
@@ -107,6 +105,7 @@ function Individuals() {
     console.log(email);
     await deleteUser(email);
   };
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -143,19 +142,24 @@ function Individuals() {
             password: values.password,
           });
           console.log(response.data);
-          signUPFireBase(values);
+          let userInfo = response.data;
+          // await localStorage.setItem("userInfo", JSON.stringify(response.data));
+          // dispatch(setUserInfo(user));
+
+          signUPFireBase(values, userInfo);
         } catch (error) {
-          console.error("Error:", error.response.data.error);
+          console.error("Error:", error?.response?.data?.error);
           setErrorCred({ userExist: error.response.data.error });
         }
       };
-      const signUPFireBase = (values) => {
+      const signUPFireBase = async (values, userInfo) => {
         try {
           createUserWithEmailAndPassword(auth, values.email, values.password)
-            .then((res) => {
+            .then(async (res) => {
               console.log("sucess");
               localStorage.setItem("user", true);
-
+              await localStorage.setItem("userInfo", JSON.stringify(userInfo));
+              dispatch(setUserInfo(userInfo));
               console.log(res);
               router.push(`/${locale}/Employee/BoardEmployee`);
             })

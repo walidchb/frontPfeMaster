@@ -16,6 +16,9 @@ import {
   MdOutlinePassword,
 } from "react-icons/md";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "@/store/features/auth/authSlice";
+import { setOrganization } from "@/store/features/organization/organizationSlice";
 
 import React, { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
@@ -25,6 +28,7 @@ import Select from "react-select";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 const deleteUserfromDataBaseAndFireBase = async (email) => {
+
   const user = auth.currentUser;
   try {
     const axiosInstance = axios.create({
@@ -62,6 +66,8 @@ const deleteUserfromDataBaseAndFireBase = async (email) => {
   }
 };
 function BusinessUsers() {
+    const dispatch = useDispatch();
+
   const router = useRouter();
   const getOptionLabel = (option) => option.name;
   const getOptionValue = (option) => JSON.stringify(option);
@@ -1113,7 +1119,8 @@ function BusinessUsers() {
           });
           console.log("user created successfuly in data base");
 
-          await signUPFireBase(values);
+          let userInfo = response.data; // Dispa
+          await signUPFireBase(values, userInfo);
         } catch (error) {
           // console.error("Error from backend:");
           if (error.response) {
@@ -1145,6 +1152,11 @@ function BusinessUsers() {
           );
           console.log("Organization created:", organizationResponse.data);
           localStorage.setItem("user", true);
+          await localStorage.setItem(
+            "organization",
+            JSON.stringify(organizationResponse.data)
+          );
+          dispatch(setOrganization(organizationResponse.data));
 
           router.push(`/${locale}/Employee/BoardEmployee`);
         } catch (error) {
@@ -1156,13 +1168,14 @@ function BusinessUsers() {
       };
 
       // Function to handle Firebase signup
-      const signUPFireBase = async (values) => {
+      const signUPFireBase = async (values, userInfo) => {
         try {
           createUserWithEmailAndPassword(auth, values.email, values.password)
-            .then((res) => {
+            .then(async (res) => {
               console.log("user created successfuly in firebase");
               createOrganization(values); // Create organization before Firebase signup
-
+              await localStorage.setItem("userInfo", JSON.stringify(userInfo));
+              dispatch(setUserInfo(userInfo));
               // console.log(res);
             })
             .catch((error) => {

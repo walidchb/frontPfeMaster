@@ -53,37 +53,56 @@ export const AuthProvider = ({ children }) => {
             email: email,
           },
         });
-        console.log("user to dispatch");
 
-        console.log(response.data);
         let user = response.data;
-        localStorage.setItem("userInfo", JSON.stringify(user));
+        await localStorage.setItem("userInfo", JSON.stringify(user));
         dispatch(setUserInfo(user)); // Dispatch action with fetched data
-        try {
-          const response = await axiosInstance.get(
-            "/organization/organizations",
-            {
-              params: {
-                Boss: user._id,
-              },
-            }
-          );
-          console.log("organization to dispatch");
+        if (user?.role === "orgBoss") {
+          try {
+            const response = await axiosInstance.get(
+              "/organization/organizations",
+              {
+                params: {
+                  Boss: user._id,
+                },
+              }
+            );
+            console.log("organization to dispatch");
 
-          console.log(response.data[0]);
-          dispatch(setOrganization(response.data[0]));
-          localStorage.setItem(
-            "organization",
-            JSON.stringify(response.data[0])
-          );
-          // Dispatch action with fetched data
+            console.log(response.data[0]);
+            dispatch(setOrganization(response.data[0]));
+            await localStorage.setItem(
+              "organization",
+              JSON.stringify(response.data[0])
+            );
 
-          sessionStorage.setItem("user", true);
-          localStorage.setItem("user", true);
-          router.push(`/${locale}/Employee/BoardEmployee`);
-          // dispatch(setUser(response.data)); // Dispatch action with fetched data
-        } catch (error) {
-          console.error("Error:", error);
+            sessionStorage.setItem("user", true);
+            localStorage.setItem("user", true);
+            router.push(`/${locale}/Employee/BoardEmployee`);
+            // dispatch(setUser(response.data)); // Dispatch action with fetched data
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        } else {
+          try {
+            const response = await axiosInstance.get(
+              "/organization/organizations",
+              {
+                params: {
+                  _id: user?.organizations[0]?._id,
+                },
+              }
+            );
+
+            dispatch(setOrganization(response.data[0]));
+            await localStorage.setItem(
+              "organization",
+              JSON.stringify(response.data[0])
+            );
+            router.push(`/${locale}/Employee/BoardEmployee`);
+          } catch (error) {
+            console.error("Error:", error);
+          }
         }
       } catch (error) {
         console.error("Error:", error);
@@ -94,9 +113,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-    // setLoading(true);
-    // await signInWithEmailAndPassword(auth, email, password);
-    // setLoading(false);
   };
 
   const logout = async () => {
@@ -105,6 +121,9 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
     sessionStorage.removeItem("user");
     localStorage.removeItem("user");
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("organization");
+
     setLoading(false);
   };
 

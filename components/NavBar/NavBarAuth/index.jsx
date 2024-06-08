@@ -50,8 +50,45 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const organization = JSON.parse(localStorage.getItem("organization"));
+  const [reload, setReload] = useState(false);
+
+  const [userInfo, setUserInfo] = useState({});
+  const [organization, setOrganization] = useState({});
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (userinfo && orga) {
+        console.log("la3zizaaa");
+
+        console.log(JSON.parse(userinfo));
+        console.log(JSON.parse(orga));
+
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (userinfo && orga) {
+        console.log("la3zizaaa");
+
+        console.log(JSON.parse(userinfo));
+        console.log(JSON.parse(orga));
+
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+    }
+  }, [reload]);
+
   const dispatch = useDispatch();
 
   const organisations = [1, 2, 4, 5];
@@ -64,7 +101,6 @@ function NavBarAuth({
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       const user = JSON.parse(localStorage.getItem("userInfo"));
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
@@ -72,9 +108,9 @@ function NavBarAuth({
             sendto: user._id,
           },
         });
-        console.log("invitaions");
+        // console.log("invitaions");
 
-        console.log(response.data);
+        // console.log(response.data);
         setInvitaions(response.data);
       } catch (error) {
         console.error("Error:", error);
@@ -83,6 +119,32 @@ function NavBarAuth({
 
     getinvitations();
   }, []);
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const user = JSON.parse(localStorage.getItem("userInfo"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            sendto: user._id,
+          },
+        });
+        // console.log("invitaions");
+
+        // console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, [reload]);
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -222,6 +284,7 @@ function NavBarAuth({
       isRead: false,
     },
   ];
+
   const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -259,7 +322,7 @@ function NavBarAuth({
               </div>
             ) : null}
             <div className="  flex max-w-min items-center justify-start sm:items-stretch sm:justify-start">
-              {userInfo.role != "orgBoss" ? (
+              {userInfo?.role != "orgBoss" ? (
                 <Menu
                   as="div"
                   className="z-20 relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
@@ -278,7 +341,7 @@ function NavBarAuth({
                       <MdBusinessCenter className="h-5 w-5 mr-2" />
 
                       <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                        {organization.Name}
+                        {organization?.Name}
                       </span>
                       <MdArrowDropDown className="h-5 w-5 " />
                     </Menu.Button>
@@ -301,7 +364,7 @@ function NavBarAuth({
                             : "30vw",
                       }}
                       className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {userInfo.organizations.map((item, index) => {
+                      {userInfo?.organizations?.map((item, index) => {
                         let textColor = getRandomColor();
                         return (
                           <Menu.Item key={index}>
@@ -326,18 +389,29 @@ function NavBarAuth({
                                     console.log("organization to dispatch");
 
                                     console.log(response.data[0]);
-                                    dispatch(setOrganization(response.data[0]));
+                                    // dispatch(setOrganization(response.data[0]));
+                                    localStorage.removeItem("organization");
                                     localStorage.setItem(
                                       "organization",
                                       JSON.stringify(response.data[0])
                                     );
+                                    console.log("local storage now ");
 
+                                    console.log(
+                                      JSON.stringify(
+                                        localStorage.getItem("organization")
+                                      )
+                                    );
+                                    router.push(
+                                      `/${locale}/Employee/BoardEmployee`
+                                    );
+                                    setReload(!reload);
                                     // dispatch(setUser(response.data)); // Dispatch action with fetched data
                                   } catch (error) {
                                     console.error("Error:", error);
                                   }
-                                  console.log("organization");
-                                  console.log(item);
+                                  // console.log("organization");
+                                  // console.log(item);
                                 }}
                                 style={{ color: textColor }}
                                 className={classNames(
@@ -347,7 +421,7 @@ function NavBarAuth({
                                 <MdBusinessCenter className={`h-5 w-5 mr-2 `} />
 
                                 <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                  {item.Name}
+                                  {item?.Name}
                                 </span>
                               </div>
                             )}
@@ -358,7 +432,9 @@ function NavBarAuth({
                   </Transition>
                 </Menu>
               ) : (
-                <h1 className="text-3xl text-white">{organization?.Name}</h1>
+                <h1 className="whitespace-nowrap overflow-hidden overflow-ellipsis text-3xl text-white">
+                  {organization?.Name}
+                </h1>
               )}
             </div>
             <div className=" flex justify-center items-center">
@@ -531,7 +607,7 @@ function NavBarAuth({
                               </Menu.Item>
                             ))
                           ) : (
-                            <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+                            <div className="w-12/12 rounded-sm  my-4 py-2 px-10 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
                               your notifications list is emptry
                             </div>
                           )}
@@ -622,7 +698,7 @@ function NavBarAuth({
                               </Menu.Item>
                             ))
                           ) : (
-                            <div className="w-11/12 rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
+                            <div className="w-12/12 rounded-sm  my-4 py-2 px-10 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
                               your invitaions list is emptry
                             </div>
                           )}

@@ -65,33 +65,7 @@ function SignIn() {
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(async () => {
                 await login(values.email, values.password);
-                // dispatch(
-                //   loginRequest({
-                //     email: values.email,
-                //     password: values.password,
-                //   })
-                // );
 
-                // router.push(`/${locale}/Employee/BoardEmployee`);
-
-                // try {
-                //   signInWithEmailAndPassword(auth, values.email, values.password)
-                //     .then((userCredential) => {
-                //       console.log("sucess");
-                //       sessionStorage.setItem("user", true);
-                //       localStorage.setItem("user", true);
-                //       // console.log(userCredential);
-                // router.push(`/${locale}/Employee/BoardEmployee`);
-                //     })
-                //     .catch((error) => {
-                //       // ..
-                //       console.error("Error signing in:", { error: error.code });
-                //       //  setErrors({ userExist: error.code });
-                //     });
-                //   // User signed up successfully
-                // } catch (error) {
-                //   console.error("Error:", error);
-                // }
                 setSubmitting(false);
               }, 400);
             }}>

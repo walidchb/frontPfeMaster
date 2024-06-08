@@ -28,8 +28,10 @@ function classNames(...classes) {
 }
 
 function MainEmployee() {
-  const [projects , setProjects] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [organizationId, setOrganizationId] = useState("");
   const [settings, setSettings] = useState({});
+
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
   const axiosInstance = axios.create({
     baseURL: "http://localhost:1937",
@@ -37,26 +39,57 @@ function MainEmployee() {
       "Content-Type": "application/json",
     },
   });
-  
-  const organizationId = "66609ae2a974839772c60e7b";
-  
+
+  const [userInfo, setUserInfo] = useState({});
+  const [organization, setOrganization] = useState({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (userinfo && orga) {
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+    }
+  }, []);
+  // const organizationId = "66609ae2a974839772c60e7b";
+
   const fetchProject = async (organizationId) => {
-    try {
-      const response = await axiosInstance.get(`/project/projects?organization=${organizationId}`);
-      console.log("responseData = ", response.data)
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des équipes :', error);
+    if (userInfo?.role === "orgBoss") {
+      try {
+        const response = await axiosInstance.get(
+          `/project/projects?organization=${organizationId}`
+        );
+        console.log("responseData = ", response.data);
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipes :", error);
+      }
+    } else if (userInfo?.role === "prjctBoss") {
+      console.log("prjctBoss");
+    } else {
+      try {
+        const response = await axiosInstance.get(`/user/userProjects`, {
+          params: { userId: userInfo?._id },
+        });
+        console.log("responseData = ", response.data);
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipes :", error);
+      }
     }
   };
 
   useEffect(() => {
-    
-    fetchProject(organizationId);
-  }, []);
+    if (userInfo?._id) {
+      fetchProject(organization?._id);
+    }
+  }, [organization]);
 
   useEffect(() => {
-    
     function handleResize() {
       // Adjust the number of slides to show based on screen width
       const screenWidth = window.innerWidth;
@@ -207,7 +240,7 @@ function MainEmployee() {
         {projects.length > 0 ? (
           <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
             {projects.map((child, index) => (
-              <ProjectCard key={index} project={child}/>
+              <ProjectCard key={index} project={child} />
             ))}
           </div>
         ) : (
@@ -349,7 +382,7 @@ function MainEmployee() {
                   }}
                   className="p-6 costumScrollBar overflow-y-auto">
                   {projects.map((child, index) => (
-                    <ProjectCard key={index} project={child}/>
+                    <ProjectCard key={index} project={child} />
                   ))}
                 </div>
               ) : (

@@ -34,8 +34,18 @@ import {
 function TeamsPage() {
   const [allPeople, setAllPeople] = useState([]);
   const [personFetched, setPersonFetched] = useState(false);
+  const [organization, setOrganization] = useState({}); // State to trigger rerender
 
-  const organization = JSON.parse(localStorage.getItem("organization"));
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const orga = localStorage.getItem("organization");
+      if (orga) {
+        let orgaJson = JSON.parse(orga);
+
+        setOrganization(orgaJson);
+      }
+    }
+  }, []);
   const [reload, setReload] = useState(false); // State to trigger rerender
   const [invitaions, setInvitaions] = useState([]);
   // get invitations
@@ -47,12 +57,11 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       const organization = JSON.parse(localStorage.getItem("organization"));
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
           params: {
-            organisation: organization._id,
+            organisation: organization?._id,
           },
         });
         console.log("invitaions");
@@ -74,12 +83,11 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       const organization = JSON.parse(localStorage.getItem("organization"));
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
           params: {
-            organisation: organization._id,
+            organisation: organization?._id,
           },
         });
         console.log("invitaions");
@@ -103,12 +111,11 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       const organization = JSON.parse(localStorage.getItem("organization"));
       try {
         const response = await axiosInstance.get("/team/teams", {
           params: {
-            Organization: organization._id,
+            Organization: organization?._id,
           },
         });
         console.log("teams");
@@ -134,12 +141,11 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       const organization = JSON.parse(localStorage.getItem("organization"));
       try {
         const response = await axiosInstance.get("/team/teams", {
           params: {
-            Organization: organization._id,
+            Organization: organization?._id,
           },
         });
         console.log("teams");
@@ -252,7 +258,6 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       try {
         const response = await axiosInstance.get("/user/users");
         console.log("people");
@@ -279,7 +284,6 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      // const organization = localStorage.getItem("organization");
       try {
         const response = await axiosInstance.get("/user/users");
         console.log("people");
@@ -320,7 +324,7 @@ function TeamsPage() {
     try {
       const response = await axiosInstance.post("/team/teams", {
         Name: values.teamName,
-        OrganizationId: organization._id,
+        OrganizationId: organization?._id,
       });
       console.log("team created");
       setShowCreateNewTeam(false);
@@ -373,11 +377,11 @@ function TeamsPage() {
     });
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization.Boss._id,
+        sendby: organization?.Boss._id,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,
-        organisation: organization._id,
+        organisation: organization?._id,
         accepted: false,
       });
 
