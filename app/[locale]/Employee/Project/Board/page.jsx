@@ -18,7 +18,18 @@ import axios from "axios";
 
 function Board() {
   const [showSideBar, setShowSideBar] = useState(true);
+  const [projectId, setProjectId] = useState("");
   const [project, setProject] = useState({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const projectinfo = localStorage.getItem("project");
+      if (projectinfo) {
+        let projectJson = JSON.parse(projectinfo);
+        setProjectId(projectJson?._id);
+      }
+    }
+  }, []);
   const axiosInstance = axios.create({
     baseURL: "http://localhost:1937",
     headers: {
@@ -26,23 +37,24 @@ function Board() {
     },
   });
 
-  const projectId = "666357fcb6ef230e0e262884";
+  // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
     try {
-      const response = await axiosInstance.get(`/project/projects?_id=${projectId}`);
+      const response = await axiosInstance.get(
+        `/project/projects?_id=${projectId}`
+      );
       const projectData = response.data[0];
-      console.log("project = ", response.data[0])
+      console.log("project = ", response.data[0]);
       setProject(projectData);
     } catch (error) {
-      console.error('Erreur lors de la récupération des équipes :', error);
+      console.error("Erreur lors de la récupération des équipes :", error);
     }
   };
 
   useEffect(() => {
     fetchProject(projectId);
-    
-  }, []);
+  }, [projectId]);
 
   return (
     <div className="bg-white text-black">
