@@ -68,7 +68,7 @@ const axiosInstance = axios.create({
         console.log(projectData)
       }, [project]);
     
-      const organizationId = "665ee35842437a997e99797b";
+      // const organizationId = "665ee35842437a997e99797b";
       const projectId = "6663a0343f2a480100ca8d6d";
   
       const fetchProjectToUpdate = async (projectId) => {
@@ -87,8 +87,8 @@ const axiosInstance = axios.create({
       const fetchAllData = async () => {
         try {
           const [teams, users] = await Promise.all([
-            fetchTeams(organizationId),
-            fetchUsers(organizationId),
+            fetchTeams(project?.organization?._id),
+            fetchUsers(project?.organization?._id),
           ]);
           setAvailableTeams(teams);
           setAvailableUsers(users);
@@ -107,7 +107,7 @@ const axiosInstance = axios.create({
         setSubmitting(true);
   
         try {
-          const response = await axiosInstance.patch(`/project/projects/${projectId}`, {
+          const response = await axiosInstance.patch(`/project/projects/${project?._id}`, {
             Name: values.projectName,
             Description: values.description,
             dateDebutEstim: values.startDate,
