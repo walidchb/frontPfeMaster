@@ -45,20 +45,23 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { pdfjs, Document, Page } from "react-pdf";
 import { GrValidate } from "react-icons/gr";
 import ProgressCircle from "@/components/Employee/components/ProgressCercle";
+import UpdateProjectForm from "../../UpdateProjectForm";
 
 
 
 
-const ProjectDetails = () => {
+const ProjectDetails = ({project}) => {
+  
   let text =
     "Import trace for requested module:Import trace for requestedmodule: Import trace for requested module:Import trace forrequested module:Import trace for requested module:Import tracefor requested module:Import trace for requested module:Importtrace for requested module:Import trace for requestedmodule:Import trace for requested module:Import trace forrequested module:Import trace for requested module:";
     const [ShowDescription, setShowDescription] = useState(true);
     const [ShowTitle, setShowTitle] = useState(true);
     const [showMore, setShowMore] = useState(false);
-    let showMoreButton = text.length >= 250 ? true : false;
     const [pageNumber, setPageNumber] = useState(1);
     const [numPages, setNumPages] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [doneTasks, setDoneTasks] = useState(0);
+    const [updateProjectModal, setUpdateProjectModal] = useState(false); 
     const [windowSize, setWindowSize] = useState({
       width: undefined,
       height: undefined,
@@ -137,22 +140,29 @@ const ProjectDetails = () => {
                  
                   className=" flex w-full">
                   <div className="bg-white flex-grow p-4 costumScrollBar ">
-                    <span
-                      onClick={() => setShowTitle(!ShowTitle)}
-                      className="cursor-pointer w-fit flex font-bold text-xl  items-center">
-                      {ShowTitle ? (
-                        <IoMdArrowDropdown className=" h-6 w-6" />
-                      ) : (
-                        <IoMdArrowDropright className=" h-6 w-6" />
-                      )}{" "}
-                      Title :
-                    </span>
+                  <div className="flex justify-between items-center">
+                  <span
+                    onClick={() => setShowTitle(!ShowTitle)}
+                    className="cursor-pointer w-fit flex font-bold text-xl items-center"
+                  >
                     {ShowTitle ? (
-                      <span className="font-bold text-xl flex">
-                        Import trace for requested module:Import trace for
-                        requested module:
-                      </span>
-                    ) : null}
+                      <IoMdArrowDropdown className=" h-6 w-6" />
+                    ) : (
+                      <IoMdArrowDropright className=" h-6 w-6" />
+                    )}{" "}
+                    Title :
+                  </span>
+                  <div
+                    onClick={() => setUpdateProjectModal(true)}
+                    className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline"
+                  >
+                    <MdEditDocument className="h-6 w-6 mr-1" />
+                    <p className="text-2xl">Edit</p>
+                  </div>
+                </div>
+                {ShowTitle ? (
+                  <span className="font-bold text-xl flex">{project.Name}</span>
+                ) : null}
 
                     <div className="flex flex-col md:flex-row justify-around items-center my-4">
   <div className="bg-gray-800 w-full md:w-fit h-fit lg:mr-6 mb-4 md:mb-0 rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10">
@@ -162,112 +172,145 @@ const ProjectDetails = () => {
       alt=""
     />
     <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-      Bonnie Green
+      {project.boss.nom} {project.boss.prenom}
     </h5>
     <span className="text-sm text-gray-500 dark:text-gray-400">
-      Team Leader
+      Project Leader
     </span>
-    <div className="text-white">Walidchebbab2001@gmail.com</div>
+    <div className="text-white">{project.boss.email}</div>
   </div>
-    <ProgressCircle completed={5} total={12} />
+    <ProgressCircle completed={doneTasks} total={project.tasks?.length} />
 </div>
 
-                    <span
-                      onClick={() => setShowDescription(!ShowDescription)}
-                      className="cursor-pointer w-fit flex font-bold text-xl my-2  items-center">
-                      {ShowDescription ? (
-                        <IoMdArrowDropdown className=" h-6 w-6" />
-                      ) : (
-                        <IoMdArrowDropright className=" h-6 w-6" />
-                      )}{" "}
-                      Description :
-                    </span>
+<span
+onClick={() => setShowDescription(!ShowDescription)}
+className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center"
+>
+{ShowDescription ? (
+  <IoMdArrowDropdown className="h-6 w-6" />
+) : (
+  <IoMdArrowDropright className="h-6 w-6" />
+)}{" "}
+Description :
+</span>
 
-                    {ShowDescription ? (
-                      <div className="">
-                        {showMore ? text : `${text.substring(0, 250)}`}
-                        {showMore ? (
-                          <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {images.map((child, index) => (
-                              <div
-                                key={index}
-                                // target="_blank"
-                                className="text-black  border-2 flex flex-col justify-between items-center"
-                                // href={{
-                                //   pathname: `/${locale}/Employee/Task/FileViewer`,
-                                //   query: { url: child.original },
-                                // }}
-                              >
-                                <div className=" overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                                  <img
-                                    className=" "
-                                    src={child.original}
-                                    frameborder="0"
-                                  />
-                                </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                    {" "}
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `photo dfgdfgdf ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                  onClick={() => handleDownload(child.original)}
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-                        {showMore ? (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {Docs.map((child, index) => (
-                              <div
-                                key={index}
-                                className="text-black  border-2 flex flex-col justify-between items-center">
-                                <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                                  {/* <div style={{ width: 300, height: 300 }}> */}
-                                  <Document
-                                    file={child.original}
-                                    onLoadSuccess={onDocumentLoadSuccess}>
-                                    <Page pageNumber={pageNumber} width={100} />
-                                  </Document>
-                                  {/* </div> */}
-                                </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `PDF ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                  onClick={() => handleDownload(child.original)}
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
+{ShowDescription ? (
+<div className="">
+  {showMore ? project.Description : `${project.Description?.substring(0, 250)}`}
+  {showMore && (
+    <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {images.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
+            <img className="" src={child.original} frameBorder="0" />
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `photo dfgdfgdf ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  {showMore && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {Docs.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
+            <Document
+              file={child.original}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={pageNumber} width={100} />
+            </Document>
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `PDF ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  <button
+    className="btn"
+    onClick={() => setShowMore(!showMore)}
+  >
+    {showMore ? "" : "..."}
+    <span className="text-sm text-blue-600">
+      {showMore ? "Show less" : "Show more"}
+    </span>
+  </button>
+</div>
+) : null}
+</div>
+<div
+          style={{
+            width: "100vw",
+            height: "100vh",
+            backdropFilter: "blur(2px)",
+            backgroundColor: "rgba(255, 255, 255, 0)",
+          }}
+          className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+            updateProjectModal ? "opacity-100 visible" : "opacity-0 invisible"
+          } `}>
+          <div
+            style={{ width: "90vw", height: "90vh" }}
+            className="myShadow relative mx-auto   rounded-lg shadow-md bg-white">
+            <div className="flex justify-between items-center px-5 border-b border-gray-200">
+              <h3
+                style={{ height: "10vh" }}
+                className="text-xl sm:text-3xl font-medium text-gray-900 flex items-center">
+                Update Project{" "}
+              </h3>
 
-                        {showMoreButton ? (
-                          <button
-                            className="btn"
-                            onClick={() => setShowMore(!showMore)}>
-                            {showMore ? "" : "..."}
-                            <span className="text-sm text-blue-600">
-                              {" "}
-                              {showMore ? "Show less" : "Show more"}
-                            </span>
-                          </button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    <div></div>
-                  </div>
-                </div>
+              <button
+                type="button"
+                onClick={() => setUpdateProjectModal(false)}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center", // Centers the items horizontally
+                height: "78vh",
+                overflowY: "auto", // Enables vertical scrollbar if needed
+              }}
+              className="p-6 costumScrollBar overflow-y-auto">
+              <UpdateProjectForm />
+            </div>
+          </div>
+        </div>
+</div>
   )
 };
 

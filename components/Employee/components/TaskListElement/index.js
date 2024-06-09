@@ -3,7 +3,7 @@ import "./style.css";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 
-function TaskListElement() {
+function TaskListElement({task}) {
   const locale = useLocale();
   const router = useRouter();
 
@@ -20,7 +20,7 @@ function TaskListElement() {
 
         <div className="text-sm w-11/12 ">
           <p className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-            Import trace for requested module:Import trace for requested module:
+            {task.Name}
           </p>
           <p>My Kanban Project</p>
         </div>

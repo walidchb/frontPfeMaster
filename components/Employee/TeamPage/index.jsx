@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import "./style.css";
 import { IoSearchCircle } from "react-icons/io5";
@@ -7,6 +8,7 @@ function TeamPage() {
   const findObjectById = (array, id) => {
     return array.find((obj) => obj.id === id);
   };
+  // <<<<<<< HEAD
   const [team, setTeam] = useState({});
   const [teamId, setTeamId] = useState(null);
   const [people, setPeople] = useState([]);
@@ -26,6 +28,36 @@ function TeamPage() {
     }
   }, []);
 
+  // =======
+  const [userInfo, setUserInfo] = useState({});
+  const [org, setOrg] = useState({});
+  // const [team, setteam] = useState({});
+
+  // Read from localStorage on component mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("userInfo");
+      console.log("nhy");
+      console.log(user);
+      if (user) {
+        console.log("fghjkljhgfgh");
+        console.log(JSON.parse(user));
+
+        setUserInfo(JSON.parse(user));
+        // setteam(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id))
+        console.log("team");
+        // console.log(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id));
+        console.log("qbdqt ");
+      }
+      const orgq = localStorage.getItem("organization");
+      if (orgq) {
+        setOrg(JSON.parse(orgq));
+      }
+    }
+  }, []);
+
+  // const team = userInfo?.team.find((obj) => obj.Organization === org._id);
+  // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
   useEffect(() => {
     const getTeams = async (values) => {
       const axiosInstance = axios.create({
@@ -50,6 +82,7 @@ function TeamPage() {
     };
 
     getTeams();
+    // <<<<<<< HEAD
   }, [teamId]);
   useEffect(() => {
     const getTeamMembers = async () => {
@@ -81,6 +114,9 @@ function TeamPage() {
 
     getTeamMembers();
   }, [teamId]);
+
+  // =======
+  // }, []);
 
   return (
     <div

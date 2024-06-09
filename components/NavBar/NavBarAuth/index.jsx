@@ -50,6 +50,7 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
+  // <<<<<<< HEAD
   const [reload, setReload] = useState(false);
 
   const [userInfo, setUserInfo] = useState({});
@@ -89,8 +90,19 @@ function NavBarAuth({
     }
   }, [reload]);
 
-  const dispatch = useDispatch();
+  // =======
 
+  // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
+  const dispatch = useDispatch();
+  // let userInfo = null;
+  // let organization = null;
+
+  if (typeof window !== "undefined") {
+    // Code s'exécutant dans le navigateur
+    userInfo = JSON.parse(window.localStorage.getItem("userInfo")) || null;
+    organization =
+      JSON.parse(window.localStorage.getItem("organization")) || null;
+  }
   const organisations = [1, 2, 4, 5];
   const [invitaions, setInvitaions] = useState([]);
   useEffect(() => {
@@ -364,7 +376,11 @@ function NavBarAuth({
                             : "30vw",
                       }}
                       className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {userInfo?.organizations?.map((item, index) => {
+                      {/* <<<<<<< HEAD */}
+                      {/* {userInfo?.organizations?.map((item, index) => { */}
+                      // =======
+                      {userInfo?.organizations.map((item, index) => {
+                        // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
                         let textColor = getRandomColor();
                         return (
                           <Menu.Item key={index}>
