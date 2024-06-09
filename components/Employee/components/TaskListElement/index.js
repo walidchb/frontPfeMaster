@@ -8,10 +8,15 @@ function TaskListElement({ task, project }) {
   const router = useRouter();
   let icon, statusInitials;
 
-  switch (task.status.toLowerCase()) {
+  switch (task?.status.toLowerCase()) {
     case "todo":
       icon = (
-        <img className="h-8 mr-2 w-auto" src="/images/list.png" alt="" srcSet="" />
+        <img
+          className="h-8 mr-2 w-auto"
+          src="/images/list.png"
+          alt=""
+          srcSet=""
+        />
       );
       statusInitials = "TD";
       break;
@@ -39,7 +44,12 @@ function TaskListElement({ task, project }) {
       break;
     case "done":
       icon = (
-        <img className="h-8 mr-2 w-auto" src="/images/checkbox.png" alt="" srcSet="" />
+        <img
+          className="h-8 mr-2 w-auto"
+          src="/images/checkbox.png"
+          alt=""
+          srcSet=""
+        />
       );
       statusInitials = "DN";
       break;
@@ -48,22 +58,21 @@ function TaskListElement({ task, project }) {
       statusInitials = "";
   }
 
-  const startDate = new Date(task.dateDebutEstim).toLocaleDateString();
-  const dueDate = new Date(task.dateFinEstim).toLocaleDateString();
+  const startDate = new Date(task?.dateDebutEstim).toLocaleDateString();
+  const dueDate = new Date(task?.dateFinEstim).toLocaleDateString();
 
   return (
     <div
       onClick={() => router.push(`/${locale}/Employee/Task`)}
-      className="TaskListElementContainer cursor-pointer rounded-xl py-2 my-2 px-4  flex justify-between items-center"
-    >
+      className="TaskListElementContainer cursor-pointer rounded-xl py-2 my-2 px-4  flex justify-between items-center">
       <div className="flex justify-start items-center w-8/12">
         {icon}
 
         <div className="text-sm w-11/12 ">
           <p className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-            {task.Name}
+            {task?.Name}
           </p>
-          <p>{project.Name}</p>
+          <p>{project?.Name}</p>
         </div>
       </div>
       <div className="flex justify-center items-center">
