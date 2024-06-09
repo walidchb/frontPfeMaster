@@ -62,10 +62,19 @@ const ProjectDetails = ({project}) => {
     const [loading, setLoading] = useState(true);
     const [doneTasks, setDoneTasks] = useState(0);
     const [updateProjectModal, setUpdateProjectModal] = useState(false); 
+    const [showUpdateProjectForm, setShowUpdateProjectForm] = useState(false);
     const [windowSize, setWindowSize] = useState({
       width: undefined,
       height: undefined,
     });
+    const handleCachUpdateProjectForm = () => {
+      setUpdateProjectModal(false);
+      setShowUpdateProjectForm(false);
+    };
+    const handleShowUpdateProjectForm = () => {
+      setUpdateProjectModal(true);
+      setShowUpdateProjectForm(true);
+    };
 
     const onDocumentLoadSuccess = ({ nextNumPages }) => {
       setNumPages(nextNumPages);
@@ -153,7 +162,7 @@ const ProjectDetails = ({project}) => {
                     Title :
                   </span>
                   <div
-                    onClick={() => setUpdateProjectModal(true)}
+                    onClick={handleShowUpdateProjectForm}
                     className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline"
                   >
                     <MdEditDocument className="h-6 w-6 mr-1" />
@@ -286,7 +295,7 @@ Description :
 
               <button
                 type="button"
-                onClick={() => setUpdateProjectModal(false)}
+                onClick={handleCachUpdateProjectForm}
                 className="text-gray-400 hover:text-gray-500 focus:outline-none">
                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -298,16 +307,19 @@ Description :
               </button>
             </div>
 
+    
             <div
-              style={{
-                display: "flex",
-                justifyContent: "center", // Centers the items horizontally
-                height: "78vh",
-                overflowY: "auto", // Enables vertical scrollbar if needed
-              }}
-              className="p-6 costumScrollBar overflow-y-auto">
-              <UpdateProjectForm />
-            </div>
+            style={{
+              display: "flex",
+              justifyContent: "center", // Centers the items horizontally
+              height: "78vh",
+              overflowY: "auto", // Enables vertical scrollbar if needed
+            }}
+            className="p-6 costumScrollBar overflow-y-auto">
+            {updateProjectModal && showUpdateProjectForm ? (
+              <UpdateProjectForm project={project} handleCachUpdateProjectForm={handleCachUpdateProjectForm}/>
+            ) : null}
+          </div>
           </div>
         </div>
 </div>

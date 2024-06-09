@@ -45,7 +45,7 @@ import React from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { pdfjs, Document, Page } from "react-pdf";
 import { GrValidate } from "react-icons/gr";
-
+import axios from "axios";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import UpdateTaskForm from "@/components/Employee/Project/UpdateTaskForm";
@@ -183,6 +183,18 @@ const TaskPage = () => {
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
   ];
+  const patchTaskStatus = async (newStatus) => {
+    try {
+      const response = await axiosInstance.patch(`/task/tasks/${taskId}`, {
+        status: newStatus,
+      });
+      const updatedTask = response.data;
+      console.log("taskupdate ", response.data)
+      setTaskData(updatedTask);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du statut :", error);
+    }
+  };
   const handleChangeStatus = (selectedOption) => {
     //  setSelectedCountry(selectedOption);
     console.log("object");
@@ -203,6 +215,61 @@ const TaskPage = () => {
   const [sent, setSent] = useState(true);
   // Décoder les données de la tâche à partir de l'URL
   const task = taskDetails ? JSON.parse(decodeURIComponent(taskDetails)) : null;
+  const [taskData, setTaskData] = useState({});
+  const [showUpdateTaskForm, setShowUpdateTaskForm] = useState(false);
+
+  const transformStatus = status => {
+    switch (status) {
+      case "Todo":
+        return "To Do"
+        break;
+      case "Inprogress":
+          return "In Progress"
+          break;
+      case "Inreview":
+        return "In Review"
+        break;
+      case "Done":
+        return "Done"
+        break;
+    }
+  }
+
+  const handleCachUpdateTaskForm = () => {
+    setUpdateIssueModal(false);
+    setShowUpdateTaskForm(false);
+  };
+  const handleShowUpdateTaskForm = () => {
+    setUpdateIssueModal(true);
+    setShowUpdateTaskForm(true);
+  };
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const taskId = "66646ed63b4dbc2fc5fe9596";
+
+  const fetchTask = async (taskId) => {
+    try {
+      const response = await axiosInstance.get(`/task/tasks?_id=${taskId}`);
+      const taskDat = response.data[0];
+      console.log("taskDat = ", response.data[0])
+      setTaskData(taskDat);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes :', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTask(taskId);
+    
+  }, []);
+  useEffect(() => {
+    
+  }, [taskData]);
 
   const [comments, setComments] = useState([
     {
@@ -319,20 +386,25 @@ const TaskPage = () => {
     };
   }, []);
   function getColor(letter) {
-    switch (letter.toLowerCase()) {
-      case "a":
-        return "red";
-      case "b":
-        return "blue";
-      case "c":
-        return "green";
-      case "d":
-        return "yellow";
-      case "e":
-        return "purple";
-      default:
-        return "black"; // default color if the input is not one of the specified letters
+    // Vérifiez si letter n'est pas undefined
+    if (typeof letter !== 'undefined') {
+      switch (letter.toLowerCase()) {
+        case "a":
+          return "red";
+        case "b":
+          return "blue";
+        case "c":
+          return "green";
+        case "d":
+          return "yellow";
+        case "e":
+          return "purple";
+        default:
+          return "black";
+      }
     }
+    // Si letter est undefined, retournez une couleur par défaut
+    return "black";
   }
   if (loading) {
     return <Loader />;
@@ -383,112 +455,92 @@ const TaskPage = () => {
                       </span>
                       {ShowTitle ? (
                         <span className="font-bold text-xl flex">
-                          Import trace for requested module:Import trace for
-                          requested module:
+                          {taskData.Name}
                         </span>
                       ) : null}
 
                       <span
-                        onClick={() => setShowDescription(!ShowDescription)}
-                        className="cursor-pointer w-fit flex font-bold text-xl my-2  items-center">
-                        {ShowDescription ? (
-                          <IoMdArrowDropdown className=" h-6 w-6" />
-                        ) : (
-                          <IoMdArrowDropright className=" h-6 w-6" />
-                        )}{" "}
-                        Description :
-                      </span>
+onClick={() => setShowDescription(!ShowDescription)}
+className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center"
+>
+{ShowDescription ? (
+  <IoMdArrowDropdown className="h-6 w-6" />
+) : (
+  <IoMdArrowDropright className="h-6 w-6" />
+)}{" "}
+Description :
+</span>
 
-                      {ShowDescription ? (
-                        <div className="">
-                          {showMore ? text : `${text.substring(0, 250)}`}
-                          {showMore ? (
-                            <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                              {images.map((child, index) => (
-                                <div
-                                  key={index}
-                                  // target="_blank"
-                                  className="text-black  border-2 flex flex-col justify-between items-center"
-                                  // href={{
-                                  //   pathname: `/${locale}/Employee/Task/FileViewer`,
-                                  //   query: { url: child.original },
-                                  // }}
-                                >
-                                  <div className=" overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                                    <img
-                                      className=" "
-                                      src={child.original}
-                                      frameborder="0"
-                                    />
-                                  </div>
-                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                      {" "}
-                                      {child.original.split("/").pop()
-                                        ? child.original.split("/").pop()
-                                        : `photo dfgdfgdf ${index}`}
-                                    </p>
-                                    <FaCircleDown
-                                      onClick={() =>
-                                        handleDownload(child.original)
-                                      }
-                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : null}
-                          {showMore ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                              {Docs.map((child, index) => (
-                                <div
-                                  key={index}
-                                  className="text-black  border-2 flex flex-col justify-between items-center">
-                                  <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                                    {/* <div style={{ width: 300, height: 300 }}> */}
-                                    <Document
-                                      file={child.original}
-                                      onLoadSuccess={onDocumentLoadSuccess}>
-                                      <Page
-                                        pageNumber={pageNumber}
-                                        width={100}
-                                      />
-                                    </Document>
-                                    {/* </div> */}
-                                  </div>
-                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                      {child.original.split("/").pop()
-                                        ? child.original.split("/").pop()
-                                        : `PDF ${index}`}
-                                    </p>
-                                    <FaCircleDown
-                                      onClick={() =>
-                                        handleDownload(child.original)
-                                      }
-                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : null}
-
-                          {showMoreButton ? (
-                            <button
-                              className="btn"
-                              onClick={() => setShowMore(!showMore)}>
-                              {showMore ? "" : "..."}
-                              <span className="text-sm text-blue-600">
-                                {" "}
-                                {showMore ? "Show less" : "Show more"}
-                              </span>
-                            </button>
-                          ) : null}
-                        </div>
-                      ) : null}
-                      <div></div>
+{ShowDescription ? (
+<div className="">
+  {showMore ? taskData?.Description : `${taskData.Description?.substring(0, 250)}`}
+  {showMore && (
+    <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {images.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
+            <img className="" src={child.original} frameBorder="0" />
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `photo dfgdfgdf ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  {showMore && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {Docs.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
+            <Document
+              file={child.original}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={pageNumber} width={100} />
+            </Document>
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `PDF ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  <button
+    className="btn"
+    onClick={() => setShowMore(!showMore)}
+  >
+    {showMore ? "" : "..."}
+    <span className="text-sm text-blue-600">
+      {showMore ? "Show less" : "Show more"}
+    </span>
+  </button>
+</div>
+) : null}
+                    <div></div>  
                       <div className="mb-4">
                         <span
                           onClick={() => setShowComments(!ShowComments)}
@@ -576,27 +628,16 @@ const TaskPage = () => {
                       <div className="flex justify-between items-center">
                         <Menu as="div" className=" relative w-min ">
                           <div>
-                            <Menu.Button
-                              style={{ height: "5vh" }}
-                              className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
-                              <div
-                                href="#"
-                                className={classNames(
-                                  "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
-                                )}>
-                                <img
-                                  className="w-6 h-6 "
-                                  src="/images/list.png"
-                                  alt=""
-                                  srcset=""
-                                />{" "}
-                                <span className="mx-2"> To Do</span>
-                              </div>
-                              <MdArrowDropDown
-                                color="white"
-                                className="h-6 w-6 "
-                              />
-                            </Menu.Button>
+                          <Menu.Button
+                            style={{ height: "7vh" }}
+                            className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm"
+                          >
+                            <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
+                              <img className="w-6 h-6" src="/images/list.png" alt="" />
+                              <span className="mx-2">{transformStatus(taskData?.status)}</span>
+                            </div>
+                            <MdArrowDropDown color="white" className="h-6 w-6" />
+                          </Menu.Button>
                           </div>
                           <Transition
                             as={Fragment}
@@ -605,30 +646,27 @@ const TaskPage = () => {
                             enterTo="transform opacity-100 scale-100"
                             leave="transition ease-in duration-75"
                             leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95">
+                            leaveTo="transform opacity-0 scale-95"
+                          >
                             <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  onClick={() => patchTaskStatus("Todo")}
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}
+                                >
+                                  <img className="w-6 h-6 mr-2" src="/images/list.png" alt="" />
+                                  To Do
+                                </div>
+                              )}
+                            </Menu.Item>
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    href="#"
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/list.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    To Do
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    href="#"
+                                    onClick={() => patchTaskStatus("Inprogress")}
                                     className={classNames(
                                       active ? "bg-blue-300" : "",
                                       " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -646,7 +684,7 @@ const TaskPage = () => {
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    href="#"
+                                    onClick={() => patchTaskStatus("Inreview")}
                                     className={classNames(
                                       active ? "bg-blue-300" : "",
                                       " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -664,7 +702,7 @@ const TaskPage = () => {
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    href="#"
+                                    onClick={() => patchTaskStatus("Done")}
                                     className={classNames(
                                       active ? "bg-blue-300" : "",
                                       " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -716,7 +754,7 @@ const TaskPage = () => {
                               <div>
                                 <div className="flex">
                                   <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                                  <p>Unassigned</p>
+                                  <p>{taskData?.affectedto ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}` : "Unassigned"}</p>
                                 </div>
                                 {!showAssigneeModal ? (
                                   <p
@@ -763,43 +801,35 @@ const TaskPage = () => {
                               ))}
                             </div>
                           ) : null}
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Priority </p>{" "}
-                            <p
-                              style={{ backgroundColor: getColor("e") }}
-                              className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
-                              A
-                            </p>
-                          </div>
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Created </p> <p>value</p>
-                          </div>
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Estimated Time</p>{" "}
-                            <p>value</p>
-                          </div>
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Start Date</p> <p>value</p>
-                          </div>
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Progress</p> <p>value</p>
-                          </div>
-                          <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Reporter</p>{" "}
-                            <div className="flex">
-                              <img
-                                className="bg-white rounded-full w-6 h-6 mr-2"
-                                src="/images/code-review.png"
-                                alt=""
-                                srcset=""
-                              />
-                              <p>value</p>
-                            </div>
-                          </div>
+                          <div className="my-2 flex justify-start items-center">
+                          <p className="w-6/12">Priority </p>{" "}
+                          <p
+                            style={{ backgroundColor: getColor(taskData?.priorite) }}
+                            className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
+                            {taskData?.priorite}
+                          </p>
                         </div>
+                        
+                        <div className="my-2 flex justify-start">
+                          <p className="w-6/12">Must start : </p> <p>{taskData?.dateDebutEstim ? new Date(taskData?.dateDebutEstim).toISOString().split('T')[0] : ''}</p>
+                        </div>
+                        <div className="my-2 flex justify-start">
+                            <p className="w-6/12">Must end : </p>{" "}
+                            <p>{taskData?.dateFinEstim ? new Date(taskData?.dateFinEstim).toISOString().split('T')[0] : ''}</p>
+                        </div>
+                        <div className="my-2 flex justify-start">
+                          <p className="w-6/12">Start Date : </p> <p>{taskData?.dateDebutReel ? new Date(taskData?.dateDebutReel).toISOString().split('T')[0] : 'Not yet'}</p>
+                        </div>
+                        <div className="my-2 flex justify-start">
+                          <p className="w-6/12">End Date : </p> <p>{taskData?.dateFinReel ? new Date(taskData?.dateFinReel).toISOString().split('T')[0] : 'Not yet'}</p>
+                        </div>
+                        <div className="my-2 flex justify-start">
+                          <p className="w-6/12">Project : </p> <p>{taskData?.projet?.Name}</p>
+                        </div>
+                      </div>
                       ) : null}
                       <div className="flex justify-end px-2 py-1">
-                        <div onClick={() => setUpdateIssueModal(true)} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                        <div onClick={handleShowUpdateTaskForm} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                           <MdEditDocument className="h-5 w-5 mr-1" />
                           <p>Edit</p>
                         </div>
@@ -828,108 +858,91 @@ const TaskPage = () => {
                     </span>
                     {ShowTitle ? (
                       <span className="font-bold text-xl flex">
-                        Import trace for requested module:Import trace for
-                        requested module:
+                        {taskData?.Name}
                       </span>
                     ) : null}
 
                     <span
-                      onClick={() => setShowDescription(!ShowDescription)}
-                      className="cursor-pointer w-fit flex font-bold text-xl my-2  items-center">
-                      {ShowDescription ? (
-                        <IoMdArrowDropdown className=" h-6 w-6" />
-                      ) : (
-                        <IoMdArrowDropright className=" h-6 w-6" />
-                      )}{" "}
-                      Description :
-                    </span>
+onClick={() => setShowDescription(!ShowDescription)}
+className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center"
+>
+{ShowDescription ? (
+  <IoMdArrowDropdown className="h-6 w-6" />
+) : (
+  <IoMdArrowDropright className="h-6 w-6" />
+)}{" "}
+Description :
+</span>
 
-                    {ShowDescription ? (
-                      <div className="">
-                        {showMore ? text : `${text.substring(0, 250)}`}
-                        {showMore ? (
-                          <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {images.map((child, index) => (
-                              <div
-                                key={index}
-                                // target="_blank"
-                                className="text-black  border-2 flex flex-col justify-between items-center"
-                                // href={{
-                                //   pathname: `/${locale}/Employee/Task/FileViewer`,
-                                //   query: { url: child.original },
-                                // }}
-                              >
-                                <div className=" overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                                  <img
-                                    className=" "
-                                    src={child.original}
-                                    frameborder="0"
-                                  />
-                                </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                    {" "}
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `photo dfgdfgdf ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                    onClick={() =>
-                                      handleDownload(child.original)
-                                    }
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-                        {showMore ? (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {Docs.map((child, index) => (
-                              <div
-                                key={index}
-                                className="text-black  border-2 flex flex-col justify-between items-center">
-                                <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                                  {/* <div style={{ width: 300, height: 300 }}> */}
-                                  <Document
-                                    file={child.original}
-                                    onLoadSuccess={onDocumentLoadSuccess}>
-                                    <Page pageNumber={pageNumber} width={100} />
-                                  </Document>
-                                  {/* </div> */}
-                                </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis ">
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `PDF ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                    onClick={() =>
-                                      handleDownload(child.original)
-                                    }
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-
-                        {showMoreButton ? (
-                          <button
-                            className="btn"
-                            onClick={() => setShowMore(!showMore)}>
-                            {showMore ? "" : "..."}
-                            <span className="text-sm text-blue-600">
-                              {" "}
-                              {showMore ? "Show less" : "Show more"}
-                            </span>
-                          </button>
-                        ) : null}
-                      </div>
-                    ) : null}
+{ShowDescription ? (
+<div className="">
+  {showMore ? taskData?.Description : `${taskData?.Description?.substring(0, 250)}`}
+  {showMore && (
+    <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {images.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
+            <img className="" src={child.original} frameBorder="0" />
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `photo dfgdfgdf ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  {showMore && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {Docs.map((child, index) => (
+        <div
+          key={index}
+          className="text-black border-2 flex flex-col justify-between items-center"
+        >
+          <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
+            <Document
+              file={child.original}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={pageNumber} width={100} />
+            </Document>
+          </div>
+          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {child.original.split("/").pop()
+                ? child.original.split("/").pop()
+                : `PDF ${index}`}
+            </p>
+            <FaCircleDown
+              onClick={() => handleDownload(child.original)}
+              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  <button
+    className="btn"
+    onClick={() => setShowMore(!showMore)}
+  >
+    {showMore ? "" : "..."}
+    <span className="text-sm text-blue-600">
+      {showMore ? "Show less" : "Show more"}
+    </span>
+  </button>
+</div>
+) : null}
                     <div></div>
                     <div className="mb-4">
                       <span
@@ -1014,29 +1027,18 @@ const TaskPage = () => {
 
                   <div className=" w-5/12 lg:w-4/12 bg-white p-2 overflow-y-auto costumScrollBar">
                     <div className="flex justify-between items-center">
-                      <Menu as="div" className=" relative w-min ">
-                        <div>
-                          <Menu.Button
-                            style={{ height: "7vh" }}
-                            className=" h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm     ">
-                            <div
-                              href="#"
-                              className={classNames(
-                                "whitespace-nowrap  px-4 py-2 text-sm text-white flex justify-start items-center"
-                              )}>
-                              <img
-                                className="w-6 h-6 "
-                                src="/images/list.png"
-                                alt=""
-                                srcset=""
-                              />{" "}
-                              <span className="mx-2"> To Do</span>
-                            </div>
-                            <MdArrowDropDown
-                              color="white"
-                              className="h-6 w-6 "
-                            />
-                          </Menu.Button>
+                    <Menu as="div" className=" relative w-min ">
+                      <div>
+                        <Menu.Button
+                          style={{ height: "7vh" }}
+                          className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm"
+                        >
+                          <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
+                            <img className="w-6 h-6" src="/images/list.png" alt="" />
+                            <span className="mx-2">{transformStatus(taskData?.status)}</span>
+                          </div>
+                          <MdArrowDropDown color="white" className="h-6 w-6" />
+                        </Menu.Button>
                         </div>
                         <Transition
                           as={Fragment}
@@ -1045,30 +1047,27 @@ const TaskPage = () => {
                           enterTo="transform opacity-100 scale-100"
                           leave="transition ease-in duration-75"
                           leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95">
+                          leaveTo="transform opacity-0 scale-95"
+                        >
                           <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                onClick={() => patchTaskStatus("Todo")}
+                                className={classNames(
+                                  active ? "bg-blue-300" : "",
+                                  "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                )}
+                              >
+                                <img className="w-6 h-6 mr-2" src="/images/list.png" alt="" />
+                                To Do
+                              </div>
+                            )}
+                          </Menu.Item>
                             <Menu.Item>
                               {({ active }) => (
                                 <div
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/list.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  To Do
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href="#"
+                                  onClick={() => patchTaskStatus("Inprogress")}
                                   className={classNames(
                                     active ? "bg-blue-300" : "",
                                     " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -1086,7 +1085,7 @@ const TaskPage = () => {
                             <Menu.Item>
                               {({ active }) => (
                                 <div
-                                  href="#"
+                                  onClick={() => patchTaskStatus("Inreview")}
                                   className={classNames(
                                     active ? "bg-blue-300" : "",
                                     " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -1104,7 +1103,7 @@ const TaskPage = () => {
                             <Menu.Item>
                               {({ active }) => (
                                 <div
-                                  href="#"
+                                  onClick={() => patchTaskStatus("Done")}
                                   className={classNames(
                                     active ? "bg-blue-300" : "",
                                     " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -1156,7 +1155,7 @@ const TaskPage = () => {
                             <div className="">
                               <div className="flex ">
                                 <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                                <p>Unassigned</p>
+                                <p>{taskData?.affectedto ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}` : "Unassigned"}</p>
                               </div>
                               {!showAssigneeModal ? (
                                 <p
@@ -1206,39 +1205,32 @@ const TaskPage = () => {
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p
-                            style={{ backgroundColor: getColor("e") }}
+                            style={{ backgroundColor: getColor(taskData?.priorite) }}
                             className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
-                            A
+                            {taskData?.priorite}
                           </p>
                         </div>
+                        
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Created </p> <p>value</p>
+                          <p className="w-6/12">Must start : </p> <p>{taskData?.dateDebutEstim ? new Date(taskData?.dateDebutEstim).toISOString().split('T')[0] : ''}</p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Estimated Time</p> <p>value</p>
+                            <p className="w-6/12">Must end : </p>{" "}
+                            <p>{taskData?.dateFinEstim ? new Date(taskData?.dateFinEstim).toISOString().split('T')[0] : ''}</p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Start Date</p> <p>value</p>
+                          <p className="w-6/12">Start Date : </p> <p>{taskData?.dateDebutReel ? new Date(taskData?.dateDebutReel).toISOString().split('T')[0] : 'Not yet'}</p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Progress</p> <p>value</p>
+                          <p className="w-6/12">End Date : </p> <p>{taskData?.dateFinReel ? new Date(taskData?.dateFinReel).toISOString().split('T')[0] : 'Not yet'}</p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Reporter</p>{" "}
-                          <div className="flex">
-                            <img
-                              className="bg-white rounded-full w-6 h-6 mr-2"
-                              src="/images/code-review.png"
-                              alt=""
-                              srcset=""
-                            />
-                            <p>value</p>
-                          </div>
+                          <p className="w-6/12">Project : </p> <p>{taskData?.projet?.Name}</p>
                         </div>
                       </div>
                     ) : null}
                     <div className="flex justify-end px-2 py-1">
-                      <div onClick={() => setUpdateIssueModal(true)} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                      <div onClick={handleShowUpdateTaskForm} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                         <MdEditDocument className="h-5 w-5 mr-1" />
                         <p>Edit</p>
                       </div>
@@ -1337,7 +1329,7 @@ const TaskPage = () => {
 
               <button
                 type="button"
-                onClick={() => setUpdateIssueModal(false)}
+                onClick={handleCachUpdateTaskForm}
                 className="text-gray-400 hover:text-gray-500 focus:outline-none">
                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -1349,16 +1341,19 @@ const TaskPage = () => {
               </button>
             </div>
 
+            
             <div
-              style={{
-                display: "flex",
-                justifyContent: "center", // Centers the items horizontally
-                height: "78vh",
-                overflowY: "auto", // Enables vertical scrollbar if needed
-              }}
-              className="p-6 costumScrollBar overflow-y-auto">
-              <UpdateTaskForm />
-            </div>
+            style={{
+              display: "flex",
+              justifyContent: "center", // Centers the items horizontally
+              height: "78vh",
+              overflowY: "auto", // Enables vertical scrollbar if needed
+            }}
+            className="p-6 costumScrollBar overflow-y-auto">
+            {updateIssueModal && showUpdateTaskForm ? (
+              <UpdateTaskForm task={taskData} handleCachUpdateTaskForm={handleCachUpdateTaskForm} />
+            ) : null}
+          </div>
           </div>
         </div>
       </div>

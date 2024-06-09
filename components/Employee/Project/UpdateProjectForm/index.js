@@ -40,32 +40,35 @@ const axiosInstance = axios.create({
       }
     };
   
-    const UpdateProjectForm = () => {
+    const UpdateProjectForm = ({project, handleCachUpdateProjectForm}) => {
       const [availableTeams, setAvailableTeams] = useState([]);
       const [availableUsers, setAvailableUsers] = useState([]);
       const [showPopup, setShowPopup] = useState(false);
       const [popupMessage, setPopupMessage] = useState("");
       const [projectData, setProjectData] = useState({});
+
+      const handlePopupClose = () => {
+        setShowPopup(false);
+        handleCachUpdateProjectForm() // Masquer le composant UpdateProjectForm
+      };
     
       const showPopupMessage = (message) => {
         setPopupMessage(message);
         setShowPopup(true);
       };
       useEffect(() => {
-        
-          formik.setFieldValue("projectName", projectData.Name);
-          formik.setFieldValue("description", projectData.Description);
-          formik.setFieldValue("startDate", projectData.dateDebutEstim);
-          formik.setFieldValue("dueDate", projectData.dateFinEstim);
-          if(projectData.boss){formik.setFieldValue("projectManager", projectData.boss._id)};
-          if (projectData.teams) {
-            formik.setFieldValue("teams", projectData.teams);
-            console.log("teams = ",projectData.teams)
-          }
+        if(project){
+          formik.setFieldValue("projectName", project.Name);
+          formik.setFieldValue("description", project.Description);
+          formik.setFieldValue("startDate", project.dateDebutEstim);
+          formik.setFieldValue("dueDate", project.dateFinEstim);
+          formik.setFieldValue("projectManager", project.boss?._id);
+          formik.setFieldValue("teams", project.teams);
+        }
         console.log(projectData)
-      }, [projectData]);
+      }, [project]);
     
-      const organizationId = "66609ae2a974839772c60e7b";
+      const organizationId = "665ee35842437a997e99797b";
       const projectId = "6663a0343f2a480100ca8d6d";
   
       const fetchProjectToUpdate = async (projectId) => {
@@ -96,7 +99,7 @@ const axiosInstance = axios.create({
   
       useEffect(() => {
         fetchAllData();
-        fetchProjectToUpdate(projectId)
+        // fetchProjectToUpdate(projectId)
 
       }, []);
 
@@ -129,7 +132,7 @@ const axiosInstance = axios.create({
       };
     
       const formik = useFormik({
-        initialValues: projectData,
+        initialValues: project,
         enableReinitialize: true,
         validationSchema: Yup.object().shape({
           projectName: Yup.string().required("Required"),
@@ -304,7 +307,7 @@ const axiosInstance = axios.create({
                 Select a project manager
               </option>
               {availableUsers.map((user) => (
-                <option key={user._id} value={user._id} selected={user._id === projectData.boss}>
+                <option key={user._id} value={user._id} selected={user._id === project.boss._id}>
                   {user.nom} {user.prenom}
                 </option>
               ))}
@@ -420,7 +423,7 @@ const axiosInstance = axios.create({
               <p>{popupMessage}</p>
               <button
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => setShowPopup(false)}
+                onClick={handlePopupClose}
               >
                 OK
               </button>
