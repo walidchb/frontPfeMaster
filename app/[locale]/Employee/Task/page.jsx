@@ -190,16 +190,13 @@ const TaskPage = () => {
       });
       const updatedTask = response.data;
       console.log("taskupdate ", response.data)
-      setTaskData(updatedTask);
+      
+      fetchTask(taskId);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut :", error);
     }
   };
-  const handleChangeStatus = (selectedOption) => {
-    //  setSelectedCountry(selectedOption);
-    console.log("object");
-    // console.log("Selected option:", selectedOption);
-  };
+  
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -265,10 +262,9 @@ const TaskPage = () => {
 
   useEffect(() => {
     fetchTask(taskId);
-    
   }, []);
   useEffect(() => {
-    
+
   }, [taskData]);
 
   const [comments, setComments] = useState([
