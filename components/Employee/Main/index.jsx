@@ -31,6 +31,34 @@ function MainEmployee() {
   const [projects, setProjects] = useState([]);
   const [organizationId, setOrganizationId] = useState("");
   const [settings, setSettings] = useState({});
+  const [allTasks, setAllTasks] = useState([]);
+  const [todoTasks, setTodoTasks] = useState([]);
+  const [inProgressTasks, setInProgressTasks] = useState([]);
+  const [inReviewTasks, setInReviewTasks] = useState([]);
+  const [doneTasks, setDoneTasks] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const fetchTasks = async (userId) => {
+    try {
+      const response = await axiosInstance.get(`/task/userTasks?userId=${userId}`);
+      setAllTasks(response.data);
+      filterTasks(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches :", error);
+    }
+  };
+  const filterTasks = (tasks) => {
+    setTodoTasks(tasks.filter(task => task.status === "Todo"));
+    setInProgressTasks(tasks.filter(task => task.status === "Inprogress"));
+    setInReviewTasks(tasks.filter(task => task.status === "Inreview"));
+    setDoneTasks(tasks.filter(task => task.status === "Done"));
+  };
+
+  // useEffect(() => {
+  //   if (userInfo?._id) {
+  //     fetchTasks(userInfo._id);
+  //   }
+  // }, [userInfo]);
 
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
   const axiosInstance = axios.create({
@@ -56,6 +84,55 @@ function MainEmployee() {
     }
   }, []);
   // const organizationId = "66609ae2a974839772c60e7b";
+  const fetchProjectsAndTasks = async (organizationId, userId) => {
+    if (userInfo?.role === "orgBoss") {
+      try {
+        const response = await axiosInstance.get(
+          `/project/projects?organization=${organizationId}`
+        );
+        console.log("responseData = ", response.data);
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipes :", error);
+      }
+    } else if (userInfo?.role === "prjctBoss") {
+        try {
+          // Récupérer les projets
+          const projectsResponse = await axiosInstance.get(
+            `/project/projects?organization=${organizationId}&boss=${userId}`
+          );
+          const projects = projectsResponse.data;
+          setProjects(projects);
+      
+          // Extraire les IDs des projets
+          const projectIds = projects.map(project => project._id);
+      
+          // Récupérer les tâches liées à ces projets
+          const tasksResponse = await axiosInstance.get('/task/tasks', {
+            params: { projet: projectIds }
+          });
+          const tasks = tasksResponse.data;
+          setAllTasks(tasks);
+          filterTasks(tasks);
+      
+          console.log("Projets récupérés : ", projects);
+          console.log("Tâches récupérées : ", tasks);
+          console.log("todoTasks = ", todoTasks)
+        } catch (error) {
+          console.error("Erreur lors de la récupération des projets et des tâches :", error);
+        }
+      } else if (userInfo?.role === "employee") {
+        try {
+          const response = await axiosInstance.get(`/user/userProjects`, {
+            params: { userId: userInfo?._id },
+          });
+          console.log("responseData = ", response.data);
+          setProjects(response.data);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des équipes :", error);
+        }
+      }
+  };
 
   const fetchProject = async (organizationId) => {
     if (userInfo?.role === "orgBoss") {
@@ -69,7 +146,18 @@ function MainEmployee() {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
     } else if (userInfo?.role === "prjctBoss") {
-      console.log("prjctBoss");
+        try {
+          const response = await axiosInstance.get(
+            `/project/projects?organization=${organizationId}&boss=${userInfo?._id}`
+          );
+          const response1 = await axiosInstance.get(`/task/userTasks?userId=${userId}`);
+          setAllTasks(response1.data);
+          filterTasks(response1.data);
+          console.log("responseData = ", response.data);
+          setProjects(response.data);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des équipes :", error);
+        }
     } else {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
@@ -84,10 +172,16 @@ function MainEmployee() {
   };
 
   useEffect(() => {
-    if (userInfo?._id) {
-      fetchProject(organization?._id);
+    if (userInfo?._id && organization?._id) {
+      fetchProjectsAndTasks(organization._id, userInfo._id);
     }
-  }, [organization]);
+  }, [organization, userInfo]);
+
+  // useEffect(() => {
+  //   if (userInfo?._id) {
+  //     fetchProject(organization?._id);
+  //   }
+  // }, [organization]);
 
   useEffect(() => {
     function handleResize() {
@@ -198,19 +292,19 @@ function MainEmployee() {
     console.log("Selected option:", selectedOption);
   };
   const Status = [
-    { value: "worked On", label: "Worked On" },
-    { value: "assigned to me", label: "Assigned to me" },
-    { value: "viewed", label: "Viewed" },
-    { value: "starred", label: "Starred" },
+    { value: "To Do", label: "To Do" },
+    { value: "In Progress", label: "In Progress" },
+    { value: "In Review", label: "In Review" },
+    { value: "Done", label: "Done" },
   ];
-  const defaultStatus = { value: "worked on", label: "Worked On" };
+  const defaultStatus = { value: "To Do", label: "To Do" };
   const [navigation, setNavigation] = useState([
-    { name: "Worked On", href: `#`, current: true },
-    { name: "Viewed", href: "#", current: false },
-    { name: "Assigned to me", href: `#`, current: false },
-    { name: "Starred", href: `#`, current: false },
+    { name: "To Do", href: `#`, current: true },
+    { name: "In Progress", href: "#", current: false },
+    { name: "In Review", href: `#`, current: false },
+    { name: "Done", href: `#`, current: false },
   ]);
-  const [curScreen, setCurScreen] = useState(1);
+  const [curScreen, setCurScreen] = useState(0);
   const [showAddProjectFrom, setShowAddProjectFrom] = useState(false);
   return (
     <div
@@ -256,12 +350,13 @@ function MainEmployee() {
               onClick={() => setCurScreen(index)}
               key={item.name}
               className={classNames(
-                index == curScreen
+                index === curScreen
                   ? "bg-gray-900 text-white"
                   : "text-gray-900 hover:bg-gray-700 hover:text-white",
-                " px-3 py-2 text-sm font-medium border-r-2"
+                "px-3 py-2 text-sm font-medium border-r-2"
               )}
-              aria-current={item.current ? "page" : undefined}>
+              aria-current={item.current ? "page" : undefined}
+            >
               {item.name}
             </button>
           ))}
@@ -292,18 +387,47 @@ function MainEmployee() {
           </div>
         </div>
 
-        {navigation.length > 0 ? (
-          <div className="">
-            {navigation.map((item, index) => (
-              <TaskListElement key={index} />
-            ))}
-          </div>
-        ) : (
-          <div className=" w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
-            your Task list is emptry
-          </div>
-        )}
-      </div>
+        <div>
+  {curScreen === 0 && todoTasks.length > 0 ? (
+    todoTasks.map((task, taskIndex) => (
+      <TaskListElement key={taskIndex} task={task} project={task.projet}/>
+    ))
+  ) : curScreen === 0 ? (
+    <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+      Your Task list is empty for "To Do" tasks
+    </div>
+  ) : null}
+
+  {curScreen === 1 && inProgressTasks.length > 0 ? (
+    inProgressTasks.map((task, taskIndex) => (
+      <TaskListElement key={taskIndex} task={task} project={task.projet}/>
+    ))
+  ) : curScreen === 1 ? (
+    <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+      Your Task list is empty for "In Progress" tasks
+    </div>
+  ) : null}
+
+  {curScreen === 2 && inReviewTasks.length > 0 ? (
+    inReviewTasks.map((task, taskIndex) => (
+      <TaskListElement key={taskIndex} task={task} project={task.projet}/>
+    ))
+  ) : curScreen === 2 ? (
+    <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+      Your Task list is empty for "In Review" tasks
+    </div>
+  ) : null}
+
+  {curScreen === 3 && doneTasks.length > 0 ? (
+    doneTasks.map((task, taskIndex) => (
+      <TaskListElement key={taskIndex} task={task} project={task.projet}/>
+    ))
+  ) : curScreen === 3 ? (
+    <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+      Your Task list is empty for "Done" tasks
+    </div>
+  ) : null}
+</div>
 
       <div
         style={{
@@ -405,6 +529,7 @@ function MainEmployee() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -248,6 +248,7 @@ const TaskPage = () => {
   });
 
   const taskId = "66646ed63b4dbc2fc5fe9596";
+  const userId = "666435387431e9b597dd7282"
 
   const fetchTask = async (taskId) => {
     try {
@@ -262,36 +263,79 @@ const TaskPage = () => {
 
   useEffect(() => {
     fetchTask(taskId);
+    fetchComments(taskId);
   }, []);
   useEffect(() => {
 
   }, [taskData]);
 
-  const [comments, setComments] = useState([
-    {
-      author: "John Doe",
-      date: "2023-05-01 10:30",
-      text: "Premier commentaire",
-    },
-    {
-      author: "Jane Smith",
-      date: "2023-05-02 14:45",
-      text: "Deuxième commentaire",
-    },
-  ]);
+  const fetchComments = async (taskId) => {
+    try {
+      const response = await axiosInstance.get(`/comment/comments?taskId=${taskId}`);
+      const comments = response.data;
+      console.log("comments = ", response.data)
+      setComments(comments);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes :', error);
+    }
+  };
+  function convertDateFormat(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    return formattedDate;
+  }
+  // {
+  //   author: "John Doe",
+  //   date: "2023-05-01 10:30",
+  //   text: "Premier commentaire",
+  // },
+  // {
+  //   author: "Jane Smith",
+  //   date: "2023-05-02 14:45",
+  //   text: "Deuxième commentaire",
+  // },
+
+  const [comments, setComments] = useState([]);
   const validationSchema = Yup.object().shape({
-    comment: Yup.string().required("Le commentaire est requis"),
+    comment: Yup.string().required("Le commentaire ne doit pas etre vide"),
   });
 
-  const handleAddComment = (values, { resetForm }) => {
-    const newComment = {
-      author: "Vous", // Vous pouvez remplacer 'Vous' par le nom de l'utilisateur authentifié
-      date: new Date().toLocaleString(),
-      text: values.comment,
-    };
-    setComments([...comments, newComment]);
-    resetForm();
+  const handleAddComment = async (values, resetForm, taskId, userId) => {
+    try {
+      const response = await axiosInstance.post(`/comment/comments`, {
+        content: values.comment,
+        taskId: taskId,
+        authorId: userId
+      });
+      const comment = response.data;
+      console.log("comment = ", response.data)
+      fetchComments(taskId);
+      resetForm();
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes :', error);
+    }
   };
+
+  useEffect(() => {
+    console.log("efef comment")
+    
+  }, [comments]);
+
+  // const handleAddComment = (values, { resetForm }) => {
+  //   const newComment = {
+  //     author: "Vous", // Vous pouvez remplacer 'Vous' par le nom de l'utilisateur authentifié
+  //     date: new Date().toLocaleString(),
+  //     text: values.comment,
+  //   };
+  //   setComments([...comments, newComment]);
+  //   resetForm();
+  // };
   let text =
     "Import trace for requested module:Import trace for requestedmodule: Import trace for requested module:Import trace forrequested module:Import trace for requested module:Import tracefor requested module:Import trace for requested module:Importtrace for requested module:Import trace for requestedmodule:Import trace for requested module:Import trace forrequested module:Import trace for requested module:";
   const [showMore, setShowMore] = useState(false);
@@ -554,7 +598,7 @@ Description :
                             <Formik
                               initialValues={{ comment: "" }}
                               validationSchema={validationSchema}
-                              onSubmit={handleAddComment}>
+                              onSubmit={(values, { resetForm }) => handleAddComment(values, resetForm, taskId, userId)}>
                               {({ errors, touched }) => (
                                 <Form>
                                   <div className="relative  mb-4">
@@ -596,20 +640,20 @@ Description :
                                     </div>
                                     <div>
                                       <p className="text-gray-600 font-semibold">
-                                        {comment.author}{" "}
+                                        {comment?.authorId?.nom} {comment?.authorId?.prenom}{" "}
                                         <span className="text-gray-500 font-normal">
-                                          ({comment.date})
+                                          ({convertDateFormat(comment?.createdAt)})
                                         </span>
                                       </p>
                                       <p className="text-gray-600">
-                                        {comment.text}
+                                        {comment?.content}
                                       </p>
                                     </div>
                                   </li>
                                 ))}
                               </ul>
                             ) : (
-                              <p className="text-gray-500">
+                              <p className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
                                 Aucun commentaire pour le moment.
                               </p>
                             )}
@@ -957,7 +1001,7 @@ Description :
                           <Formik
                             initialValues={{ comment: "" }}
                             validationSchema={validationSchema}
-                            onSubmit={handleAddComment}>
+                            onSubmit={(values, { resetForm }) => handleAddComment(values, resetForm, taskId, userId)}>
                             {({ errors, touched }) => (
                               <Form>
                                 <div className="relative  mb-4">
@@ -999,20 +1043,20 @@ Description :
                                   </div>
                                   <div>
                                     <p className="text-gray-600 font-semibold">
-                                      {comment.author}{" "}
+                                      {comment?.authorId?.nom} {comment?.authorId?.prenom}{" "}
                                       <span className="text-gray-500 font-normal">
-                                        ({comment.date})
+                                        ({convertDateFormat(comment?.createdAt)})
                                       </span>
                                     </p>
                                     <p className="text-gray-600">
-                                      {comment.text}
+                                      {comment?.content}
                                     </p>
                                   </div>
                                 </li>
                               ))}
                             </ul>
                           ) : (
-                            <p className="text-gray-500">
+                            <p className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
                               Aucun commentaire pour le moment.
                             </p>
                           )}

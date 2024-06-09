@@ -8,7 +8,7 @@ import { useTranslations, useLocale } from "next-intl";
 function ProjectCard({project}) {
   const locale = useLocale();
   const router = useRouter();
-  const doneTasks = project.tasks.filter(task => task.status == "Done");
+  const doneTasks = project.tasks.filter(task => task.status === "Done");
 
   return (
     <div
