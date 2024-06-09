@@ -189,14 +189,14 @@ const TaskPage = () => {
         status: newStatus,
       });
       const updatedTask = response.data;
-      console.log("taskupdate ", response.data)
-      
+      console.log("taskupdate ", response.data);
+
       fetchTask(taskId);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut :", error);
     }
   };
-  
+
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -215,22 +215,22 @@ const TaskPage = () => {
   const [taskData, setTaskData] = useState({});
   const [showUpdateTaskForm, setShowUpdateTaskForm] = useState(false);
 
-  const transformStatus = status => {
+  const transformStatus = (status) => {
     switch (status) {
       case "Todo":
-        return "To Do"
+        return "To Do";
         break;
       case "Inprogress":
-          return "In Progress"
-          break;
+        return "In Progress";
+        break;
       case "Inreview":
-        return "In Review"
+        return "In Review";
         break;
       case "Done":
-        return "Done"
+        return "Done";
         break;
     }
-  }
+  };
 
   const handleCachUpdateTaskForm = () => {
     setUpdateIssueModal(false);
@@ -248,49 +248,69 @@ const TaskPage = () => {
   });
 
   const taskId = "66646ed63b4dbc2fc5fe9596";
+  const userId = "666435387431e9b597dd7282";
 
   const fetchTask = async (taskId) => {
     try {
       const response = await axiosInstance.get(`/task/tasks?_id=${taskId}`);
       const taskDat = response.data[0];
-      console.log("taskDat = ", response.data[0])
+      console.log("taskDat = ", response.data[0]);
       setTaskData(taskDat);
     } catch (error) {
-      console.error('Erreur lors de la récupération des équipes :', error);
+      console.error("Erreur lors de la récupération des équipes :", error);
     }
   };
 
   useEffect(() => {
     fetchTask(taskId);
+    fetchComments(taskId);
   }, []);
-  useEffect(() => {
+  useEffect(() => {}, [taskData]);
 
-  }, [taskData]);
+  const fetchComments = async (taskId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/comment/comments?taskId=${taskId}`
+      );
+      const comments = response.data;
+      console.log("comments = ", response.data);
+      setComments(comments);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des équipes :", error);
+    }
+  };
+  function convertDateFormat(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
 
-  const [comments, setComments] = useState([
-    {
-      author: "John Doe",
-      date: "2023-05-01 10:30",
-      text: "Premier commentaire",
-    },
-    {
-      author: "Jane Smith",
-      date: "2023-05-02 14:45",
-      text: "Deuxième commentaire",
-    },
-  ]);
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    return formattedDate;
+  }
+
+  const [comments, setComments] = useState([]);
   const validationSchema = Yup.object().shape({
     comment: Yup.string().required("Le commentaire est requis"),
+    comment: Yup.string().required("Le commentaire ne doit pas etre vide"),
   });
 
-  const handleAddComment = (values, { resetForm }) => {
-    const newComment = {
-      author: "Vous", // Vous pouvez remplacer 'Vous' par le nom de l'utilisateur authentifié
-      date: new Date().toLocaleString(),
-      text: values.comment,
-    };
-    setComments([...comments, newComment]);
-    resetForm();
+  const handleAddComment = async (values, resetForm, taskId, userId) => {
+    try {
+      const response = await axiosInstance.post(`/comment/comments`, {
+        content: values.comment,
+        taskId: taskId,
+        authorId: userId,
+      });
+      const comment = response.data;
+      console.log("comment = ", response.data);
+      fetchComments(taskId);
+      resetForm();
+    } catch (error) {
+      console.error("Erreur lors de la récupération des équipes :", error);
+    }
   };
   let text =
     "Import trace for requested module:Import trace for requestedmodule: Import trace for requested module:Import trace forrequested module:Import trace for requested module:Import tracefor requested module:Import trace for requested module:Importtrace for requested module:Import trace for requestedmodule:Import trace for requested module:Import trace forrequested module:Import trace for requested module:";
@@ -383,7 +403,7 @@ const TaskPage = () => {
   }, []);
   function getColor(letter) {
     // Vérifiez si letter n'est pas undefined
-    if (typeof letter !== 'undefined') {
+    if (typeof letter !== "undefined") {
       switch (letter.toLowerCase()) {
         case "a":
           return "red";
@@ -456,87 +476,95 @@ const TaskPage = () => {
                       ) : null}
 
                       <span
-onClick={() => setShowDescription(!ShowDescription)}
-className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center"
->
-{ShowDescription ? (
-  <IoMdArrowDropdown className="h-6 w-6" />
-) : (
-  <IoMdArrowDropright className="h-6 w-6" />
-)}{" "}
-Description :
-</span>
+                        onClick={() => setShowDescription(!ShowDescription)}
+                        className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center">
+                        {ShowDescription ? (
+                          <IoMdArrowDropdown className="h-6 w-6" />
+                        ) : (
+                          <IoMdArrowDropright className="h-6 w-6" />
+                        )}{" "}
+                        Description :
+                      </span>
 
-{ShowDescription ? (
-<div className="">
-  {showMore ? taskData?.Description : `${taskData.Description?.substring(0, 250)}`}
-  {showMore && (
-    <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {images.map((child, index) => (
-        <div
-          key={index}
-          className="text-black border-2 flex flex-col justify-between items-center"
-        >
-          <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-            <img className="" src={child.original} frameBorder="0" />
-          </div>
-          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-              {child.original.split("/").pop()
-                ? child.original.split("/").pop()
-                : `photo dfgdfgdf ${index}`}
-            </p>
-            <FaCircleDown
-              onClick={() => handleDownload(child.original)}
-              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-  {showMore && (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {Docs.map((child, index) => (
-        <div
-          key={index}
-          className="text-black border-2 flex flex-col justify-between items-center"
-        >
-          <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-            <Document
-              file={child.original}
-              onLoadSuccess={onDocumentLoadSuccess}
-            >
-              <Page pageNumber={pageNumber} width={100} />
-            </Document>
-          </div>
-          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-              {child.original.split("/").pop()
-                ? child.original.split("/").pop()
-                : `PDF ${index}`}
-            </p>
-            <FaCircleDown
-              onClick={() => handleDownload(child.original)}
-              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-  <button
-    className="btn"
-    onClick={() => setShowMore(!showMore)}
-  >
-    {showMore ? "" : "..."}
-    <span className="text-sm text-blue-600">
-      {showMore ? "Show less" : "Show more"}
-    </span>
-  </button>
-</div>
-) : null}
-                    <div></div>  
+                      {ShowDescription ? (
+                        <div className="">
+                          {showMore
+                            ? taskData?.Description
+                            : `${taskData.Description?.substring(0, 250)}`}
+                          {showMore && (
+                            <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                              {images.map((child, index) => (
+                                <div
+                                  key={index}
+                                  className="text-black border-2 flex flex-col justify-between items-center">
+                                  <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
+                                    <img
+                                      className=""
+                                      src={child.original}
+                                      frameBorder="0"
+                                    />
+                                  </div>
+                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                      {child.original.split("/").pop()
+                                        ? child.original.split("/").pop()
+                                        : `photo dfgdfgdf ${index}`}
+                                    </p>
+                                    <FaCircleDown
+                                      onClick={() =>
+                                        handleDownload(child.original)
+                                      }
+                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {showMore && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                              {Docs.map((child, index) => (
+                                <div
+                                  key={index}
+                                  className="text-black border-2 flex flex-col justify-between items-center">
+                                  <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
+                                    <Document
+                                      file={child.original}
+                                      onLoadSuccess={onDocumentLoadSuccess}>
+                                      <Page
+                                        pageNumber={pageNumber}
+                                        width={100}
+                                      />
+                                    </Document>
+                                  </div>
+                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                      {child.original.split("/").pop()
+                                        ? child.original.split("/").pop()
+                                        : `PDF ${index}`}
+                                    </p>
+                                    <FaCircleDown
+                                      onClick={() =>
+                                        handleDownload(child.original)
+                                      }
+                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <button
+                            className="btn"
+                            onClick={() => setShowMore(!showMore)}>
+                            {showMore ? "" : "..."}
+                            <span className="text-sm text-blue-600">
+                              {showMore ? "Show less" : "Show more"}
+                            </span>
+                          </button>
+                        </div>
+                      ) : null}
+                      <div></div>
                       <div className="mb-4">
                         <span
                           onClick={() => setShowComments(!ShowComments)}
@@ -554,7 +582,14 @@ Description :
                             <Formik
                               initialValues={{ comment: "" }}
                               validationSchema={validationSchema}
-                              onSubmit={handleAddComment}>
+                              onSubmit={(values, { resetForm }) =>
+                                handleAddComment(
+                                  values,
+                                  resetForm,
+                                  taskId,
+                                  userId
+                                )
+                              }>
                               {({ errors, touched }) => (
                                 <Form>
                                   <div className="relative  mb-4">
@@ -596,20 +631,25 @@ Description :
                                     </div>
                                     <div>
                                       <p className="text-gray-600 font-semibold">
-                                        {comment.author}{" "}
+                                        {comment?.authorId?.nom}{" "}
+                                        {comment?.authorId?.prenom}{" "}
                                         <span className="text-gray-500 font-normal">
-                                          ({comment.date})
+                                          (
+                                          {convertDateFormat(
+                                            comment?.createdAt
+                                          )}
+                                          )
                                         </span>
                                       </p>
                                       <p className="text-gray-600">
-                                        {comment.text}
+                                        {comment?.content}
                                       </p>
                                     </div>
                                   </li>
                                 ))}
                               </ul>
                             ) : (
-                              <p className="text-gray-500">
+                              <p className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
                                 Aucun commentaire pour le moment.
                               </p>
                             )}
@@ -624,16 +664,24 @@ Description :
                       <div className="flex justify-between items-center">
                         <Menu as="div" className=" relative w-min ">
                           <div>
-                          <Menu.Button
-                            style={{ height: "7vh" }}
-                            className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm"
-                          >
-                            <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
-                              <img className="w-6 h-6" src="/images/list.png" alt="" />
-                              <span className="mx-2">{transformStatus(taskData?.status)}</span>
-                            </div>
-                            <MdArrowDropDown color="white" className="h-6 w-6" />
-                          </Menu.Button>
+                            <Menu.Button
+                              style={{ height: "7vh" }}
+                              className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm">
+                              <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
+                                <img
+                                  className="w-6 h-6"
+                                  src="/images/list.png"
+                                  alt=""
+                                />
+                                <span className="mx-2">
+                                  {transformStatus(taskData?.status)}
+                                </span>
+                              </div>
+                              <MdArrowDropDown
+                                color="white"
+                                className="h-6 w-6"
+                              />
+                            </Menu.Button>
                           </div>
                           <Transition
                             as={Fragment}
@@ -642,27 +690,31 @@ Description :
                             enterTo="transform opacity-100 scale-100"
                             leave="transition ease-in duration-75"
                             leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95"
-                          >
+                            leaveTo="transform opacity-0 scale-95">
                             <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Todo")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}
-                                >
-                                  <img className="w-6 h-6 mr-2" src="/images/list.png" alt="" />
-                                  To Do
-                                </div>
-                              )}
-                            </Menu.Item>
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={() => patchTaskStatus("Inprogress")}
+                                    onClick={() => patchTaskStatus("Todo")}
+                                    className={classNames(
+                                      active ? "bg-blue-300" : "",
+                                      "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                    )}>
+                                    <img
+                                      className="w-6 h-6 mr-2"
+                                      src="/images/list.png"
+                                      alt=""
+                                    />
+                                    To Do
+                                  </div>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    onClick={() =>
+                                      patchTaskStatus("Inprogress")
+                                    }
                                     className={classNames(
                                       active ? "bg-blue-300" : "",
                                       " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
@@ -750,7 +802,11 @@ Description :
                               <div>
                                 <div className="flex">
                                   <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                                  <p>{taskData?.affectedto ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}` : "Unassigned"}</p>
+                                  <p>
+                                    {taskData?.affectedto
+                                      ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}`
+                                      : "Unassigned"}
+                                  </p>
                                 </div>
                                 {!showAssigneeModal ? (
                                   <p
@@ -798,34 +854,66 @@ Description :
                             </div>
                           ) : null}
                           <div className="my-2 flex justify-start items-center">
-                          <p className="w-6/12">Priority </p>{" "}
-                          <p
-                            style={{ backgroundColor: getColor(taskData?.priorite) }}
-                            className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
-                            {taskData?.priorite}
-                          </p>
-                        </div>
-                        
-                        <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Must start : </p> <p>{taskData?.dateDebutEstim ? new Date(taskData?.dateDebutEstim).toISOString().split('T')[0] : ''}</p>
-                        </div>
-                        <div className="my-2 flex justify-start">
+                            <p className="w-6/12">Priority </p>{" "}
+                            <p
+                              style={{
+                                backgroundColor: getColor(taskData?.priorite),
+                              }}
+                              className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
+                              {taskData?.priorite}
+                            </p>
+                          </div>
+
+                          <div className="my-2 flex justify-start">
+                            <p className="w-6/12">Must start : </p>{" "}
+                            <p>
+                              {taskData?.dateDebutEstim
+                                ? new Date(taskData?.dateDebutEstim)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : ""}
+                            </p>
+                          </div>
+                          <div className="my-2 flex justify-start">
                             <p className="w-6/12">Must end : </p>{" "}
-                            <p>{taskData?.dateFinEstim ? new Date(taskData?.dateFinEstim).toISOString().split('T')[0] : ''}</p>
+                            <p>
+                              {taskData?.dateFinEstim
+                                ? new Date(taskData?.dateFinEstim)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : ""}
+                            </p>
+                          </div>
+                          <div className="my-2 flex justify-start">
+                            <p className="w-6/12">Start Date : </p>{" "}
+                            <p>
+                              {taskData?.dateDebutReel
+                                ? new Date(taskData?.dateDebutReel)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : "Not yet"}
+                            </p>
+                          </div>
+                          <div className="my-2 flex justify-start">
+                            <p className="w-6/12">End Date : </p>{" "}
+                            <p>
+                              {taskData?.dateFinReel
+                                ? new Date(taskData?.dateFinReel)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : "Not yet"}
+                            </p>
+                          </div>
+                          <div className="my-2 flex justify-start">
+                            <p className="w-6/12">Project : </p>{" "}
+                            <p>{taskData?.projet?.Name}</p>
+                          </div>
                         </div>
-                        <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Start Date : </p> <p>{taskData?.dateDebutReel ? new Date(taskData?.dateDebutReel).toISOString().split('T')[0] : 'Not yet'}</p>
-                        </div>
-                        <div className="my-2 flex justify-start">
-                          <p className="w-6/12">End Date : </p> <p>{taskData?.dateFinReel ? new Date(taskData?.dateFinReel).toISOString().split('T')[0] : 'Not yet'}</p>
-                        </div>
-                        <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Project : </p> <p>{taskData?.projet?.Name}</p>
-                        </div>
-                      </div>
                       ) : null}
                       <div className="flex justify-end px-2 py-1">
-                        <div onClick={handleShowUpdateTaskForm} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                        <div
+                          onClick={handleShowUpdateTaskForm}
+                          className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                           <MdEditDocument className="h-5 w-5 mr-1" />
                           <p>Edit</p>
                         </div>
@@ -859,86 +947,91 @@ Description :
                     ) : null}
 
                     <span
-onClick={() => setShowDescription(!ShowDescription)}
-className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center"
->
-{ShowDescription ? (
-  <IoMdArrowDropdown className="h-6 w-6" />
-) : (
-  <IoMdArrowDropright className="h-6 w-6" />
-)}{" "}
-Description :
-</span>
+                      onClick={() => setShowDescription(!ShowDescription)}
+                      className="cursor-pointer w-fit flex font-bold text-xl my-2 items-center">
+                      {ShowDescription ? (
+                        <IoMdArrowDropdown className="h-6 w-6" />
+                      ) : (
+                        <IoMdArrowDropright className="h-6 w-6" />
+                      )}{" "}
+                      Description :
+                    </span>
 
-{ShowDescription ? (
-<div className="">
-  {showMore ? taskData?.Description : `${taskData?.Description?.substring(0, 250)}`}
-  {showMore && (
-    <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {images.map((child, index) => (
-        <div
-          key={index}
-          className="text-black border-2 flex flex-col justify-between items-center"
-        >
-          <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-            <img className="" src={child.original} frameBorder="0" />
-          </div>
-          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-              {child.original.split("/").pop()
-                ? child.original.split("/").pop()
-                : `photo dfgdfgdf ${index}`}
-            </p>
-            <FaCircleDown
-              onClick={() => handleDownload(child.original)}
-              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-  {showMore && (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {Docs.map((child, index) => (
-        <div
-          key={index}
-          className="text-black border-2 flex flex-col justify-between items-center"
-        >
-          <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-            <Document
-              file={child.original}
-              onLoadSuccess={onDocumentLoadSuccess}
-            >
-              <Page pageNumber={pageNumber} width={100} />
-            </Document>
-          </div>
-          <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-            <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-              {child.original.split("/").pop()
-                ? child.original.split("/").pop()
-                : `PDF ${index}`}
-            </p>
-            <FaCircleDown
-              onClick={() => handleDownload(child.original)}
-              className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-  <button
-    className="btn"
-    onClick={() => setShowMore(!showMore)}
-  >
-    {showMore ? "" : "..."}
-    <span className="text-sm text-blue-600">
-      {showMore ? "Show less" : "Show more"}
-    </span>
-  </button>
-</div>
-) : null}
+                    {ShowDescription ? (
+                      <div className="">
+                        {showMore
+                          ? taskData?.Description
+                          : `${taskData?.Description?.substring(0, 250)}`}
+                        {showMore && (
+                          <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            {images.map((child, index) => (
+                              <div
+                                key={index}
+                                className="text-black border-2 flex flex-col justify-between items-center">
+                                <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
+                                  <img
+                                    className=""
+                                    src={child.original}
+                                    frameBorder="0"
+                                  />
+                                </div>
+                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                    {child.original.split("/").pop()
+                                      ? child.original.split("/").pop()
+                                      : `photo dfgdfgdf ${index}`}
+                                  </p>
+                                  <FaCircleDown
+                                    onClick={() =>
+                                      handleDownload(child.original)
+                                    }
+                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {showMore && (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            {Docs.map((child, index) => (
+                              <div
+                                key={index}
+                                className="text-black border-2 flex flex-col justify-between items-center">
+                                <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
+                                  <Document
+                                    file={child.original}
+                                    onLoadSuccess={onDocumentLoadSuccess}>
+                                    <Page pageNumber={pageNumber} width={100} />
+                                  </Document>
+                                </div>
+                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                    {child.original.split("/").pop()
+                                      ? child.original.split("/").pop()
+                                      : `PDF ${index}`}
+                                  </p>
+                                  <FaCircleDown
+                                    onClick={() =>
+                                      handleDownload(child.original)
+                                    }
+                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          className="btn"
+                          onClick={() => setShowMore(!showMore)}>
+                          {showMore ? "" : "..."}
+                          <span className="text-sm text-blue-600">
+                            {showMore ? "Show less" : "Show more"}
+                          </span>
+                        </button>
+                      </div>
+                    ) : null}
                     <div></div>
                     <div className="mb-4">
                       <span
@@ -957,7 +1050,14 @@ Description :
                           <Formik
                             initialValues={{ comment: "" }}
                             validationSchema={validationSchema}
-                            onSubmit={handleAddComment}>
+                            onSubmit={(values, { resetForm }) =>
+                              handleAddComment(
+                                values,
+                                resetForm,
+                                taskId,
+                                userId
+                              )
+                            }>
                             {({ errors, touched }) => (
                               <Form>
                                 <div className="relative  mb-4">
@@ -999,20 +1099,22 @@ Description :
                                   </div>
                                   <div>
                                     <p className="text-gray-600 font-semibold">
-                                      {comment.author}{" "}
+                                      {comment?.authorId?.nom}{" "}
+                                      {comment?.authorId?.prenom}{" "}
                                       <span className="text-gray-500 font-normal">
-                                        ({comment.date})
+                                        ({convertDateFormat(comment?.createdAt)}
+                                        )
                                       </span>
                                     </p>
                                     <p className="text-gray-600">
-                                      {comment.text}
+                                      {comment?.content}
                                     </p>
                                   </div>
                                 </li>
                               ))}
                             </ul>
                           ) : (
-                            <p className="text-gray-500">
+                            <p className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
                               Aucun commentaire pour le moment.
                             </p>
                           )}
@@ -1023,18 +1125,26 @@ Description :
 
                   <div className=" w-5/12 lg:w-4/12 bg-white p-2 overflow-y-auto costumScrollBar">
                     <div className="flex justify-between items-center">
-                    <Menu as="div" className=" relative w-min ">
-                      <div>
-                        <Menu.Button
-                          style={{ height: "7vh" }}
-                          className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm"
-                        >
-                          <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
-                            <img className="w-6 h-6" src="/images/list.png" alt="" />
-                            <span className="mx-2">{transformStatus(taskData?.status)}</span>
-                          </div>
-                          <MdArrowDropDown color="white" className="h-6 w-6" />
-                        </Menu.Button>
+                      <Menu as="div" className=" relative w-min ">
+                        <div>
+                          <Menu.Button
+                            style={{ height: "7vh" }}
+                            className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm">
+                            <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
+                              <img
+                                className="w-6 h-6"
+                                src="/images/list.png"
+                                alt=""
+                              />
+                              <span className="mx-2">
+                                {transformStatus(taskData?.status)}
+                              </span>
+                            </div>
+                            <MdArrowDropDown
+                              color="white"
+                              className="h-6 w-6"
+                            />
+                          </Menu.Button>
                         </div>
                         <Transition
                           as={Fragment}
@@ -1043,23 +1153,25 @@ Description :
                           enterTo="transform opacity-100 scale-100"
                           leave="transition ease-in duration-75"
                           leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95"
-                        >
+                          leaveTo="transform opacity-0 scale-95">
                           <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div
-                                onClick={() => patchTaskStatus("Todo")}
-                                className={classNames(
-                                  active ? "bg-blue-300" : "",
-                                  "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                )}
-                              >
-                                <img className="w-6 h-6 mr-2" src="/images/list.png" alt="" />
-                                To Do
-                              </div>
-                            )}
-                          </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  onClick={() => patchTaskStatus("Todo")}
+                                  className={classNames(
+                                    active ? "bg-blue-300" : "",
+                                    "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                  )}>
+                                  <img
+                                    className="w-6 h-6 mr-2"
+                                    src="/images/list.png"
+                                    alt=""
+                                  />
+                                  To Do
+                                </div>
+                              )}
+                            </Menu.Item>
                             <Menu.Item>
                               {({ active }) => (
                                 <div
@@ -1151,7 +1263,11 @@ Description :
                             <div className="">
                               <div className="flex ">
                                 <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                                <p>{taskData?.affectedto ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}` : "Unassigned"}</p>
+                                <p>
+                                  {taskData?.affectedto
+                                    ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}`
+                                    : "Unassigned"}
+                                </p>
                               </div>
                               {!showAssigneeModal ? (
                                 <p
@@ -1201,32 +1317,64 @@ Description :
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p
-                            style={{ backgroundColor: getColor(taskData?.priorite) }}
+                            style={{
+                              backgroundColor: getColor(taskData?.priorite),
+                            }}
                             className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
                             {taskData?.priorite}
                           </p>
                         </div>
-                        
+
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Must start : </p> <p>{taskData?.dateDebutEstim ? new Date(taskData?.dateDebutEstim).toISOString().split('T')[0] : ''}</p>
+                          <p className="w-6/12">Must start : </p>{" "}
+                          <p>
+                            {taskData?.dateDebutEstim
+                              ? new Date(taskData?.dateDebutEstim)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : ""}
+                          </p>
                         </div>
                         <div className="my-2 flex justify-start">
-                            <p className="w-6/12">Must end : </p>{" "}
-                            <p>{taskData?.dateFinEstim ? new Date(taskData?.dateFinEstim).toISOString().split('T')[0] : ''}</p>
+                          <p className="w-6/12">Must end : </p>{" "}
+                          <p>
+                            {taskData?.dateFinEstim
+                              ? new Date(taskData?.dateFinEstim)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : ""}
+                          </p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Start Date : </p> <p>{taskData?.dateDebutReel ? new Date(taskData?.dateDebutReel).toISOString().split('T')[0] : 'Not yet'}</p>
+                          <p className="w-6/12">Start Date : </p>{" "}
+                          <p>
+                            {taskData?.dateDebutReel
+                              ? new Date(taskData?.dateDebutReel)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : "Not yet"}
+                          </p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">End Date : </p> <p>{taskData?.dateFinReel ? new Date(taskData?.dateFinReel).toISOString().split('T')[0] : 'Not yet'}</p>
+                          <p className="w-6/12">End Date : </p>{" "}
+                          <p>
+                            {taskData?.dateFinReel
+                              ? new Date(taskData?.dateFinReel)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : "Not yet"}
+                          </p>
                         </div>
                         <div className="my-2 flex justify-start">
-                          <p className="w-6/12">Project : </p> <p>{taskData?.projet?.Name}</p>
+                          <p className="w-6/12">Project : </p>{" "}
+                          <p>{taskData?.projet?.Name}</p>
                         </div>
                       </div>
                     ) : null}
                     <div className="flex justify-end px-2 py-1">
-                      <div onClick={handleShowUpdateTaskForm} className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                      <div
+                        onClick={handleShowUpdateTaskForm}
+                        className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
                         <MdEditDocument className="h-5 w-5 mr-1" />
                         <p>Edit</p>
                       </div>
@@ -1327,7 +1475,10 @@ Description :
                 type="button"
                 onClick={handleCachUpdateTaskForm}
                 className="text-gray-400 hover:text-gray-500 focus:outline-none">
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
@@ -1337,19 +1488,21 @@ Description :
               </button>
             </div>
 
-            
             <div
-            style={{
-              display: "flex",
-              justifyContent: "center", // Centers the items horizontally
-              height: "78vh",
-              overflowY: "auto", // Enables vertical scrollbar if needed
-            }}
-            className="p-6 costumScrollBar overflow-y-auto">
-            {updateIssueModal && showUpdateTaskForm ? (
-              <UpdateTaskForm task={taskData} handleCachUpdateTaskForm={handleCachUpdateTaskForm} />
-            ) : null}
-          </div>
+              style={{
+                display: "flex",
+                justifyContent: "center", // Centers the items horizontally
+                height: "78vh",
+                overflowY: "auto", // Enables vertical scrollbar if needed
+              }}
+              className="p-6 costumScrollBar overflow-y-auto">
+              {updateIssueModal && showUpdateTaskForm ? (
+                <UpdateTaskForm
+                  task={taskData}
+                  handleCachUpdateTaskForm={handleCachUpdateTaskForm}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
