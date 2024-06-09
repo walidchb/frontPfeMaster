@@ -35,7 +35,6 @@ function BoardMain({project}) {
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
 
-
   useEffect(() => {
     let filteredTasks = project?.tasks || [];
   
@@ -195,11 +194,17 @@ function BoardMain({project}) {
         </div>
       ) : null}
       {showBoard ? (
-        <div className="">
-          {tasks?.map((item, index) => (
-            <TaskListElement key={index} task={item} project={project}/>
-          ))}
-        </div>
+        tasks && tasks.length > 0 ? (
+          <div className="">
+            {tasks.map((item, index) => (
+              <TaskListElement key={index} task={item} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-5 w-full py-2 text-blue-400 flex justify-center items-center border-2 border-dashed">
+            No Tasks
+          </div>
+        )
       ) : null}
       {/* {showBoard ? (
         <div className=" w-full py-2 text-blue-400 flex justify-center items-center  border-b-2 border-x-2 border-dashed">

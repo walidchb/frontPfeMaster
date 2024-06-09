@@ -18,7 +18,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      statusInitials = "TD";
+      
       break;
     case "inprogress":
       icon = (
@@ -29,7 +29,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      statusInitials = "IP";
+      
       break;
     case "inreview":
       icon = (
@@ -40,7 +40,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      statusInitials = "IR";
+      
       break;
     case "done":
       icon = (
@@ -51,11 +51,32 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      statusInitials = "DN";
+      
       break;
     default:
       icon = null;
-      statusInitials = "";
+  }
+
+  function getColor(letter) {
+    // Vérifiez si letter n'est pas undefined
+    if (typeof letter !== "undefined") {
+      switch (letter.toLowerCase()) {
+        case "a":
+          return "red";
+        case "b":
+          return "blue";
+        case "c":
+          return "green";
+        case "d":
+          return "yellow";
+        case "e":
+          return "purple";
+        default:
+          return "black";
+      }
+    }
+    // Si letter est undefined, retournez une couleur par défaut
+    return "black";
   }
 
   const startDate = new Date(task?.dateDebutEstim).toLocaleDateString();
@@ -80,9 +101,13 @@ function TaskListElement({ task, project }) {
           <p className="text-xs">Start: {startDate}</p>
           <p className="text-xs">Due: {dueDate}</p>
         </div>
-        <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-          {statusInitials}
-        </button>
+        <p
+          style={{
+            backgroundColor: getColor(task?.priorite),
+          }}
+          className={`text-white flex justify-center items-center w-10 h-10 rounded-full`}>
+          {task?.priorite}
+        </p>
       </div>
     </div>
   );

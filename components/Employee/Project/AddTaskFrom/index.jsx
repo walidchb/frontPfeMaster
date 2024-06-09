@@ -48,7 +48,7 @@ const AddTaskForm = ({ parentProject, handleCachAddTaskForm }) => {
   useEffect(() => {
     const fetchData = async () => {
       
-      const teams = await fetchTeams(organizationId);
+      const teams = await fetchTeams(parentProject?.organization?._id);
       console.log("teams = ", teams);
 
       setAvailableTeams(teams);
@@ -71,7 +71,7 @@ const AddTaskForm = ({ parentProject, handleCachAddTaskForm }) => {
         team: values.assignedTo
       });
       console.log("respons = ", response.data);
-      const response1 = await axiosInstance.patch(`/project/projects/${projectId}`, {
+      const response1 = await axiosInstance.patch(`/project/projects/${parentProject?._id}`, {
         tasks: response.data._id
       })
       console.log("respons1 = ", response1.data);

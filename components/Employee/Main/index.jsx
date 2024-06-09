@@ -372,6 +372,48 @@ function MainEmployee() {
         )}
       </div>
       <div className="px-4 sm:px-10 ">
+        <div className="hidden sm:flex border-b-2">
+          {navigation.map((item, index) => (
+            <button
+              onClick={() => setCurScreen(index)}
+              key={item.name}
+              className={classNames(
+                index === curScreen
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-900 hover:bg-gray-700 hover:text-white",
+                "px-3 py-2 text-sm font-medium border-r-2"
+              )}
+              aria-current={item.current ? "page" : undefined}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
+        <div className="w-12/12 sm:hidden flex flex-row-reverse">
+          <div className="w-8/12 border-2 flex justify-start items-center px-2 input rounded-xl h-10 ">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24"
+              viewBox="0 -960 960 960"
+              width="24">
+              <path d="M220-80v-300h-60v-220q0-33 23.5-56.5T240-680h120q33 0 56.5 23.5T440-600v220h-60v300H220Zm80-640q-33 0-56.5-23.5T220-800q0-33 23.5-56.5T300-880q33 0 56.5 23.5T380-800q0 33-23.5 56.5T300-720ZM600-80v-240H480l102-306q8-26 29.5-40t48.5-14q27 0 48.5 14t29.5 40l102 306H720v240H600Zm60-640q-33 0-56.5-23.5T580-800q0-33 23.5-56.5T660-880q33 0 56.5 23.5T740-800q0 33-23.5 56.5T660-720Z" />
+            </svg>
+            <Select
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  // borderColor: state.isFocused ? "grey" : "red",
+                  borderWidth: state.isFocused ? 0 : 0,
+                }),
+              }}
+              defaultValue={defaultStatus}
+              // placeholder={defaultStatus.label}
+              className="w-full"
+              options={Status}
+              onChange={handleChangeStatus}
+            />
+          </div>
+        </div>
         <div>
           {curScreen === 0 && todoTasks.length > 0 ? (
             todoTasks.map((task, taskIndex) => (
@@ -430,17 +472,7 @@ function MainEmployee() {
           ) : null}
         </div>
 
-        {navigation.length > 0 ? (
-          <div className="">
-            {navigation.map((item, index) => (
-              <TaskListElement key={index} />
-            ))}
-          </div>
-        ) : (
-          <div className=" w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed">
-            your Task list is emptry
-          </div>
-        )}
+        
       </div>
 
       <div

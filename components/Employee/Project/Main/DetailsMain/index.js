@@ -52,6 +52,7 @@ import UpdateProjectForm from "../../UpdateProjectForm";
 
 const ProjectDetails = ({project}) => {
   
+  
   let text =
     "Import trace for requested module:Import trace for requestedmodule: Import trace for requested module:Import trace forrequested module:Import trace for requested module:Import tracefor requested module:Import trace for requested module:Importtrace for requested module:Import trace for requestedmodule:Import trace for requested module:Import trace forrequested module:Import trace for requested module:";
     const [ShowDescription, setShowDescription] = useState(true);
@@ -111,6 +112,11 @@ const ProjectDetails = ({project}) => {
         thumbnail: "/walid.pdf",
       },
     ];
+
+    useEffect(() => {
+      setDoneTasks(project.tasks.filter(task => task.status === "Done"))
+ 
+    }, [project]);
 
     useEffect(() => {
       async function setWindowDim() {
@@ -188,7 +194,7 @@ const ProjectDetails = ({project}) => {
     </span>
     <div className="text-white">{project.boss.email}</div>
   </div>
-    <ProgressCircle completed={doneTasks} total={project.tasks?.length} />
+    <ProgressCircle completed={doneTasks?.length} total={project.tasks?.length} />
 </div>
 
 <span
