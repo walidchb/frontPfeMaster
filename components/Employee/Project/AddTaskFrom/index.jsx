@@ -23,7 +23,7 @@ const fetchTeams = async (organizationId) => {
   }
 };
 
-const AddTaskForm = ({ parentProject, handleCachAddTaskForm }) => {
+const AddTaskForm = ({ parentProject, handleCachAddTaskForm, reloadpage, reload }) => {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
@@ -31,6 +31,7 @@ const AddTaskForm = ({ parentProject, handleCachAddTaskForm }) => {
   const handlePopupClose = () => {
     setShowPopup(false);
     handleCachAddTaskForm() // Masquer le composant AddTaskForm
+    reloadpage(reload)
   };
 
   const showPopupMessage = (message) => {

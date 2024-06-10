@@ -37,6 +37,7 @@ function MainEmployee() {
   const [inReviewTasks, setInReviewTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [reload, setReload] = useState(false); // State to trigger rerender
 
   const fetchTasks = async (userId) => {
     try {
@@ -205,11 +206,16 @@ function MainEmployee() {
   //     fetchProject(organization?._id);
   //   }
   // }, [organization]);
+
+  const reloadpage = (a) => {
+    setReload(!a)
+  }
+
   useEffect(() => {
     if (userInfo?._id && organization?._id) {
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
-  }, [organization, userInfo, teamId]);
+  }, [organization, userInfo, teamId, reload]);
 
   useEffect(() => {
     function handleResize() {
@@ -334,6 +340,15 @@ function MainEmployee() {
   ]);
   const [curScreen, setCurScreen] = useState(0);
   const [showAddProjectFrom, setShowAddProjectFrom] = useState(false);
+  const [showAddProjectForm, setShowAddProjectForm] = useState(false);
+  const handleCachAddProjectForm = () => {
+    setShowAddProjectForm(false);
+    // Ne ferme pas la modal seeAllProjectsModal
+  };
+  
+  const handleShowAddProjectForm = () => {
+    setShowAddProjectForm(true);
+  };
   return (
     <div
       style={{ height: "90vh" }}
@@ -351,7 +366,7 @@ function MainEmployee() {
           </h1>
           <button
             onClick={() => {
-              setShowAddProjectFrom(false);
+              setShowAddProjectForm(false);
               setSeeAllProjectsModal(true);
             }}
             className="underline text-blue-600 hover:no-underline">
@@ -489,90 +504,104 @@ function MainEmployee() {
           style={{ width: "90vw", height: "90vh" }}
           className="myShadow relative mx-auto   rounded-lg shadow-md bg-white">
           <div className="flex justify-between items-center px-5 border-b border-gray-200">
-            {!showAddProjectFrom ? (
-              <div className="flex justify-center items-center">
-                {" "}
-                <h3
-                  style={{ height: "10vh" }}
-                  className="hidden  mr-4 text-xl font-medium text-gray-900 sm:flex items-center">
-                  All Projects (50)
-                </h3>
+            {!showAddProjectForm ? (
+              <Fragment>
+                <div className="flex justify-center items-center">
+                  <h3
+                    style={{ height: "10vh" }}
+                    className="mr-4 text-xl font-medium text-gray-900 flex items-center">
+                    All Projects ({projects.length})
+                  </h3>
+                  <button
+                    onClick={() => handleShowAddProjectForm()}
+                    className="flex items-center my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
+                    type="submit">
+                    <IoMdAddCircle className="w-6 h-6 mr-2" />
+                    <span>Add Project</span>
+                  </button>
+                </div>
                 <button
-                  onClick={() => setShowAddProjectFrom(true)}
-                  className=" flex jus items-center my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
-                  type="submit">
-                  <IoMdAddCircle className="w-6 h-6 mr-2" />
-                  <span> Add Project</span>
+                  type="button"
+                  onClick={() => {
+                    setSeeAllProjectsModal(false);
+                    setShowAddProjectForm(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
-              </div>
+              </Fragment>
             ) : (
-              <RiArrowGoBackFill
-                onClick={() => setShowAddProjectFrom(false)}
-                className="ml-2 cursor-pointer text-blue-600 h-5 w-5 mr-2 hover:transform hover:scale-110"
-              />
+              <Fragment>
+              
+              
+                <div className="flex justify-center items-center">
+                  <h3
+                    style={{ height: "10vh" }}
+                    className="text-xl sm:text-3xl font-medium text-gray-900 flex items-center">
+                    Add Project
+                  </h3>
+                </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      
+                      setShowAddProjectForm(false);
+                    }}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </Fragment>
             )}
 
-            {showAddProjectFrom ? (
-              <div className="flex justify-center items-center">
-                {" "}
-                <h3
-                  style={{ height: "10vh" }}
-                  className="text-xl sm:text-3xl font-medium text-gray-900 flex items-center">
-                  Add Project{" "}
-                </h3>
-              </div>
-            ) : null}
-            <button
-              type="button"
-              onClick={() => setSeeAllProjectsModal(false)}
-              className="text-gray-400 hover:text-gray-500 focus:outline-none">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+            
           </div>
-          {!showAddProjectFrom ? (
-            <div>
-              <h3 className="sm:hidden pl-4 pt-2  text-xl font-medium text-gray-900 flex items-center">
-                All Projects (50)
-              </h3>
-              {projects.length > 0 ? (
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap", // Elements wrap to new line when they overflow
-                    justifyContent: "center", // Centers the items horizontally
-                    gap: "20px", // Spacing between items
-                    height: "77vh",
-                    overflowY: "auto", // Enables vertical scrollbar if needed
-                  }}
-                  className="p-6 costumScrollBar overflow-y-auto">
-                  {projects.map((child, index) => (
-                    <ProjectCard key={index} project={child} />
-                  ))}
-                </div>
-              ) : (
-                <div className="m-10 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
-                  No Project
-                </div>
-              )}
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center", // Centers the items horizontally
-                height: "78vh",
-                overflowY: "auto", // Enables vertical scrollbar if needed
-              }}
-              className="w-full  costumScrollBar py-10 overflow-y-auto">
-              <AddProjectForm />
-            </div>
-          )}
+{!showAddProjectForm ? (
+  <div>
+    {projects.length > 0 ? (
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: "20px",
+          height: "77vh",
+          overflowY: "auto",
+        }}
+        className="p-6 costumScrollBar overflow-y-auto">
+        {projects.map((child, index) => (
+          <ProjectCard key={index} project={child} />
+        ))}
+      </div>
+    ) : (
+      <div className="m-10 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
+        No Project
+      </div>
+    )}
+  </div>
+) : (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      height: "78vh",
+      overflowY: "auto",
+    }}
+    className="p-6 costumScrollBar overflow-y-auto">
+    <AddProjectForm organization={organization} handleCachAddProjectForm={handleCachAddProjectForm} reloadpage={reloadpage} reload={reload}/>
+  </div>
+)}
         </div>
       </div>
     </div>

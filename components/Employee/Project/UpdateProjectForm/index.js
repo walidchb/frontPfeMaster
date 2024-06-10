@@ -40,7 +40,7 @@ const axiosInstance = axios.create({
       }
     };
   
-    const UpdateProjectForm = ({project, handleCachUpdateProjectForm}) => {
+    const UpdateProjectForm = ({project, handleCachUpdateProjectForm, reloadpage, reload}) => {
       const [availableTeams, setAvailableTeams] = useState([]);
       const [availableUsers, setAvailableUsers] = useState([]);
       const [showPopup, setShowPopup] = useState(false);
@@ -50,6 +50,7 @@ const axiosInstance = axios.create({
       const handlePopupClose = () => {
         setShowPopup(false);
         handleCachUpdateProjectForm() // Masquer le composant UpdateProjectForm
+        reloadpage(reload)
       };
     
       const showPopupMessage = (message) => {
@@ -65,11 +66,11 @@ const axiosInstance = axios.create({
           formik.setFieldValue("projectManager", project.boss?._id);
           formik.setFieldValue("teams", project.teams);
         }
-        console.log(projectData)
+        console.log("projectaa = ", project)
       }, [project]);
     
       // const organizationId = "665ee35842437a997e99797b";
-      const projectId = "6663a0343f2a480100ca8d6d";
+      // const projectId = "6663a0343f2a480100ca8d6d";
   
       const fetchProjectToUpdate = async (projectId) => {
         try {
@@ -117,6 +118,9 @@ const axiosInstance = axios.create({
           });
           console.log(response.data);
           showPopupMessage("Project updated successfully!");
+          const response1 = await axiosInstance.patch(`/user/users?id=${values?.projectManager}`, {
+            role:"prjctBoss"
+          })
           formik.resetForm();
         } catch (error) {
           console.error("Error from backend:");

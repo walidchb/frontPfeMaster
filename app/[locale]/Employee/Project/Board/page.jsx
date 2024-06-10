@@ -20,6 +20,10 @@ function Board() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [projectId, setProjectId] = useState("");
   const [project, setProject] = useState({});
+  const [reload, setReload] = useState(false);
+  const reloadpage = (a) => {
+    setReload(!a)
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -54,7 +58,7 @@ function Board() {
 
   useEffect(() => {
     fetchProject(projectId);
-  }, [projectId]);
+  }, [projectId, reload]);
 
   return (
     <div className="bg-white text-black">
@@ -73,8 +77,8 @@ function Board() {
           {/* Vérifier si project n'est pas vide avant de rendre les composants */}
           {Object.keys(project).length > 0 ? (
             <>
-              <ProjectDetails project={project} />
-              <BoardMain project={project} />
+              <ProjectDetails project={project} reloadpage={reloadpage} reload={reload}/>
+              <BoardMain project={project} reloadpage={reloadpage} reload={reload}/>
             </>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré

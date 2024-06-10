@@ -15,7 +15,7 @@ import {
   IoCloseCircleSharp,
 } from "react-icons/io5";
 
-function BoardMain({project}) {
+function BoardMain({project, reloadpage, reload}) {
   const [status, setStatus] = useState([
     { id: 1, image: "list", number: false },
     { id: 2, image: "development", number: true },
@@ -75,6 +75,27 @@ function BoardMain({project}) {
     filtreInprogress,
     taskFeteched
   ]);
+
+  const sortTasksByStatusAndPriority = (tasks) => {
+    const statusOrder = ["Todo", "Inprogress", "Inreview", "Done"];
+  
+    return tasks.sort((a, b) => {
+      const priorityOrder = ["A", "B", "C", "D", "E"];
+  
+      // Trier d'abord par statut
+      const statusA = statusOrder.indexOf(a.status);
+      const statusB = statusOrder.indexOf(b.status);
+      const statusDiff = statusA - statusB;
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+  
+      // Si les statuts sont les mêmes, trier par priorité
+      const priorityA = priorityOrder.indexOf(a.priorite);
+      const priorityB = priorityOrder.indexOf(b.priorite);
+      return priorityA - priorityB;
+    });
+  };
 
   const handleSubmitSearchTask = async (values, { setSubmitting }) => {
     if (values.Name.trim() === '') {
@@ -196,7 +217,7 @@ function BoardMain({project}) {
       {showBoard ? (
         tasks && tasks.length > 0 ? (
           <div className="">
-            {tasks.map((item, index) => (
+            {sortTasksByStatusAndPriority(tasks).map((item, index) => (
               <TaskListElement key={index} task={item} project={project} />
             ))}
           </div>
@@ -262,7 +283,7 @@ function BoardMain({project}) {
             }}
             className="p-6 costumScrollBar overflow-y-auto">
             {createIssueModal && showAddTaskForm ? (
-              <AddTaskForm parentProject={project} handleCachAddTaskForm={handleCachAddTaskForm} />
+              <AddTaskForm parentProject={project} handleCachAddTaskForm={handleCachAddTaskForm} reloadpage={reloadpage} reload={reload}/>
             ) : null}
           </div>
         </div>

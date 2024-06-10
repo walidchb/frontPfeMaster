@@ -408,13 +408,13 @@ const TaskPage = () => {
         case "a":
           return "red";
         case "b":
-          return "blue";
+          return "orange";
         case "c":
           return "green";
         case "d":
           return "yellow";
         case "e":
-          return "purple";
+          return "gray";
         default:
           return "black";
       }

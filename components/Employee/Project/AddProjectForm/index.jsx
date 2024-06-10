@@ -38,27 +38,35 @@ const fetchUsers = async (organizationId) => {
   }
 };
 
-const AddProjectForm = () => {
+const AddProjectForm = ({organization, handleCachAddProjectForm, reloadpage, reload}) => {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
 
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    handleCachAddProjectForm() // Masquer le composant AddTaskForm
+    reloadpage(reload)
+  };
+
   const showPopupMessage = (message) => {
     setPopupMessage(message);
     setShowPopup(true);
   };
-  const organizationId = '66609ae2a974839772c60e7b';
+  // const organizationId = '66609ae2a974839772c60e7b';
 
   useEffect(() => {
     const fetchData = async () => {
       
-      const teams = await fetchTeams(organizationId);
+      const teams = await fetchTeams(organization?._id);
       console.log("teams = ", teams);
-      const users = await fetchUsers(organizationId);
-
+      const users = await fetchUsers(organization?._id);
+      const projectBossesAndEmployees = users.filter(
+        (user) => user.role === "prjctBoss" || user.role === "employee"
+      );
       setAvailableTeams(teams);
-      setAvailableUsers(users);
+      setAvailableUsers(projectBossesAndEmployees);
     };
 
     fetchData();
@@ -86,11 +94,14 @@ const AddProjectForm = () => {
         Description: values.description,
         dateDebutEstim: values.startDate,
         dateFinEstim: values.dueDate,
-        organization: organizationId,
+        organization: organization?._id,
         boss: values.projectManager,
         teams: values.teams
       });
       console.log("sendproject", response.data);
+      const response1 = await axiosInstance.patch(`/user/users?id=${values?.projectManager}`, {
+        role:"prjctBoss"
+      })
       showPopupMessage('Project created successfully!'); // Afficher la pop-up de succès
       formik.resetForm(); // Réinitialiser les valeurs du formulaire
     } catch (error) {
@@ -383,7 +394,7 @@ const AddProjectForm = () => {
             <p>{popupMessage}</p>
             <button
               className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={() => setShowPopup(false)}
+              onClick={handlePopupClose}
             >
               OK
             </button>
