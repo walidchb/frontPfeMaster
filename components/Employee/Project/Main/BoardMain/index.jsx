@@ -15,7 +15,8 @@ import {
   IoCloseCircleSharp,
 } from "react-icons/io5";
 
-function BoardMain({project, reloadpage, reload}) {
+function BoardMain({project, user, teamId, reloadpage, reload}) {
+  
   const [status, setStatus] = useState([
     { id: 1, image: "list", number: false },
     { id: 2, image: "development", number: true },
@@ -29,14 +30,28 @@ function BoardMain({project, reloadpage, reload}) {
   const [filtreInprogress, setfiltreInprogress] = useState(false);
   const [showBoard, setShowBoard] = useState(true);
   const [createIssueModal, setCreateIssueModal] = useState(false);
-  const [tasks, setTasks] = useState(project?.tasks || []);
+  const [tasks, setTasks] = useState([]);
   const initialValuesSearchTask = { Name: "" };
   const [inputTaskValue, setInputTaskValue] = useState("");
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
 
   useEffect(() => {
-    let filteredTasks = project?.tasks || [];
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss = project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
+  
+    let filteredTasks = taskss; // Initialiser filteredTasks avec les tâches filtrées par rôle
   
     // Filtrer par statut
     const statusFilters = [filtreDone, filtreTodo, filtreInreview, filtreInprogress];
@@ -67,35 +82,16 @@ function BoardMain({project, reloadpage, reload}) {
   
     setTasks(filteredTasks);
   }, [
-    project?.tasks,
+    project,
     inputTaskValue,
     filtreDone,
     filtreTodo,
     filtreInreview,
     filtreInprogress,
-    taskFeteched
+    taskFeteched,
+    user?.role,
+    teamId
   ]);
-
-  const sortTasksByStatusAndPriority = (tasks) => {
-    const statusOrder = ["Todo", "Inprogress", "Inreview", "Done"];
-  
-    return tasks.sort((a, b) => {
-      const priorityOrder = ["A", "B", "C", "D", "E"];
-  
-      // Trier d'abord par statut
-      const statusA = statusOrder.indexOf(a.status);
-      const statusB = statusOrder.indexOf(b.status);
-      const statusDiff = statusA - statusB;
-      if (statusDiff !== 0) {
-        return statusDiff;
-      }
-  
-      // Si les statuts sont les mêmes, trier par priorité
-      const priorityA = priorityOrder.indexOf(a.priorite);
-      const priorityB = priorityOrder.indexOf(b.priorite);
-      return priorityA - priorityB;
-    });
-  };
 
   const handleSubmitSearchTask = async (values, { setSubmitting }) => {
     if (values.Name.trim() === '') {
@@ -109,7 +105,19 @@ function BoardMain({project, reloadpage, reload}) {
 
   useEffect(() => {
     
-    setTasks(project?.tasks);
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss = project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
   }, []);
 
   const handleFilterDoneChange = () => {
@@ -217,7 +225,7 @@ function BoardMain({project, reloadpage, reload}) {
       {showBoard ? (
         tasks && tasks.length > 0 ? (
           <div className="">
-            {sortTasksByStatusAndPriority(tasks).map((item, index) => (
+            {tasks.map((item, index) => (
               <TaskListElement key={index} task={item} project={project} />
             ))}
           </div>

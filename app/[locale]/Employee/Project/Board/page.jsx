@@ -21,6 +21,9 @@ function Board() {
   const [projectId, setProjectId] = useState("");
   const [project, setProject] = useState({});
   const [reload, setReload] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
+  const [organization, setOrganization] = useState({});
+  const [teamId, setTeamId] = useState("");
   const reloadpage = (a) => {
     setReload(!a)
   }
@@ -28,9 +31,21 @@ function Board() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const projectinfo = localStorage.getItem("project");
-      if (projectinfo) {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (projectinfo && userinfo && orga) {
         let projectJson = JSON.parse(projectinfo);
         setProjectId(projectJson?._id);
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+
+        const team = userJson?.team.find(
+          (obj) => obj.Organization === orgaJson._id
+        );
+        setTeamId(team?._id);
       }
     }
   }, []);
@@ -58,7 +73,7 @@ function Board() {
 
   useEffect(() => {
     fetchProject(projectId);
-  }, [projectId, reload]);
+  }, [userInfo, projectId, reload]);
 
   return (
     <div className="bg-white text-black">
@@ -78,7 +93,7 @@ function Board() {
           {Object.keys(project).length > 0 ? (
             <>
               <ProjectDetails project={project} reloadpage={reloadpage} reload={reload}/>
-              <BoardMain project={project} reloadpage={reloadpage} reload={reload}/>
+              <BoardMain project={project} user={userInfo} reloadpage={reloadpage} reload={reload}/>
             </>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
