@@ -18,7 +18,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      
+
       break;
     case "inprogress":
       icon = (
@@ -29,7 +29,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      
+
       break;
     case "inreview":
       icon = (
@@ -40,7 +40,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      
+
       break;
     case "done":
       icon = (
@@ -51,7 +51,7 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-      
+
       break;
     default:
       icon = null;
@@ -68,7 +68,7 @@ function TaskListElement({ task, project }) {
         case "c":
           return "green";
         case "d":
-          return "yellow";
+          return "pink";
         case "e":
           return "purple";
         default:
@@ -84,7 +84,11 @@ function TaskListElement({ task, project }) {
 
   return (
     <div
-      onClick={() => router.push(`/${locale}/Employee/Task`)}
+      onClick={() => {
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(task?._id)}`
+        );
+      }}
       className="TaskListElementContainer cursor-pointer rounded-xl py-2 my-2 px-4  flex justify-between items-center">
       <div className="flex justify-start items-center w-8/12">
         {icon}

@@ -345,7 +345,7 @@ function MainEmployee() {
 
         <div className=" mt-10 w-full  flex justify-between items-center">
           <h1 className="text-2xl     ">
-            Your Projects :
+            Your Projects ({projects?.length}):
             {/* &nbsp;&nbsp; &#x276F; &nbsp;&nbsp; departement &nbsp;&nbsp;
           &#x276F; &nbsp;&nbsp; project Name{" "} */}
           </h1>
@@ -383,8 +383,7 @@ function MainEmployee() {
                   : "text-gray-900 hover:bg-gray-700 hover:text-white",
                 "px-3 py-2 text-sm font-medium border-r-2"
               )}
-              aria-current={item.current ? "page" : undefined}
-            >
+              aria-current={item.current ? "page" : undefined}>
               {item.name}
             </button>
           ))}
@@ -471,8 +470,6 @@ function MainEmployee() {
             </div>
           ) : null}
         </div>
-
-        
       </div>
 
       <div
@@ -495,7 +492,7 @@ function MainEmployee() {
                 <h3
                   style={{ height: "10vh" }}
                   className="hidden  mr-4 text-xl font-medium text-gray-900 sm:flex items-center">
-                  All Projects (50)
+                  All Projects ({projects?.length})
                 </h3>
                 <button
                   onClick={() => setShowAddProjectFrom(true)}
@@ -538,7 +535,7 @@ function MainEmployee() {
           {!showAddProjectFrom ? (
             <div>
               <h3 className="sm:hidden pl-4 pt-2  text-xl font-medium text-gray-900 flex items-center">
-                All Projects (50)
+                All Projects ({projects?.length})
               </h3>
               {projects.length > 0 ? (
                 <div

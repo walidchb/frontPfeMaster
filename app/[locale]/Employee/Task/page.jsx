@@ -1,6 +1,7 @@
 "use client";
 import TaskDetails from "@/components/Employee/components/TaskDetails";
 import { Fragment, useState, useEffect } from "react";
+
 import {
   FaEdit,
   FaChevronDown,
@@ -214,6 +215,7 @@ const TaskPage = () => {
   const task = taskDetails ? JSON.parse(decodeURIComponent(taskDetails)) : null;
   const [taskData, setTaskData] = useState({});
   const [showUpdateTaskForm, setShowUpdateTaskForm] = useState(false);
+  const taskId = JSON.parse(searchParams.get("task"));
 
   const transformStatus = (status) => {
     switch (status) {
@@ -247,8 +249,18 @@ const TaskPage = () => {
     },
   });
 
-  const taskId = "66646ed63b4dbc2fc5fe9596";
-  const userId = "666435387431e9b597dd7282";
+  const [userInfo, setUserInfo] = useState({});
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      if (userinfo) {
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+      }
+    }
+  }, []);
+  // const taskId = "66646ed63b4dbc2fc5fe9596";
+  // const userId = "666435387431e9b597dd7282";
 
   const fetchTask = async (taskId) => {
     try {
@@ -260,11 +272,15 @@ const TaskPage = () => {
       console.error("Erreur lors de la récupération des équipes :", error);
     }
   };
-
+  const [reloadComments, setReloadComments] = useState(false);
   useEffect(() => {
     fetchTask(taskId);
     fetchComments(taskId);
   }, []);
+  useEffect(() => {
+    // fetchTask(taskId);
+    fetchComments(taskId);
+  }, [reloadComments]);
   useEffect(() => {}, [taskData]);
 
   const fetchComments = async (taskId) => {
@@ -306,7 +322,8 @@ const TaskPage = () => {
       });
       const comment = response.data;
       console.log("comment = ", response.data);
-      fetchComments(taskId);
+      // fetchComments(taskId);
+      setReloadComments(!reloadComments);
       resetForm();
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
@@ -412,7 +429,7 @@ const TaskPage = () => {
         case "c":
           return "green";
         case "d":
-          return "yellow";
+          return "pink";
         case "e":
           return "purple";
         default:
@@ -422,6 +439,57 @@ const TaskPage = () => {
     // Si letter est undefined, retournez une couleur par défaut
     return "black";
   }
+
+  function getIcon(status) {
+    switch (status) {
+      case "todo":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/list.png"
+            alt=""
+            srcSet=""
+          />
+        );
+
+        break;
+      case "inprogress":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/development.png"
+            alt=""
+            srcSet=""
+          />
+        );
+
+        break;
+      case "inreview":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/code-review.png"
+            alt=""
+            srcSet=""
+          />
+        );
+
+        break;
+      case "ione":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/checkbox.png"
+            alt=""
+            srcSet=""
+          />
+        );
+        break;
+      default:
+        return null;
+    }
+  }
+
   if (loading) {
     return <Loader />;
   } else {
@@ -587,7 +655,7 @@ const TaskPage = () => {
                                   values,
                                   resetForm,
                                   taskId,
-                                  userId
+                                  userInfo?._id
                                 )
                               }>
                               {({ errors, touched }) => (
@@ -626,9 +694,10 @@ const TaskPage = () => {
                                   <li
                                     key={index}
                                     className="bg-gray-100 rounded-md p-2 mb-2 last:mb-0 flex items-center">
-                                    <div className="bg-gray-300 rounded-full p-2 mr-4">
-                                      <FaUserCircle className="text-gray-500" />
-                                    </div>
+                                    <button className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                      {comment?.authorId?.prenom[0].toUpperCase()}
+                                      {comment?.authorId?.nom[0].toUpperCase()}
+                                    </button>
                                     <div>
                                       <p className="text-gray-600 font-semibold">
                                         {comment?.authorId?.nom}{" "}
@@ -668,11 +737,7 @@ const TaskPage = () => {
                               style={{ height: "7vh" }}
                               className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm">
                               <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
-                                <img
-                                  className="w-6 h-6"
-                                  src="/images/list.png"
-                                  alt=""
-                                />
+                                {getIcon(taskData?.status?.toLowerCase())}
                                 <span className="mx-2">
                                   {transformStatus(taskData?.status)}
                                 </span>
@@ -1055,7 +1120,7 @@ const TaskPage = () => {
                                 values,
                                 resetForm,
                                 taskId,
-                                userId
+                                userInfo?._id
                               )
                             }>
                             {({ errors, touched }) => (
@@ -1094,9 +1159,10 @@ const TaskPage = () => {
                                 <li
                                   key={index}
                                   className="bg-gray-100 rounded-md p-2 mb-2 last:mb-0 flex items-center">
-                                  <div className="bg-gray-300 rounded-full p-2 mr-4">
-                                    <FaUserCircle className="text-gray-500" />
-                                  </div>
+                                  <button className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    {comment?.authorId?.prenom[0].toUpperCase()}
+                                    {comment?.authorId?.nom[0].toUpperCase()}
+                                  </button>
                                   <div>
                                     <p className="text-gray-600 font-semibold">
                                       {comment?.authorId?.nom}{" "}
@@ -1131,11 +1197,7 @@ const TaskPage = () => {
                             style={{ height: "7vh" }}
                             className="h-full w-full flex justify-center items-center px-1 rounded-xl bg-blue-700 text-sm">
                             <div className="whitespace-nowrap px-4 py-2 text-sm text-white flex justify-start items-center">
-                              <img
-                                className="w-6 h-6"
-                                src="/images/list.png"
-                                alt=""
-                              />
+                              {getIcon(taskData?.status?.toLowerCase())}
                               <span className="mx-2">
                                 {transformStatus(taskData?.status)}
                               </span>

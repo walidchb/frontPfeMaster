@@ -136,7 +136,7 @@ function Individuals() {
             nom: values.firstName,
             prenom: values.lastName,
             email: values.email,
-            role: "employee",
+            role: "individual",
             phoneNumber: values.phoneNumber,
             gender: values.gender,
             password: values.password,
