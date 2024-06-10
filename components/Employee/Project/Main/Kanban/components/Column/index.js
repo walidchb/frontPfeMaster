@@ -4,7 +4,7 @@ import "./style.css";
 
 import { FaTasks, FaClock, FaCheckCircle } from "react-icons/fa";
 
-const Column = ({ title, tasks, onDrop, onDragOver, status }) => {
+const Column = ({ title, tasks, onDrop, onDragOver, status, project }) => {
   // Définir l'icône correspondant au titre
 
   let bg_gradient;
@@ -72,7 +72,7 @@ const Column = ({ title, tasks, onDrop, onDragOver, status }) => {
         {tasks.length > 0 ? (
           tasks.map((task, index) => (
             <TaskCard
-              key={task.id}
+              key={task._id}
               {...task}
               onDragOver={(e) => {
                 e.preventDefault();

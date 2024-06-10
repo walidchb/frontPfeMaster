@@ -15,7 +15,7 @@ import {
   IoCloseCircleSharp,
 } from "react-icons/io5";
 
-function BoardMain({project}) {
+function BoardMain({ project, user, teamId, reloadpage, reload }) {
   const [status, setStatus] = useState([
     { id: 1, image: "list", number: false },
     { id: 2, image: "development", number: true },
@@ -29,17 +29,36 @@ function BoardMain({project}) {
   const [filtreInprogress, setfiltreInprogress] = useState(false);
   const [showBoard, setShowBoard] = useState(true);
   const [createIssueModal, setCreateIssueModal] = useState(false);
-  const [tasks, setTasks] = useState(project?.tasks || []);
+  const [tasks, setTasks] = useState([]);
   const initialValuesSearchTask = { Name: "" };
   const [inputTaskValue, setInputTaskValue] = useState("");
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
-
   useEffect(() => {
-    let filteredTasks = project?.tasks || [];
-  
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss =
+          project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
+
+    let filteredTasks = taskss;
+
     // Filtrer par statut
-    const statusFilters = [filtreDone, filtreTodo, filtreInreview, filtreInprogress];
+    const statusFilters = [
+      filtreDone,
+      filtreTodo,
+      filtreInreview,
+      filtreInprogress,
+    ];
     if (statusFilters.some((filter) => filter)) {
       filteredTasks = filteredTasks.filter((task) => {
         const statusMatch =
@@ -47,39 +66,41 @@ function BoardMain({project}) {
           (filtreTodo && task.status === "Todo") ||
           (filtreInreview && task.status === "Inreview") ||
           (filtreInprogress && task.status === "Inprogress");
-  
+
         // Si aucune case n'est cochée, afficher toutes les tâches
         if (!statusFilters.some((filter) => filter)) {
           return true;
         }
-  
+
         // Sinon, filtrer les tâches en fonction des cases cochées
         return statusMatch;
       });
     }
-  
+
     // Filtrer par nom de tâche si taskFeteched est true
     if (taskFeteched && inputTaskValue) {
       filteredTasks = filteredTasks.filter((task) =>
         task.Name.toLowerCase().includes(inputTaskValue.toLowerCase())
       );
     }
-  
+
     setTasks(filteredTasks);
   }, [
-    project?.tasks,
+    project,
     inputTaskValue,
     filtreDone,
     filtreTodo,
     filtreInreview,
     filtreInprogress,
-    taskFeteched
+    taskFeteched,
+    user?.role,
+    teamId,
   ]);
 
   const handleSubmitSearchTask = async (values, { setSubmitting }) => {
-    if (values.Name.trim() === '') {
+    if (values.Name.trim() === "") {
       setTaskFeteched(false);
-      setInputTaskValue('');
+      setInputTaskValue("");
     } else {
       setTaskFeteched(true);
       setInputTaskValue(values.Name);
@@ -87,22 +108,34 @@ function BoardMain({project}) {
   };
 
   useEffect(() => {
-    
-    setTasks(project?.tasks);
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss =
+          project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
   }, []);
 
   const handleFilterDoneChange = () => {
     setfiltreDone(!filtreDone);
   };
-  
+
   const handleFilterTodoChange = () => {
     setfiltreTodo(!filtreTodo);
   };
-  
+
   const handleFilterInreviewChange = () => {
     setfiltreInreview(!filtreInreview);
   };
-  
+
   const handleFilterInprogressChange = () => {
     setfiltreInprogress(!filtreInprogress);
   };
@@ -127,62 +160,64 @@ function BoardMain({project}) {
           <IoMdArrowDropright className=" h-6 w-6" />
         )}{" "}
         Board &nbsp;{" "}
-        <span className="text-gray-400 font-normal text-sm">({tasks?.length} tasks)</span>{" "}
+        <span className="text-gray-400 font-normal text-sm">
+          ({tasks?.length} tasks)
+        </span>{" "}
       </span>
       {showBoard ? (
         <div className="w-full mt-6 px-4 py-2 rounded-t-md bg-gray-300 flex flex-col sm:flex-row justify-between items-center">
-        <Formik
-        initialValues={initialValuesSearchTask}
-        onSubmit={handleSubmitSearchTask}>
-        {({ isSubmitting }) => (
-          <Form className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10 w-8/12">
-            <Field
-              className="px-4 w-full focus:outline-none"
-              type="text"
-              name="Name"
-              placeholder="Enter task name"
-            />
-            {!taskFeteched ? (
-              <button type="submit" disabled={isSubmitting}>
-                <IoSearchCircle className="text-blue-600 h-6 w-6" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault(); // Prevent default form submission
+          <Formik
+            initialValues={initialValuesSearchTask}
+            onSubmit={handleSubmitSearchTask}>
+            {({ isSubmitting }) => (
+              <Form className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10 w-8/12">
+                <Field
+                  className="px-4 w-full focus:outline-none"
+                  type="text"
+                  name="Name"
+                  placeholder="Enter task name"
+                />
+                {!taskFeteched ? (
+                  <button type="submit" disabled={isSubmitting}>
+                    <IoSearchCircle className="text-blue-600 h-6 w-6" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault(); // Prevent default form submission
 
-                  setTaskFeteched(false);
-                }}>
-                <IoCloseCircleSharp className=" text-blue-600 h-6 w-6" />
-              </button>
+                      setTaskFeteched(false);
+                    }}>
+                    <IoCloseCircleSharp className=" text-blue-600 h-6 w-6" />
+                  </button>
+                )}
+              </Form>
             )}
-          </Form>
-        )}
-      </Formik>
-      <div className="flex">
-      {status?.map((item, index) => (
-        <div key={index} className="flex justify-center items-center">
-          <input
-            id={`checked-checkbox-${index}`}
-            type="checkbox"
-            checked={
-              (item.id === 4 && filtreDone) ||
-              (item.id === 1 && filtreTodo) ||
-              (item.id === 3 && filtreInreview) ||
-              (item.id === 2 && filtreInprogress)
-            }
-            onChange={
-              item.id === 4
-                ? handleFilterDoneChange
-                : item.id === 1
-                ? handleFilterTodoChange
-                : item.id === 3
-                ? handleFilterInreviewChange
-                : handleFilterInprogressChange
-            }
-            className="cursor-pointer mx-2 w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-          />
+          </Formik>
+          <div className="flex">
+            {status?.map((item, index) => (
+              <div key={index} className="flex justify-center items-center">
+                <input
+                  id={`checked-checkbox-${index}`}
+                  type="checkbox"
+                  checked={
+                    (item.id === 4 && filtreDone) ||
+                    (item.id === 1 && filtreTodo) ||
+                    (item.id === 3 && filtreInreview) ||
+                    (item.id === 2 && filtreInprogress)
+                  }
+                  onChange={
+                    item.id === 4
+                      ? handleFilterDoneChange
+                      : item.id === 1
+                      ? handleFilterTodoChange
+                      : item.id === 3
+                      ? handleFilterInreviewChange
+                      : handleFilterInprogressChange
+                  }
+                  className="cursor-pointer mx-2 w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
                 <img
                   src={`/images/${item.image}.png`}
                   alt={item.image}
@@ -213,7 +248,7 @@ function BoardMain({project}) {
       ) : null} */}
 
       <div
-        onClick= {handleShowAddTaskForm}
+        onClick={handleShowAddTaskForm}
         className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
         <IoMdAddCircle className="w-6 h-6" />{" "}
         <span className="mx-2 font-semibold ">Create issue</span>
@@ -262,7 +297,12 @@ function BoardMain({project}) {
             }}
             className="p-6 costumScrollBar overflow-y-auto">
             {createIssueModal && showAddTaskForm ? (
-              <AddTaskForm parentProject={project} handleCachAddTaskForm={handleCachAddTaskForm} />
+              <AddTaskForm
+                parentProject={project}
+                handleCachAddTaskForm={handleCachAddTaskForm}
+                reloadpage={reloadpage}
+                reload={reload}
+              />
             ) : null}
           </div>
         </div>
