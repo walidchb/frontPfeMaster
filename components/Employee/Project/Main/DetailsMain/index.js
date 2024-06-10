@@ -50,7 +50,7 @@ import UpdateProjectForm from "../../UpdateProjectForm";
 
 
 
-const ProjectDetails = ({project}) => {
+const ProjectDetails = ({project, reloadpage, reload}) => {
   
   
   let text =
@@ -323,7 +323,7 @@ Description :
             }}
             className="p-6 costumScrollBar overflow-y-auto">
             {updateProjectModal && showUpdateProjectForm ? (
-              <UpdateProjectForm project={project} handleCachUpdateProjectForm={handleCachUpdateProjectForm}/>
+              <UpdateProjectForm project={project} handleCachUpdateProjectForm={handleCachUpdateProjectForm} reloadpage={reloadpage} reload={reload}/>
             ) : null}
           </div>
           </div>

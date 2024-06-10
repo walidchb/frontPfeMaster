@@ -15,7 +15,8 @@ import {
   IoCloseCircleSharp,
 } from "react-icons/io5";
 
-function BoardMain({project}) {
+function BoardMain({project, user, teamId, reloadpage, reload}) {
+  
   const [status, setStatus] = useState([
     { id: 1, image: "list", number: false },
     { id: 2, image: "development", number: true },
@@ -29,14 +30,28 @@ function BoardMain({project}) {
   const [filtreInprogress, setfiltreInprogress] = useState(false);
   const [showBoard, setShowBoard] = useState(true);
   const [createIssueModal, setCreateIssueModal] = useState(false);
-  const [tasks, setTasks] = useState(project?.tasks || []);
+  const [tasks, setTasks] = useState([]);
   const initialValuesSearchTask = { Name: "" };
   const [inputTaskValue, setInputTaskValue] = useState("");
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
 
   useEffect(() => {
-    let filteredTasks = project?.tasks || [];
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss = project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
+  
+    let filteredTasks = taskss; // Initialiser filteredTasks avec les tâches filtrées par rôle
   
     // Filtrer par statut
     const statusFilters = [filtreDone, filtreTodo, filtreInreview, filtreInprogress];
@@ -67,13 +82,15 @@ function BoardMain({project}) {
   
     setTasks(filteredTasks);
   }, [
-    project?.tasks,
+    project,
     inputTaskValue,
     filtreDone,
     filtreTodo,
     filtreInreview,
     filtreInprogress,
-    taskFeteched
+    taskFeteched,
+    user?.role,
+    teamId
   ]);
 
   const handleSubmitSearchTask = async (values, { setSubmitting }) => {
@@ -88,7 +105,19 @@ function BoardMain({project}) {
 
   useEffect(() => {
     
-    setTasks(project?.tasks);
+    let taskss;
+    switch (user?.role) {
+      case "employee":
+        taskss = project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        break;
+      case "teamBoss":
+        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        break;
+      default:
+        taskss = project.tasks;
+        break;
+    }
+    setTasks(taskss);
   }, []);
 
   const handleFilterDoneChange = () => {
@@ -262,7 +291,7 @@ function BoardMain({project}) {
             }}
             className="p-6 costumScrollBar overflow-y-auto">
             {createIssueModal && showAddTaskForm ? (
-              <AddTaskForm parentProject={project} handleCachAddTaskForm={handleCachAddTaskForm} />
+              <AddTaskForm parentProject={project} handleCachAddTaskForm={handleCachAddTaskForm} reloadpage={reloadpage} reload={reload}/>
             ) : null}
           </div>
         </div>
