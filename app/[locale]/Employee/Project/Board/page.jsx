@@ -105,6 +105,7 @@ function Board() {
                 reloadpage={reloadpage}
                 reload={reload}
               />
+              
             </>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
