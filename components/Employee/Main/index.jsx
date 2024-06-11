@@ -22,16 +22,17 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import UpdateProjectForm from "../Project/UpdateProjectForm";
 import axios from "axios";
+import Loader from "@/components/Loader";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 function MainEmployee() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(null);
   const [organizationId, setOrganizationId] = useState("");
   const [settings, setSettings] = useState({});
-  const [allTasks, setAllTasks] = useState([]);
+  const [allTasks, setAllTasks] = useState(null);
   const [todoTasks, setTodoTasks] = useState([]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
   const [inReviewTasks, setInReviewTasks] = useState([]);
@@ -106,7 +107,7 @@ function MainEmployee() {
         setProjects(projects);
 
         // Extraire les IDs des projets
-        const projectIds = projects.map((project) => project._id);
+        const projectIds = projects?.map((project) => project._id);
 
         // Récupérer les tâches liées à ces projets
         const tasksResponse = await axiosInstance.get("/task/tasks", {
@@ -239,7 +240,7 @@ function MainEmployee() {
           dots: false,
           infinite: true,
           speed: 500,
-          slidesToShow: projects.length >= 2 ? 2 : 1,
+          slidesToShow: projects?.length >= 2 ? 2 : 1,
           slidesToScroll: 1,
           prevArrow: <SamplePrevArrow />,
           nextArrow: <SampleNextArrow />,
@@ -249,7 +250,7 @@ function MainEmployee() {
           dots: false,
           infinite: true,
           speed: 500,
-          slidesToShow: projects.length >= 3 ? 3 : 1,
+          slidesToShow: projects?.length >= 3 ? 3 : 1,
           slidesToScroll: 1,
           prevArrow: <SamplePrevArrow />,
           nextArrow: <SampleNextArrow />,
@@ -259,7 +260,7 @@ function MainEmployee() {
           dots: false,
           infinite: true,
           speed: 500,
-          slidesToShow: projects.length >= 4 ? 4 : 1,
+          slidesToShow: projects?.length >= 4 ? 4 : 1,
           slidesToScroll: 1,
           prevArrow: <SamplePrevArrow />,
           nextArrow: <SampleNextArrow />,
@@ -346,6 +347,9 @@ function MainEmployee() {
     setShowAddProjectForm(true);
   };
   return (
+    
+    <>
+    {allTasks?.length > 0 && projects?.length ? (
     <div
       style={{ height: "90vh" }}
       className={"  w-screen overflow-auto costumScrollBar pb-40"}>
@@ -370,9 +374,9 @@ function MainEmployee() {
           </button>
         </div>
 
-        {projects.length > 0 ? (
+        {projects?.length > 0 ? (
           <div className=" w-12/12 overflow-auto costumScrollBar flex items-center">
-            {projects.map((child, index) => (
+            {projects?.map((child, index) => (
               <ProjectCard key={index} project={child} />
             ))}
           </div>
@@ -504,7 +508,7 @@ function MainEmployee() {
                   <h3
                     style={{ height: "10vh" }}
                     className="mr-4 text-xl font-medium text-gray-900 flex items-center">
-                    All Projects ({projects.length})
+                    All Projects ({projects?.length})
                   </h3>
                   <button
                     onClick={() => handleShowAddProjectForm()}
@@ -564,7 +568,7 @@ function MainEmployee() {
 
             {!showAddProjectForm ? (
               <div>
-                {projects.length > 0 ? (
+                {projects?.length > 0 ? (
                   <div
                     style={{
                       display: "flex",
@@ -575,7 +579,7 @@ function MainEmployee() {
                       overflowY: "auto",
                     }}
                     className="p-6 costumScrollBar overflow-y-auto">
-                    {projects.map((child, index) => (
+                    {projects?.map((child, index) => (
                       <ProjectCard key={index} project={child} />
                     ))}
                   </div>
@@ -618,7 +622,11 @@ function MainEmployee() {
         </div>
       </div>
     </div>
+  ) : (
+    <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
+  )}
+    </>
   );
 }
 
-export default MainEmployee;
+export default React.memo(MainEmployee);

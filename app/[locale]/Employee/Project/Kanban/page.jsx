@@ -13,6 +13,7 @@ import MainEmployee from "@/components/Employee/Main";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import MenuProject from "@/components/Employee/Project/MenuProject";
 import axios from "axios";
+import Loader from "@/components/Loader";
 function Kanban() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [projectId, setProjectId] = useState(null);
@@ -55,13 +56,13 @@ function Kanban() {
   // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
-    console.log("kanbaaaaaaaaaaaaaaaaaaaaaan");
+    
     try {
       const response = await axiosInstance.get(
         `/project/projects?_id=${projectId}`
       );
       const projectData = response.data[0];
-      console.log("project in kanban = ", response.data[0]);
+      
       setProject(projectData);
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
@@ -88,7 +89,11 @@ function Kanban() {
         {/* <MainProject showSideBar={showSideBar} /> */}
         <div className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={1} />
+          {Object.keys(project).length > 0 ? (
           <KanbanBoard project={project} user={userInfo} teamId={teamId} />
+          ) : (
+            <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
+          )}
         </div>
       </div>
     </div>

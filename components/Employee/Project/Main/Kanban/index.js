@@ -2,8 +2,9 @@
 import Column from "./components/Column";
 import "./style.css";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import Loader from "@/components/Loader";
 const KanbanBoard = ({ project, user, teamId }) => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:1937",
@@ -13,62 +14,78 @@ const KanbanBoard = ({ project, user, teamId }) => {
   });
   const [tasks, setTasks] = useState([]);
   useEffect(() => {
-    let taskss;
-    switch (user?.role) {
-      case "employee":
-        taskss =
-          project.tasks?.filter((task) => task?.affectedto === user._id) || [];
-        break;
-      case "teamBoss":
-        taskss = project.tasks?.filter((task) => task?.team === teamId) || [];
-        break;
-      default:
-        taskss = project.tasks;
-        break;
-    }
-    setTasks(taskss);
-  }, [project]);
+    const fetchTasks = async () => {
+      let taskIds;
+      switch (user?.role) {
+        case "employee":
+          taskIds = project.tasks?.filter((task) => task?.affectedto === user._id).map((task) => task._id);
+          break;
+        case "teamBoss":
+          taskIds = project.tasks?.filter((task) => task?.team === teamId).map((task) => task._id);
+          break;
+        default:
+          taskIds = project.tasks?.map((task) => task._id);
+          break;
+      }
+
+      try {
+        const response = await axiosInstance.get(`/task/tasks?_id=${taskIds.join('&_id=')}`);
+        setTasks(response.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des tâches :", error);
+      }
+    };
+
+    fetchTasks();
+  }, [project, user, teamId]);
+
   const onDragOver = (e) => {
     e.preventDefault(); // Nécessaire pour permettre le drop
   };
 
-  const onDrop = async (e, newStatus, newIndex) => {
-    let id = e.dataTransfer.getData("_id");
-    let draggedTask = tasks.find((task) => task?._id.toString() === id);
-    let updatedTasks = tasks.filter((task) => task?._id.toString() !== id);
+  const updateTaskStatus = useCallback(
+    async (taskId, newStatus) => {
+      try {
+        await axiosInstance.patch(`/task/tasks/${taskId}`, {
+          status: newStatus,
+        });
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === taskId ? { ...task, status: newStatus } : task
+          )
+        );
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du statut :", error);
+      }
+    },
+    [axiosInstance]
+  );
 
-    // Vérifiez si draggedTask est défini avant d'accéder à sa propriété status
-    if (draggedTask && draggedTask.status === newStatus) {
-      // Réordonnancement à l'intérieur de la même colonne
-      updatedTasks = [
-        ...updatedTasks.slice(0, newIndex),
-        draggedTask,
-        ...updatedTasks.slice(newIndex),
-      ];
-    } else {
-      // Vérifiez si draggedTask est défini avant de modifier sa propriété status
-      if (draggedTask) {
+  const onDrop = useCallback(
+    (e, newStatus, newIndex) => {
+      const id = e.dataTransfer.getData("_id");
+      const draggedTask = tasks.find((task) => task._id.toString() === id);
+      const updatedTasks = tasks.filter((task) => task._id.toString() !== id);
+
+      if (draggedTask && draggedTask.status === newStatus) {
+        // Réordonnancement à l'intérieur de la même colonne
+        updatedTasks.splice(newIndex, 0, draggedTask);
+        setTasks(updatedTasks);
+      } else {
         // Changement de colonne
-        draggedTask.status = newStatus;
-
-        // Envoyer une requête pour mettre à jour le statut dans la base de données
-        try {
-          await axiosInstance.patch(`/task/tasks/${draggedTask?._id}`, {
-            status: newStatus,
-          });
-        } catch (error) {
-          console.error("Erreur lors de la mise à jour du statut :", error);
+        if (draggedTask) {
+          const updatedTask = { ...draggedTask, status: newStatus };
+          updateTaskStatus(updatedTask._id, newStatus);
+          updatedTasks.splice(newIndex, 0, updatedTask);
+          setTasks(updatedTasks);
         }
       }
-      // Ajoutez la tâche à la nouvelle colonne
-      updatedTasks.splice(newIndex, 0, draggedTask);
-    }
-
-    setTasks(updatedTasks);
-  };
+    },
+    [tasks, updateTaskStatus]
+  );
 
   const getTasksForStatus = (status) => {
-    console.log(tasks);
+    
     const tasksForStatus =
       tasks?.filter((task) => task?.status === status) || [];
     return tasksForStatus.sort((a, b) => {
@@ -80,6 +97,8 @@ const KanbanBoard = ({ project, user, teamId }) => {
   };
 
   return (
+    <>
+    {tasks.length > 0 ? (
     <div
       style={{ height: "90vh" }}
       className="flex flex-col lg:flex-row w-full  overflow-auto costumScrollBar">
@@ -91,33 +110,37 @@ const KanbanBoard = ({ project, user, teamId }) => {
             tasks={getTasksForStatus("Todo")}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            status="todo"
+            status="Todo"
           />
           <Column
             title="In progress"
             tasks={getTasksForStatus("Inprogress")}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            status="doing"
+            status="Inprogress"
           />
           <Column
             title="In Review"
             tasks={getTasksForStatus("Inreview")}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            status="in review"
+            status="Inreview"
           />
           <Column
             title="Done"
             tasks={getTasksForStatus("Done")}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            status="done"
+            status="Done"
           />
         </div>
       </div>
     </div>
+  ) : (
+    <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
+  )}
+  </>
   );
 };
 
-export default KanbanBoard;
+export default React.memo(KanbanBoard);
