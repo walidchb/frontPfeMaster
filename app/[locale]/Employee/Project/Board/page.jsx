@@ -94,12 +94,13 @@ function Board() {
           {/* Vérifier si project n'est pas vide avant de rendre les composants */}
           {Object.keys(project).length > 0 ? (
             <>
+            
               <ProjectDetails
                 project={project}
                 reloadpage={reloadpage}
                 reload={reload}
               />
-              
+
               <BoardMain
                 project={project}
                 user={userInfo}
