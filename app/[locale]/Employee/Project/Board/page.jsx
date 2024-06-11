@@ -99,6 +99,7 @@ function Board() {
                 reloadpage={reloadpage}
                 reload={reload}
               />
+              
               <BoardMain
                 project={project}
                 user={userInfo}
