@@ -13,7 +13,7 @@ const Column = ({ title, tasks, onDrop, onDragOver, status, project }) => {
   switch (title.toLowerCase()) {
     case "todo":
       icon = (
-        <img className="w-6 h-6" src="/images/list.png" alt="" srcset="" />
+        <img className="w-6 h-6" src="/images/list.png" alt="" srcSet="" />
       );
       bg_gradient = "bg-gradient-to-r from-blue-500 to-green-500";
       break;
@@ -23,7 +23,7 @@ const Column = ({ title, tasks, onDrop, onDragOver, status, project }) => {
           className="w-6 h-6"
           src="/images/development.png"
           alt=""
-          srcset=""
+          srcSet=""
         />
       );
       bg_gradient = "bg-gradient-to-r from-orange-500 to-purple-500";
@@ -35,7 +35,7 @@ const Column = ({ title, tasks, onDrop, onDragOver, status, project }) => {
           className="w-6 h-6"
           src="/images/code-review.png"
           alt=""
-          srcset=""
+          srcSet=""
         />
       );
       bg_gradient = "bg-gradient-to-r from-amber-800 to-green-500";

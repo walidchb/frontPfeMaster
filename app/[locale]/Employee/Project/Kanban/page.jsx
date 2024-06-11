@@ -15,7 +15,7 @@ import MenuProject from "@/components/Employee/Project/MenuProject";
 import axios from "axios";
 function Kanban() {
   const [showSideBar, setShowSideBar] = useState(true);
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(null);
   const [userInfo, setUserInfo] = useState({});
   const [project, setProject] = useState({});
   const [reload, setReload] = useState(false);
@@ -55,12 +55,13 @@ function Kanban() {
   // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
+    console.log("kanbaaaaaaaaaaaaaaaaaaaaaan");
     try {
       const response = await axiosInstance.get(
         `/project/projects?_id=${projectId}`
       );
       const projectData = response.data[0];
-      console.log("project = ", response.data[0]);
+      console.log("project in kanban = ", response.data[0]);
       setProject(projectData);
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
@@ -68,8 +69,10 @@ function Kanban() {
   };
 
   useEffect(() => {
-    fetchProject(projectId);
-  }, [userInfo, projectId, reload]);
+    if (projectId) {
+      fetchProject(projectId);
+    }
+  }, [projectId, reload]);
   return (
     <div className=" bg-white text-black ">
       <NavBarAuth

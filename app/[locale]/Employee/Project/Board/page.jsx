@@ -18,7 +18,7 @@ import axios from "axios";
 
 function Board() {
   const [showSideBar, setShowSideBar] = useState(true);
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState({});
   const [reload, setReload] = useState(false);
   const [userInfo, setUserInfo] = useState({});
@@ -58,7 +58,9 @@ function Board() {
   // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
+    console.log("projectIdddddddddddddddddddddddddddddddd");
     try {
+      console.log("projectId : " + projectId);
       const response = await axiosInstance.get(
         `/project/projects?_id=${projectId}`
       );
@@ -71,8 +73,10 @@ function Board() {
   };
 
   useEffect(() => {
-    fetchProject(projectId);
-  }, [userInfo, projectId, reload]);
+    if (projectId != null) {
+      fetchProject(projectId);
+    }
+  }, [projectId, reload]);
   return (
     <div className="bg-white text-black">
       <NavBarAuth

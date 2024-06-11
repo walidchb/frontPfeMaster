@@ -118,6 +118,7 @@ const UpdateProjectForm = ({
   }, []);
 
   const sendProjectData = async (values, setSubmitting) => {
+    console.log("paaaaatchhhhh");
     setSubmitting(true);
 
     try {
