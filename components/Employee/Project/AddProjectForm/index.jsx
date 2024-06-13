@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { FaPlus } from "react-icons/fa";
 import * as Yup from "yup";
 import axios from "axios";
+import Loader from "@/components/Loader";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:1937",
@@ -46,8 +47,8 @@ const AddProjectForm = ({
   reloadpage,
   reload,
 }) => {
-  const [availableTeams, setAvailableTeams] = useState([]);
-  const [availableUsers, setAvailableUsers] = useState([]);
+  const [availableTeams, setAvailableTeams] = useState();
+  const [availableUsers, setAvailableUsers] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
 
@@ -138,6 +139,8 @@ const AddProjectForm = ({
   });
 
   return (
+    <>
+    {availableUsers && availableTeams ? (
     <div
       style={loginDiv}
       className="w-11/12 flex md:w-8/12 h-fit lg:w-6/12 flex-col items-center justify-center bg-white rounded-2xl py-12 md:py-8">
@@ -407,6 +410,11 @@ const AddProjectForm = ({
         </div>
       )}
     </div>
+  ) : (
+    <Loader /> 
+  )}
+
+  </>
   );
 };
 export default AddProjectForm;
