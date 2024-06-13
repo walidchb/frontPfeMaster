@@ -25,7 +25,6 @@ const TaskCard = (task) => {
     try {
       const response = await axiosInstance.get(`/task/tasks?_id=${taskId}`);
       const task = response.data[0];
-      console.log(`task ${task.Name} =`, task);
       setTaskData(task);
     } catch (error) {
       console.error("Erreur lors de la récupération de la tache :", error);
@@ -38,7 +37,8 @@ const TaskCard = (task) => {
   const [isDragging, setIsDragging] = useState(false); // Nouvel état pour suivre si la tâche est en cours de glissement
   const locale = useLocale();
   useEffect(() => {
-    fetchTask(task?._id);
+    // fetchTask(task?._id);
+    setTaskData(task)
   }, [task]);
 
   const priorityClasses = {
@@ -57,7 +57,7 @@ const TaskCard = (task) => {
     }[task.priority] || "bg-blue-500 text-white";
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData("id", task?.id?.toString());
+    e.dataTransfer.setData("_id", task?._id?.toString());
     setIsDragging(true); // Mettre à jour l'état lors du début du glissement
   };
 

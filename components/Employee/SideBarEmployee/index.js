@@ -22,12 +22,10 @@ function classNames(...classes) {
 function SideBarEmployee({ fromEmployee, currentPage }) {
   const [user, setUser] = useState({});
 
-  console.log(user);
+  
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
-    console.log("user");
-
-    console.log(user);
+    
     setUser(user);
   }, []);
 
