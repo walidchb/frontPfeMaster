@@ -94,6 +94,14 @@ function MainEmployee() {
         );
         console.log("responseData = ", response.data);
         setProjects(response.data);
+        const response1 = await axiosInstance.get(`/user/userTasks`, {
+          params: { 
+            organizationId: organization._id,
+           },
+        });
+        const tasks = response1.data;
+        setAllTasks(tasks);
+        filterTasks(tasks); 
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
@@ -110,8 +118,11 @@ function MainEmployee() {
         const projectIds = projects?.map((project) => project._id);
 
         // Récupérer les tâches liées à ces projets
-        const tasksResponse = await axiosInstance.get("/task/tasks", {
-          params: { projet: projectIds },
+        const tasksResponse = await axiosInstance.get(`/user/userTasks`, {
+          params: { 
+            userId: userId,
+            organizationId: organization._id,
+           },
         });
         const tasks = tasksResponse.data;
         setAllTasks(tasks);
@@ -129,7 +140,7 @@ function MainEmployee() {
     } else if (userInfo?.role === "teamBoss") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
-          params: { userId: userInfo?._id },
+          params: { userId: userId },
         });
         console.log("responseData = ", response.data);
         setProjects(response.data);
@@ -151,8 +162,11 @@ function MainEmployee() {
         console.log("responseData = ", response.data);
         setProjects(response.data);
 
-        const tasksResponse = await axiosInstance.get("/task/tasks", {
-          params: { affectedto: userInfo?._id },
+        const tasksResponse = await axiosInstance.get(`/user/userTasks`, {
+          params: { 
+            userId: userId,
+            teamId: teamId,
+           },
         });
         const tasks = tasksResponse.data;
         setAllTasks(tasks);
@@ -349,7 +363,7 @@ function MainEmployee() {
   return (
     
     <>
-    {allTasks?.length > 0 && projects?.length ? (
+    {(allTasks && projects) ? (
     <div
       style={{ height: "90vh" }}
       className={"  w-screen overflow-auto costumScrollBar pb-40"}>
@@ -501,14 +515,13 @@ function MainEmployee() {
           style={{ width: "90vw", height: "90vh" }}
           className="myShadow relative mx-auto   rounded-lg shadow-md bg-white">
           <div className="flex justify-between items-center px-5 border-b border-gray-200">
-            {/* {!showAddProjectFrom ? ( */}
             {!showAddProjectForm ? (
               <Fragment>
                 <div className="flex justify-center items-center">
                   <h3
                     style={{ height: "10vh" }}
                     className="mr-4 text-xl font-medium text-gray-900 flex items-center">
-                    All Projects ({projects?.length})
+                    All Projects ({projects.length})
                   </h3>
                   <button
                     onClick={() => handleShowAddProjectForm()}
@@ -525,10 +538,7 @@ function MainEmployee() {
                     setShowAddProjectForm(false);
                   }}
                   className="text-gray-400 hover:text-gray-500 focus:outline-none">
-                  <svg
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor">
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path
                       fillRule="evenodd"
                       d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
@@ -539,6 +549,8 @@ function MainEmployee() {
               </Fragment>
             ) : (
               <Fragment>
+              
+              
                 <div className="flex justify-center items-center">
                   <h3
                     style={{ height: "10vh" }}
@@ -546,79 +558,61 @@ function MainEmployee() {
                     Add Project
                   </h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddProjectForm(false);
-                  }}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none">
-                  <svg
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </Fragment>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      
+                      setShowAddProjectForm(false);
+                    }}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </Fragment>
             )}
 
-            {!showAddProjectForm ? (
-              <div>
-                {projects?.length > 0 ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      justifyContent: "center",
-                      gap: "20px",
-                      height: "77vh",
-                      overflowY: "auto",
-                    }}
-                    className="p-6 costumScrollBar overflow-y-auto">
-                    {projects?.map((child, index) => (
-                      <ProjectCard key={index} project={child} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="m-10 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
-                    No Project
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  height: "78vh",
-                  overflowY: "auto",
-                }}
-                className="p-6 costumScrollBar overflow-y-auto">
-                <AddProjectForm
-                  organization={organization}
-                  handleCachAddProjectForm={handleCachAddProjectForm}
-                  reloadpage={reloadpage}
-                  reload={reload}
-                />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => setSeeAllProjectsModal(false)}
-              className="text-gray-400 hover:text-gray-500 focus:outline-none">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+            
           </div>
+{!showAddProjectForm ? (
+  <div>
+    {projects.length > 0 ? (
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: "20px",
+          height: "77vh",
+          overflowY: "auto",
+        }}
+        className="p-6 costumScrollBar overflow-y-auto">
+        {projects.map((child, index) => (
+          <ProjectCard key={index} project={child} />
+        ))}
+      </div>
+    ) : (
+      <div className="m-10 min-w-56 max-w-56 min-h-44 max-h-44  text-gray-00 flex justify-center items-center border-gray-600  border-2 border-dashed rounded-xl">
+        No Project
+      </div>
+    )}
+  </div>
+) : (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      height: "78vh",
+      overflowY: "auto",
+    }}
+    className="p-6 costumScrollBar overflow-y-auto">
+    <AddProjectForm organization={organization} handleCachAddProjectForm={handleCachAddProjectForm} reloadpage={reloadpage} reload={reload}/>
+  </div>
+)}
         </div>
       </div>
     </div>

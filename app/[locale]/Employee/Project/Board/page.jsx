@@ -94,6 +94,7 @@ function Board() {
           {/* Vérifier si project n'est pas vide avant de rendre les composants */}
           {Object.keys(project).length > 0 ? (
             <>
+
               <ProjectDetails
                 project={project}
                 reloadpage={reloadpage}
@@ -105,6 +106,7 @@ function Board() {
                 reloadpage={reloadpage}
                 reload={reload}
               />
+              
             </>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
