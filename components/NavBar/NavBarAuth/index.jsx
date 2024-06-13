@@ -56,6 +56,7 @@ function NavBarAuth({
   const [userInfo, setUserInfo] = useState({});
   const [organization, setOrganization] = useState({});
   useEffect(() => {
+    console.log("yawwwww rani hnaaa");
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");

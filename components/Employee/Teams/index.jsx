@@ -33,16 +33,23 @@ import {
 
 function TeamsPage() {
   const [allPeople, setAllPeople] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+
   const [personFetched, setPersonFetched] = useState(false);
   const [organization, setOrganization] = useState({}); // State to trigger rerender
+  const [userInfo, setUserInfo] = useState({});
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const orga = localStorage.getItem("organization");
+      const userinfo = localStorage.getItem("userInfo");
+
       if (orga) {
         let orgaJson = JSON.parse(orga);
 
         setOrganization(orgaJson);
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
       }
     }
   }, []);
@@ -112,22 +119,42 @@ function TeamsPage() {
         },
       });
       const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/team/teams", {
-          params: {
-            Organization: organization?._id,
-          },
-        });
-        console.log("teams");
+      if (userInfo?.role === "orgBoss") {
+        try {
+          const response = await axiosInstance.get("/team/teams", {
+            params: {
+              Organization: organization?._id,
+            },
+          });
+          console.log("teams");
 
-        console.log(response.data);
-        setTeams(response.data);
+          console.log(response.data);
+          setTeams(response.data);
 
-        // Create an array of false values with the same length as response.data
-        const newShowTeam = new Array(response.data.length).fill(false);
-        setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
+          // Create an array of false values with the same length as response.data
+          const newShowTeam = new Array(response.data.length).fill(false);
+          setShowTeam(newShowTeam);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      } else {
+        try {
+          const response = await axiosInstance.get("/team/teamsByBoss", {
+            params: {
+              projectBossId: userInfo?._id,
+            },
+          });
+          console.log("teams");
+
+          console.log(response.data);
+          setTeams(response.data);
+
+          // Create an array of false values with the same length as response.data
+          const newShowTeam = new Array(response.data.length).fill(false);
+          setShowTeam(newShowTeam);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       }
     };
 
@@ -142,22 +169,42 @@ function TeamsPage() {
         },
       });
       const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/team/teams", {
-          params: {
-            Organization: organization?._id,
-          },
-        });
-        console.log("teams");
+      if (userInfo?.role === "orgBoss") {
+        try {
+          const response = await axiosInstance.get("/team/teams", {
+            params: {
+              Organization: organization?._id,
+            },
+          });
+          console.log("teams");
 
-        console.log(response.data);
-        setTeams(response.data);
+          console.log(response.data);
+          setTeams(response.data);
 
-        // Create an array of false values with the same length as response.data
-        const newShowTeam = new Array(response.data.length).fill(false);
-        setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
+          // Create an array of false values with the same length as response.data
+          const newShowTeam = new Array(response.data.length).fill(false);
+          setShowTeam(newShowTeam);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      } else {
+        try {
+          const response = await axiosInstance.get("/team/teamsByBoss", {
+            params: {
+              projectBossId: userInfo?._id,
+            },
+          });
+          console.log("teams");
+
+          console.log(response.data);
+          setTeams(response.data);
+
+          // Create an array of false values with the same length as response.data
+          const newShowTeam = new Array(response.data.length).fill(false);
+          setShowTeam(newShowTeam);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       }
     };
 
@@ -391,6 +438,81 @@ function TeamsPage() {
       console.error("Error:", error);
     }
   };
+  // team members fetch
+
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      try {
+        const response = await axiosInstance.get("/user/users", {
+          params: {
+            team: team?._id,
+          },
+        });
+        console.log("people");
+
+        console.log(response.data);
+        setTeamMembers(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, [team]);
+
+  const makeUserTeamBoss = async (team, person) => {
+    const axiosInstance = axios.create({
+      baseURL: "http://localhost:1937",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(0);
+
+    try {
+      console.log(1);
+      const response = await axiosInstance.patch(
+        `/user/users?id=${person?._id}`,
+        {
+          role: "teamBoss",
+        }
+      );
+      console.log("user updated successfuly");
+
+      try {
+        console.log(1);
+        const response = await axiosInstance.patch(
+          `/team/teams?id=${team?._id}`,
+          {
+            Boss: person?._id,
+          }
+        );
+
+        console.log("team updated successfuly");
+        setReload(!reload);
+      } catch (error) {
+        console.log(4);
+
+        console.error(
+          "Error updating team:",
+          error.response?.data || error.message
+        );
+      }
+    } catch (error) {
+      console.log(4);
+
+      console.error(
+        "Error updating user:",
+        error.response?.data || error.message
+      );
+    }
+  };
   return (
     <div
       style={{ height: "90vh" }}
@@ -415,13 +537,18 @@ function TeamsPage() {
               <span
                 onClick={() => {
                   // Create a copy of the state to avoid mutation
-                  const updatedShowTeam = [...showTeam];
+                  // const updatedShowTeam = [...showTeam];
+                  const updatedShowTeam = showTeam.map(
+                    (value, idx) => idx === index
+                  );
 
-                  // Toggle the clicked element's state
-                  updatedShowTeam[index] = !updatedShowTeam[index];
-                  setTeam(team);
                   // Update the state using the setter function
                   setShowTeam(updatedShowTeam);
+                  // Toggle the clicked element's state
+                  // updatedShowTeam[index] = !updatedShowTeam[index];
+                  setTeam(team);
+                  // Update the state using the setter function
+                  // setShowTeam(updatedShowTeam);
                 }}
                 className="cursor-pointer w-fit flex font-bold text-xl  items-center">
                 {showTeam[index] ? (
@@ -472,41 +599,47 @@ function TeamsPage() {
                 ) : null}
 
                 <ul
-                  style={{ height: "73vh" }}
+                  style={{ maxHeight: "73vh" }}
                   role="list"
                   className=" mb-8 w-full overflow-auto costumScrollBar grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
-                  {people.map((person, index) => (
-                    <li key={index}>
-                      <div className="flex items-center gap-x-6 ">
-                        <img
-                          className="h-16 w-16 rounded-full"
-                          src={person.imageUrl}
-                          alt=""
-                        />
-                        <div>
-                          <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
-                            {person.name}
-                          </h3>
-                          <p className="text-sm font-semibold leading-6 text-indigo-600">
-                            {person.role}
-                          </p>
-                          {!team.Boss ? (
-                            <button
-                              className="px-2 py-1 
+                  {teamMembers.length > 0 ? (
+                    teamMembers.map((person, index) => (
+                      <li key={index}>
+                        <div className="flex items-center gap-x-6 ">
+                          <button className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                            {person?.prenom[0].toUpperCase()}
+                            {person?.nom[0].toUpperCase()}
+                          </button>
+                          <div>
+                            <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
+                              {person?.prenom} {person?.nom}
+                            </h3>
+                            <p className="text-sm font-semibold leading-6 text-indigo-600">
+                              {person?.email}
+                            </p>
+                            {!team.Boss ? (
+                              <button
+                                onClick={() => makeUserTeamBoss(team, person)}
+                                className="px-2 py-1 
                            rounded-md font-medium bg-green-400 text-center text-white shadow-sm flex justify-between">
-                              <img
-                                src="/images/leader.png"
-                                className="h-6 w-6 mr-2"
-                                alt=""
-                                srcset=""
-                              />
-                              <span>Make it Boss</span>
-                            </button>
-                          ) : null}
+                                <img
+                                  src="/images/leader.png"
+                                  className="h-6 w-6 mr-2"
+                                  alt=""
+                                  // srcset=""
+                                />
+                                <span>Make it Boss</span>
+                              </button>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    ))
+                  ) : (
+                    <div className="w-full  my-2 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+                      there are no members in this team yet{" "}
+                    </div>
+                  )}
                 </ul>
               </div>
             ) : null}

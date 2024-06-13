@@ -49,6 +49,7 @@ const Invitation = () => {
       const response = await axiosInstance.patch(
         `/user/users?id=${userInfo?._id}`,
         {
+          role: invitation?.roleinvitedto,
           team: invitation?.team._id, // New team value to be pushed
           organizations: invitation?.organisation._id,
         }
