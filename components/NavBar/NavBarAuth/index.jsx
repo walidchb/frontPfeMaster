@@ -62,6 +62,9 @@ function NavBarAuth({
       const orga = localStorage.getItem("organization");
       if (userinfo && orga) {
         let userJson = JSON.parse(userinfo);
+        console.log("userJson");
+
+        console.log(userJson);
         setUserInfo(userJson);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
@@ -90,58 +93,59 @@ function NavBarAuth({
 
   const organisations = [1, 2, 4, 5];
   const [invitaions, setInvitaions] = useState([]);
-  // useEffect(() => {
-  //   const getinvitations = async (values) => {
-  //     const axiosInstance = axios.create({
-  //       baseURL: "http://localhost:1937",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const user = JSON.parse(localStorage.getItem("userInfo"));
-  //     try {
-  //       const response = await axiosInstance.get("/invitation/invitations", {
-  //         params: {
-  //           sendto: user._id,
-  //         },
-  //       });
-  //       // console.log("invitaions");
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const user = JSON.parse(localStorage.getItem("userInfo"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            sendto: userInfo._id,
+          },
+        });
+        // console.log("invitaions");
 
-  //       // console.log(response.data);
-  //       setInvitaions(response.data);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   };
+        // console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    if (userInfo) {
+      getinvitations();
+    }
+  }, [userInfo]);
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const user = JSON.parse(localStorage.getItem("userInfo"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            sendto: user._id,
+          },
+        });
+        // console.log("invitaions");
 
-  //   getinvitations();
-  // }, []);
-  // useEffect(() => {
-  //   const getinvitations = async (values) => {
-  //     const axiosInstance = axios.create({
-  //       baseURL: "http://localhost:1937",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const user = JSON.parse(localStorage.getItem("userInfo"));
-  //     try {
-  //       const response = await axiosInstance.get("/invitation/invitations", {
-  //         params: {
-  //           sendto: user._id,
-  //         },
-  //       });
-  //       // console.log("invitaions");
+        // console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
 
-  //       // console.log(response.data);
-  //       setInvitaions(response.data);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   };
-
-  //   getinvitations();
-  // }, [reload]);
+    getinvitations();
+  }, [reload]);
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -385,7 +389,7 @@ function NavBarAuth({
                                       "/organization/organizations",
                                       {
                                         params: {
-                                          _id: item._id,
+                                          _id: item._id || item,
                                         },
                                       }
                                     );

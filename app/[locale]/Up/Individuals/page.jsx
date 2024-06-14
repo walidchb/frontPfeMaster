@@ -160,6 +160,7 @@ function Individuals() {
               localStorage.setItem("user", true);
               await localStorage.setItem("userInfo", JSON.stringify(userInfo));
               dispatch(setUserInfo(userInfo));
+
               console.log(res);
               router.push(`/${locale}/Employee/BoardEmployee`);
             })

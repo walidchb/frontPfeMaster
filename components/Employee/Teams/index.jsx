@@ -313,10 +313,13 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
+      const roles = ["employee", "teamBoss", "prjctBoss", "individual"];
+      // Join the roles array to form a string separated by commas
+      const roleQueryParam = roles.join(",");
       try {
         const response = await axiosInstance.get("/user/users", {
           params: {
-            role: ["employee", "teamBoss", "prjctBoss", "individual"],
+            roles: roleQueryParam,
           },
         });
         console.log("people");
@@ -343,13 +346,21 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
+      const roles = ["employee", "teamBoss", "prjctBoss", "individual"];
+      // Join the roles array to form a string separated by commas
+      const roleQueryParam = roles.join(",");
       try {
-        const response = await axiosInstance.get("/user/users");
+        const response = await axiosInstance.get("/user/users", {
+          params: {
+            roles: roleQueryParam,
+          },
+        });
         console.log("people");
 
         console.log(response.data);
         setAllPeople(response.data);
         // setTeams(response.data);
+
         // Create an array of false values with the same length as response.data
         // const newShowTeam = new Array(response.data.length).fill(false);
         // setShowTeam(newShowTeam);
@@ -357,9 +368,8 @@ function TeamsPage() {
         console.error("Error:", error);
       }
     };
-    if (!personFetched) {
-      getPeople();
-    }
+
+    getPeople();
   }, [personFetched]);
 
   const [teamLead, setTeamLead] = useState(true);
@@ -436,7 +446,7 @@ function TeamsPage() {
     });
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss._id,
+        sendby: organization?.Boss?._id,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,

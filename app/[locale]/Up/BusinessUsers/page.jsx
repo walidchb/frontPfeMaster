@@ -28,7 +28,6 @@ import Select from "react-select";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 const deleteUserfromDataBaseAndFireBase = async (email) => {
-
   const user = auth.currentUser;
   try {
     const axiosInstance = axios.create({
@@ -66,7 +65,7 @@ const deleteUserfromDataBaseAndFireBase = async (email) => {
   }
 };
 function BusinessUsers() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const router = useRouter();
   const getOptionLabel = (option) => option.name;
@@ -1150,15 +1149,32 @@ function BusinessUsers() {
               Boss: "",
             }
           );
-          console.log("Organization created:", organizationResponse.data);
-          localStorage.setItem("user", true);
-          await localStorage.setItem(
-            "organization",
-            JSON.stringify(organizationResponse.data)
-          );
-          dispatch(setOrganization(organizationResponse.data));
+          try {
+            const Response = await axiosInstance.get(
+              "/organization/organizations",
+              {
+                params: {
+                  _id: organizationResponse?.data?._id,
+                },
+              }
+            );
+            localStorage.setItem("user", true);
+            const existingOrganization = localStorage.getItem("organization");
 
-          router.push(`/${locale}/Employee/BoardEmployee`);
+            // If it exists, remove it
+            if (existingOrganization) {
+              localStorage.removeItem("organization");
+            }
+            await localStorage.setItem(
+              "organization",
+              JSON.stringify(Response.data[0])
+            );
+            dispatch(setOrganization(Response.data[0]));
+            router.push(`/${locale}/Employee/BoardEmployee`);
+          } catch (error) {
+            console.error("Error fetchin organization:", error);
+          }
+          console.log("Organization created:", organizationResponse.data);
         } catch (error) {
           console.error("Error creating organization:", error);
           handleDelete(values.email); // Si vous avez une fonction handleDelete

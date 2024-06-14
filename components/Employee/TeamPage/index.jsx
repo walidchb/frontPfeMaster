@@ -5,24 +5,33 @@ import { IoSearchCircle } from "react-icons/io5";
 import axios from "axios";
 
 function TeamPage() {
-  const findObjectById = (array, id) => {
-    return array.find((obj) => obj.id === id);
-  };
+  // const findObjectById = (array, id) => {
+  //   return array.find((obj) => obj.id === id);
+  // };
   // <<<<<<< HEAD
   const [team, setTeam] = useState({});
   const [teamId, setTeamId] = useState(null);
   const [people, setPeople] = useState([]);
   useEffect(() => {
+    console.log("local storage");
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
       if (userinfo && orga) {
         let userJson = JSON.parse(userinfo);
+        console.log("userJson");
+        console.log(userJson);
 
         let orgaJson = JSON.parse(orga);
+        console.log("orgaJson");
+        console.log(orgaJson);
+
         const team = userJson?.team.find(
           (obj) => obj.Organization === orgaJson._id
         );
+        console.log("team");
+        console.log(team);
+
         setTeamId(team?._id);
       }
     }
@@ -32,29 +41,6 @@ function TeamPage() {
   const [userInfo, setUserInfo] = useState({});
   const [org, setOrg] = useState({});
   // const [team, setteam] = useState({});
-
-  // Read from localStorage on component mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const user = localStorage.getItem("userInfo");
-      console.log("nhy");
-      console.log(user);
-      if (user) {
-        console.log("fghjkljhgfgh");
-        console.log(JSON.parse(user));
-
-        setUserInfo(JSON.parse(user));
-        // setteam(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id))
-        console.log("team");
-        // console.log(JSON.parse(user)?.team.find((obj) => obj.Organization === org._id));
-        console.log("qbdqt ");
-      }
-      const orgq = localStorage.getItem("organization");
-      if (orgq) {
-        setOrg(JSON.parse(orgq));
-      }
-    }
-  }, []);
 
   // const team = userInfo?.team.find((obj) => obj.Organization === org._id);
   // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
@@ -102,17 +88,13 @@ function TeamPage() {
 
         console.log(response.data);
         setPeople(response.data);
-        // setTeams(response.data);
-
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
       } catch (error) {
         console.error("Error:", error);
       }
     };
-
-    getTeamMembers();
+    if (teamId) {
+      getTeamMembers();
+    }
   }, [teamId]);
 
   // =======
@@ -148,8 +130,8 @@ function TeamPage() {
             style={{ height: "73vh" }}
             role="list"
             className="w-full overflow-auto costumScrollBar grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
-            {people.map((person) => (
-              <li key={person.name}>
+            {people?.map((person, index) => (
+              <li key={index}>
                 <div className="flex items-center gap-x-6">
                   <button className="h-10 w-10 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     {person?.prenom[0].toUpperCase()}{" "}

@@ -4,6 +4,8 @@ import { useTranslations, useLocale } from "next-intl";
 import axios from "axios";
 import "./style.css";
 import { useDispatch } from "react-redux";
+import { setOrganization } from "@/store/features/organization/organizationSlice";
+
 import { setUserInfo } from "@/store/features/auth/authSlice";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -56,12 +58,44 @@ const Invitation = () => {
       );
       console.log(3);
 
+      try {
+        const UserFetchResponse = await axiosInstance.get(`/user/users`, {
+          params: { _id: response?.data?._id },
+        });
+        console.log("userInfo after accept invtation to dispatch");
+        localStorage.removeItem("userInfo");
+        await localStorage.setItem(
+          "userInfo",
+          JSON.stringify(UserFetchResponse.data[0])
+        );
+        dispatch(setUserInfo(UserFetchResponse.data[0])); // Dispatch action with fetched data
+      } catch (error) {
+        console.error("Error:", error);
+      }
       console.log("User updated successfully:", response.data);
       console.log(response.data);
-      localStorage.removeItem("userInfo");
-      localStorage.setItem("userInfo", JSON.stringify(response.data));
 
-      dispatch(setUserInfo(response.data)); // Dispatch action with fetched data
+      try {
+        const response = await axiosInstance.get(
+          "/organization/organizations",
+          {
+            params: {
+              _id: invitation?.organisation._id,
+            },
+          }
+        );
+
+        console.log(response.data[0]);
+        localStorage.removeItem("organization");
+        await localStorage.setItem(
+          "organization",
+          JSON.stringify(response.data[0])
+        );
+
+        dispatch(setOrganization(response.data[0]));
+      } catch (error) {
+        console.error("Error:", error);
+      }
     } catch (error) {
       console.log(4);
 
