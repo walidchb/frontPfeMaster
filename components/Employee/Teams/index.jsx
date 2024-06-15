@@ -313,7 +313,7 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      const roles = ["employee", "teamBoss", "prjctBoss", "individual"];
+      const roles = ["employee", "teamBoss", "individual"];
       // Join the roles array to form a string separated by commas
       const roleQueryParam = roles.join(",");
       try {
@@ -346,7 +346,7 @@ function TeamsPage() {
           "Content-Type": "application/json",
         },
       });
-      const roles = ["employee", "teamBoss", "prjctBoss", "individual"];
+      const roles = ["employee", "teamBoss", "individual"];
       // Join the roles array to form a string separated by commas
       const roleQueryParam = roles.join(",");
       try {

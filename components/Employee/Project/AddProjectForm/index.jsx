@@ -5,6 +5,14 @@ import { FaPlus } from "react-icons/fa";
 import * as Yup from "yup";
 import axios from "axios";
 import Loader from "@/components/Loader";
+import { Formik, Form, Field } from "formik";
+import { GrValidate } from "react-icons/gr";
+import {
+  IoSearchCircle,
+  IoAddCircleSharp,
+  IoCloseCircleSharp,
+} from "react-icons/io5";
+import "./style.css";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:1937",
@@ -31,6 +39,7 @@ const fetchUsers = async (organizationId) => {
     const response = await axiosInstance.get("/user/users", {
       params: {
         organizations: organizationId,
+        role: "prjctBoss"
       },
     });
     const users = response.data;
@@ -51,6 +60,15 @@ const AddProjectForm = ({
   const [availableUsers, setAvailableUsers] = useState();
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
+  const [showInvitePeopleModal, setShowInvitePeopleModal] = useState(false);
+  const [allPeople, setAllPeople] = useState([]);
+  const [personFetched, setPersonFetched] = useState(false);
+  const [reloadInvit, setReloadInvit] = useState(false);
+  const [invitaions, setInvitaions] = useState([]);
+
+  function invitationSent(array, value) {
+    return array.some((item) => item.sendto._id === value);
+  }
 
   const handlePopupClose = () => {
     setShowPopup(false);
@@ -137,6 +155,168 @@ const AddProjectForm = ({
       sendProjectData(values, setSubmitting);
     },
   });
+
+  const initialValuesSearchPerson = { email: "" };
+  const handleSubmitSearchPerson = async (values, { setSubmitting }) => {
+    try {
+      const response = await axiosInstance.get("/user/users", {
+        params: {
+          email: values.email,
+        },
+      });
+      // console.log("team created");
+      setAllPeople(response.data);
+      setPersonFetched(true);
+      console.log(response.data);
+      // setReload(!reload);
+      // window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    // Handle form submission logic here
+    console.log("Form submitted with values:", values);
+    setSubmitting(false);
+  };
+
+  const sendInvitaion = async (person) => {
+    console.log(organization);
+    try {
+      const response = await axiosInstance.post("/invitation/invitations", {
+        sendby: organization?.Boss?._id,
+        sendto: person._id,
+        roleinvitedto: "prjctBoss",
+        organisation: organization?._id,
+        accepted: false,
+      });
+
+      console.log(response.data);
+      setReloadInvit(!reloadInvit);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // get invitations
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            organisation: organization?._id,
+          },
+        });
+        console.log("invitaions");
+
+        console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, []);
+  useEffect(() => {
+    const getinvitations = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const organization = JSON.parse(localStorage.getItem("organization"));
+      try {
+        const response = await axiosInstance.get("/invitation/invitations", {
+          params: {
+            organisation: organization?._id,
+          },
+        });
+        console.log("invitaions");
+
+        console.log(response.data);
+        setInvitaions(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getinvitations();
+  }, [reloadInvit]);
+
+  useEffect(() => {
+    const getPeople = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const roles = ["prjctBoss", "individual"];
+      // Join the roles array to form a string separated by commas
+      const roleQueryParam = roles.join(",");
+      try {
+        const response = await axiosInstance.get("/user/users", {
+          params: {
+            roles: roleQueryParam,
+          },
+        });
+        console.log("people");
+
+        console.log(response.data);
+        setAllPeople(response.data);
+        // setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        // const newShowTeam = new Array(response.data.length).fill(false);
+        // setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getPeople();
+  }, []);
+
+  useEffect(() => {
+    const getPeople = async (values) => {
+      const axiosInstance = axios.create({
+        baseURL: "http://localhost:1937",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const roles = ["prjctBoss", "individual"];
+      // Join the roles array to form a string separated by commas
+      const roleQueryParam = roles.join(",");
+      try {
+        const response = await axiosInstance.get("/user/users", {
+          params: {
+            roles: roleQueryParam,
+          },
+        });
+        console.log("people");
+
+        console.log(response.data);
+        setAllPeople(response.data);
+        // setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        // const newShowTeam = new Array(response.data.length).fill(false);
+        // setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    getPeople();
+  }, [personFetched]);
 
   return (
     <>
@@ -272,7 +452,16 @@ const AddProjectForm = ({
         </div>
 
         <div className="w-full">
-          <p className="text-l">Project Manager :</p>
+          <div className="w-full flex justify-between items-center">
+            <p className="text-l">Project Manager :</p>
+            <button
+              type="button"
+              className="underline text-blue-600 hover:no-underline"
+              onClick={() => setShowInvitePeopleModal(true)}
+            >
+              Invite People
+            </button>
+          </div>
           <div className="flex justify-start items-center px-2 border-b border-[#314155] h-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -397,6 +586,119 @@ const AddProjectForm = ({
           )}
         </button>
       </form>
+      {/* invite people */}
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          backdropFilter: "blur(2px)",
+          backgroundColor: "rgba(255, 255, 255, 0)",
+        }}
+        className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+          showInvitePeopleModal ? "opacity-100 visible" : "opacity-0 invisible"
+        } `}>
+        <div className="w-[90vw]  md:w-[60vw] h-[90vh] myShadow relative mx-auto overflow-hidden   rounded-lg shadow-md bg-white">
+          <div
+            style={{ height: "10vh" }}
+            className="flex justify-end items-center px-5 ">
+            <button
+              type="button"
+              onClick={() => setShowInvitePeopleModal(false)}
+              className="text-gray-400 hover:text-gray-500 focus:outline-none">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            style={{ height: "80vh" }}
+            className=" flex flex-col justify-start items-center ">
+            <h1 className="text-4xl font-bold py-6">Organization: {organization.Name}</h1>
+
+            <h1 className="text-3xl pb-6">Invite a projects's managers to your organization</h1>
+            <div className="w-10/12">
+              <Formik
+                initialValues={initialValuesSearchPerson}
+                onSubmit={handleSubmitSearchPerson}>
+                {({ isSubmitting }) => (
+                  <Form className="bg-white flex justify-start items-center px-2 input rounded-2xl h-10">
+                    <Field
+                      className="px-4 w-full focus:outline-none"
+                      type="text"
+                      name="email"
+                      placeholder="Email"
+                    />
+                    {!personFetched ? (
+                      <button type="submit" disabled={isSubmitting}>
+                        <IoSearchCircle className="text-blue-600 h-6 w-6" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevent default form submission
+                          setPersonFetched(false);
+                        }}>
+                        <IoCloseCircleSharp className=" text-blue-600 h-6 w-6" />
+                      </button>
+                    )}
+                  </Form>
+                )}
+              </Formik>
+            </div>
+
+            <div className="w-11/12 h-[50vh] overflow-auto costumScrollBar">
+              {allPeople.length > 0 ? (
+                allPeople.map((person, index) => (
+                  <div
+                    key={index}
+                    className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
+                    <div className="flex ">
+                      <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                        <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          {person.prenom[0].toUpperCase()}{" "}
+                          {person.nom[0].toUpperCase()}
+                        </button>
+                      </div>
+                      <div className=" flex flex-col justify-center ml-4">
+                        <div className="truncate  text-sm text-gray-600 ">
+                          {person.prenom} {person.nom}
+                        </div>
+                        <div
+                          className={`truncate  text-gray-800 font-semibold  text-sm `}>
+                          {person.email}{" "}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className=" flex justify-center items-center">
+                      {!invitationSent(invitaions, person._id) ? (
+                        <button
+                          type="button"
+                          className="text-gray-600  hover:text-blue-500 focus:outline-none "
+                          onClick={() => sendInvitaion(person)}>
+                          {/* <FaTrash className="mr-1" /> */}
+                          send
+                        </button>
+                      ) : (
+                        <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="w-full rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center text-gray-500 border-gray-600  border-2 border-dashed">
+                  your people list is emptry
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       {showPopup && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg">

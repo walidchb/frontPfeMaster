@@ -46,13 +46,15 @@ const Invitation = () => {
     });
     console.log(0);
 
+    
+
     try {
       console.log(1);
       const response = await axiosInstance.patch(
         `/user/users?id=${userInfo?._id}`,
         {
           role: invitation?.roleinvitedto,
-          team: invitation?.team._id, // New team value to be pushed
+          team: invitation?.team?._id, // New team value to be pushed
           organizations: invitation?.organisation._id,
         }
       );
@@ -63,8 +65,8 @@ const Invitation = () => {
           params: { _id: response?.data?._id },
         });
         console.log("userInfo after accept invtation to dispatch");
-        localStorage.removeItem("userInfo");
-        await localStorage.setItem(
+        // localStorage.removeItem("userInfo");
+        localStorage.setItem(
           "userInfo",
           JSON.stringify(UserFetchResponse.data[0])
         );
@@ -86,8 +88,8 @@ const Invitation = () => {
         );
 
         console.log(response.data[0]);
-        localStorage.removeItem("organization");
-        await localStorage.setItem(
+        // localStorage.removeItem("organization");
+        localStorage.setItem(
           "organization",
           JSON.stringify(response.data[0])
         );
@@ -95,6 +97,21 @@ const Invitation = () => {
         dispatch(setOrganization(response.data[0]));
       } catch (error) {
         console.error("Error:", error);
+      }
+      try {
+        const response = await axiosInstance.patch(
+          `/invitation/invitations/${invitation._id}`,
+          {
+            accepted: true,
+          }
+        );
+        console.log("Invitation updated successfully:", response.data);
+        router.push(`/${locale}/Employee/BoardEmployee`);
+      } catch (error) {
+        console.error(
+          "Error updating invitation:",
+          error.response?.data || error.message
+        );
       }
     } catch (error) {
       console.log(4);
@@ -105,21 +122,7 @@ const Invitation = () => {
       );
     }
 
-    try {
-      const response = await axiosInstance.patch(
-        `/invitation/invitations/${invitation._id}`,
-        {
-          accepted: true,
-        }
-      );
-      console.log("Invitation updated successfully:", response.data);
-      router.push(`/${locale}/Employee/BoardEmployee`);
-    } catch (error) {
-      console.error(
-        "Error updating invitation:",
-        error.response?.data || error.message
-      );
-    }
+    
     // setSubmitting(false);
   };
 
