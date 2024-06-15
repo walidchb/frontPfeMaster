@@ -23,7 +23,7 @@ const fetchTeams = async (organizationId) => {
   }
 };
 
-const UpdateTaskForm = ({task, handleCachUpdateTaskForm}) => {
+const UpdateTaskForm = ({task, organization, handleCachUpdateTaskForm}) => {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -51,8 +51,8 @@ const UpdateTaskForm = ({task, handleCachUpdateTaskForm}) => {
     
   }, [task]);
 
-  const organizationId = "66609ae2a974839772c60e7b";
-  const taskId = "66639f183f2a480100ca8d3a"; // Remplacez par l'ID de la tâche à mettre à jour
+  // const organizationId = "66609ae2a974839772c60e7b";
+  // const taskId = "66639f183f2a480100ca8d3a"; // Remplacez par l'ID de la tâche à mettre à jour
 
   const fetchTaskToUpdate = async (taskId) => {
     try {
@@ -66,7 +66,7 @@ const UpdateTaskForm = ({task, handleCachUpdateTaskForm}) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const teams = await fetchTeams(organizationId);
+      const teams = await fetchTeams(organization?._id);
       setAvailableTeams(teams);
     };
 

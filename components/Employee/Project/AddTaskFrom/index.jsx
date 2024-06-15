@@ -51,8 +51,8 @@ const AddTaskForm = ({
       "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
   };
 
-  const organizationId = "66609ae2a974839772c60e7b";
-  const projectId = "666357fcb6ef230e0e262884";
+  // const organizationId = "66609ae2a974839772c60e7b";
+  // const projectId = "666357fcb6ef230e0e262884";
   useEffect(() => {
     const fetchData = async () => {
       const teams = await fetchTeams(parentProject?.organization?._id);
@@ -74,7 +74,7 @@ const AddTaskForm = ({
         priorite: values.priority,
         dateDebutEstim: values.startDate,
         dateFinEstim: values.dueDate,
-        projet: projectId,
+        projet: parentProject?._id,
         team: values.assignedTo,
       });
       console.log("respons = ", response.data);
