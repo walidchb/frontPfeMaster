@@ -7,6 +7,7 @@ import axios from "axios";
 import Loader from "@/components/Loader";
 import { Formik, Form, Field } from "formik";
 import { GrValidate } from "react-icons/gr";
+import { useLocale } from "next-intl";
 import {
   IoSearchCircle,
   IoAddCircleSharp,
@@ -66,6 +67,8 @@ const AddProjectForm = ({
   const [reloadInvit, setReloadInvit] = useState(false);
   const [invitaions, setInvitaions] = useState([]);
 
+  const locale = useLocale();
+
   function invitationSent(array, value) {
     return array.some((item) => item.sendto._id === value);
   }
@@ -124,14 +127,38 @@ const AddProjectForm = ({
         teams: values.teams,
       });
       console.log("sendproject", response.data);
-      const response1 = await axiosInstance.patch(
-        `/user/users?id=${values?.projectManager}`,
-        {
-          role: "prjctBoss",
-        }
-      );
+      
+        const teamIds = values.teams.join(',');
+        console.log("ids team = ", teamIds)
+        const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+        const membersToNotify = response2.data.map(user => user._id);
+        const usersToNotify = [values.projectManager, ...membersToNotify];
+        const notificationContent = {
+          message: `Un nouveau projet "${values.projectName}" a été créé.`,
+          url: `/${locale}/Employee/Project/Board=${JSON.stringify(response.data)}`, // Ajoutez l'URL appropriée pour accéder au projet
+        };
+        // Utilisez usersToNotify pour envoyer les notifications
+        console.log('Users to notify:', usersToNotify);
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: usersToNotify,
+          content: notificationContent,
+          type: 'project',
+          organization: organization?._id,
+          seen: usersToNotify.map(userId => ({ userId, seen: false }))
+        })
+        console.log("notif = ", response1.data)
+
+      // const response1 = await axiosInstance.patch(
+      //   `/user/users?id=${values?.projectManager}`,
+      //   {
+      //     role: "prjctBoss",
+      //   }
+      // );
+      
       showPopupMessage("Project created successfully!"); // Afficher la pop-up de succès
+      
       formik.resetForm(); // Réinitialiser les valeurs du formulaire
+
     } catch (error) {
       console.error("Error from backend:");
       console.log(error);
