@@ -50,11 +50,18 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   // <<<<<<< HEAD
   const [reload, setReload] = useState(false);
 
-  const [userInfo, setUserInfo] = useState({});
-  const [organization, setOrganization] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
+  const [organization, setOrganization] = useState(null);
   useEffect(() => {
     console.log("yawwwww rani hnaaa");
     console.log("localstor = ", localStorage)
@@ -94,14 +101,10 @@ function NavBarAuth({
 
   const organisations = [1, 2, 4, 5];
   const [invitaions, setInvitaions] = useState([]);
+  const [notifications, setNotifications] = useState(null);
   useEffect(() => {
     const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      
       const user = JSON.parse(localStorage.getItem("userInfo"));
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
@@ -117,23 +120,32 @@ function NavBarAuth({
         console.error("Error:", error);
       }
     };
+    // const getNotifications = async () => {
+    //   try {
+    //     const response = await axiosInstance.get('/notification/notifications', {
+    //       data: {
+    //         recipient: userInfo?._id,
+    //         organization: organization?._id
+    //       }
+    //     }); 
+    //     setNotifacations(response.data);
+    //   } catch (error) {
+    //     console.error('Error fetching user notifications:', error);
+    //     throw error;
+    //   }
+    // }
     if (userInfo) {
+      // getNotifications();
       getinvitations();
     }
   }, [userInfo]);
   useEffect(() => {
     const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const user = JSON.parse(localStorage.getItem("userInfo"));
+
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
           params: {
-            sendto: user._id,
+            sendto: userInfo?._id,
           },
         });
         // console.log("invitaions");
@@ -144,9 +156,73 @@ function NavBarAuth({
         console.error("Error:", error);
       }
     };
-
-    getinvitations();
+    // const getNotifications = async () => {
+    //   try {
+    //     const response = await axiosInstance.get('/notification/notifications', {
+    //       data: {
+    //         recipient: userInfo?._id,
+    //         organization: organization?._id
+    //       }
+    //     }); 
+    //     setNotifacations(response.data);
+    //   } catch (error) {
+    //     console.error('Error fetching user notifications:', error);
+    //     throw error;
+    //   }
+    // }
+    if (userInfo) {
+      // getNotifications();
+      getinvitations();
+    }
   }, [reload]);
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        if (userInfo && organization) { // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get('/notification/notifications', {
+            params: {
+              recipient: userInfo._id,
+              organization: organization._id
+            }
+          });
+          setNotifications(response.data);
+        } else {
+          console.error('userInfo or organization is null');
+        }
+      } catch (error) {
+        console.error('Error fetching user notifications:', error);
+        throw error;
+      }
+    }
+  
+    if (userInfo) {
+      getNotifications();
+    }
+  }, [reload]);
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        if (userInfo && organization) { // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get('/notification/notifications', {
+            params: {
+              recipient: userInfo._id,
+              organization: organization._id
+            }
+          });
+          setNotifications(response.data);
+        } else {
+          console.error('userInfo or organization is null');
+        }
+      } catch (error) {
+        console.error('Error fetching user notifications:', error);
+        throw error;
+      }
+    }
+  
+    if (userInfo) {
+      getNotifications();
+    }
+  }, [userInfo, organization]);
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -203,89 +279,122 @@ function NavBarAuth({
     };
   }, []);
 
-  const notifications = [
-    {
-      id: 1,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "project",
-      isRead: false,
-    },
-    {
-      id: 2,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "task",
-      isRead: true,
-    },
-    {
-      id: 3,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "reminder",
-      isRead: false,
-    },
-    {
-      id: 4,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "message",
-      isRead: false,
-    },
-    {
-      id: 1,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "project",
-      isRead: false,
-    },
-    {
-      id: 2,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "task",
-      isRead: true,
-    },
-    {
-      id: 3,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "reminder",
-      isRead: false,
-    },
-    {
-      id: 4,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "message",
-      isRead: false,
-    },
-    {
-      id: 5,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "event",
-      isRead: true,
-    },
-    {
-      id: 6,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "team",
-      isRead: false,
-    },
-    {
-      id: 7,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "report",
-      isRead: false,
-    },
-  ];
+  // const notifications = 
+  // [
+  //   {
+  //     id: 1,
+  //     date: new Date("2021-12-25T10:30:00"),
+  //     content:
+  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+  //     type: "project",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 2,
+  //     date: new Date("2021-12-20T14:00:00"),
+  //     content: "Meeting Agenda for Monday",
+  //     type: "task",
+  //     isRead: true,
+  //   },
+  //   {
+  //     id: 3,
+  //     date: new Date("2021-12-19T09:15:00"),
+  //     content: "Weekly update from project team",
+  //     type: "reminder",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 4,
+  //     date: new Date("2021-12-25T10:30:00"),
+  //     content:
+  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+  //     type: "message",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 1,
+  //     date: new Date("2021-12-25T10:30:00"),
+  //     content:
+  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+  //     type: "project",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 2,
+  //     date: new Date("2021-12-20T14:00:00"),
+  //     content: "Meeting Agenda for Monday",
+  //     type: "task",
+  //     isRead: true,
+  //   },
+  //   {
+  //     id: 3,
+  //     date: new Date("2021-12-19T09:15:00"),
+  //     content: "Weekly update from project team",
+  //     type: "reminder",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 4,
+  //     date: new Date("2021-12-25T10:30:00"),
+  //     content:
+  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
+  //     type: "message",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 5,
+  //     date: new Date("2021-12-20T14:00:00"),
+  //     content: "Meeting Agenda for Monday",
+  //     type: "event",
+  //     isRead: true,
+  //   },
+  //   {
+  //     id: 6,
+  //     date: new Date("2021-12-19T09:15:00"),
+  //     content: "Weekly update from project team",
+  //     type: "team",
+  //     isRead: false,
+  //   },
+  //   {
+  //     id: 7,
+  //     date: new Date("2021-12-19T09:15:00"),
+  //     content: "Weekly update from project team",
+  //     type: "report",
+  //     isRead: false,
+  //   },
+  // ];
+
+  const GotoNotifacations = async (notification) => {
+    switch (notification.type) {
+      case "project":
+        const projectInfo = localStorage.getItem("project");
+        if (projectInfo) {
+          localStorage.removeItem("project");
+        }
+
+        await localStorage.setItem("project", notification?.content?.url);
+        router.push(`/${locale}/Employee/Project/Board`);
+        break;
+      case "task":
+        router.push(`/${locale}/Employee/Task?task=${JSON.stringify(JSON.parse(notification?.content?.url)._id)}`)
+        break;
+    
+      default:
+        break;
+    }
+    if(!notification?.seen?.seen){
+      try{
+        const response = await axiosInstance.patch('/notification/notifications', {
+          notificationId: notification?._id,
+          userId: userInfo._id,
+        });
+        console.log("notification mis à jour")   
+      }catch(error){
+        console.log(error)
+      }
+    }
+    setReload(!reload)
+  }
 
   const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
@@ -496,7 +605,7 @@ function NavBarAuth({
                         maxHeight: "80vh",
                         minHeight: "60vh",
                       }}
-                      className="px-2 flex flex-col items-center costumScrollBar absolute  z-10 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      className="px-2 flex flex-col items-center costumScrollBar absolute  z-20 mt-2   overflow-y-auto  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <div className="sticky top-0 z-10 text-black flex  rounded-t-lg bg-white w-full">
                         {/* {pages.map((page, index) => ( */}
                         <p
@@ -523,7 +632,7 @@ function NavBarAuth({
                         <div>
                           <div className="w-full text-sm flex justify-between items-center p-2">
                             <p className="text-black font-semibold text-xl">
-                              All notifications ({notifications.length}) :
+                              All notifications ({notifications?.length}) :
                             </p>
                             <a
                               href={`/${locale}/Employee/Notification`}
@@ -531,15 +640,17 @@ function NavBarAuth({
                               View all notifications
                             </a>
                           </div>
-                          {notifications.length > 0 ? (
-                            notifications.map((notification, index) => (
+                          {notifications?.length > 0 ? (
+                            notifications?.map((notification, index) => (
                               <Menu.Item key={index}>
                                 {({ active }) => (
                                   <div
+                                    onClick={() => GotoNotifacations(notification)}
                                     className={classNames(
-                                      active ? "bg-gray-100" : "",
-
-                                      "NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0"
+                                      !notification.seen[0].seen
+                                        ? "bg-blue-300" // Appliquer la classe bg-blue-300 si notification.seen.seen est false
+                                        : "bg-gray-100", // Appliquer la classe bg-gray-100 si notification.seen.seen est true
+                                      "cursor-pointer NotificationListElement w-full my-2 rounded-xl flex justify-between items-center p-2 border-gray-200 last:border-b-0 last:border-0"
                                     )}>
                                     <div className="flex ">
                                       <div
@@ -589,16 +700,16 @@ function NavBarAuth({
                                         className="">
                                         <div className="truncate text-sm text-gray-600 mb-2">
                                           {new Date(
-                                            notification.date
+                                            notification.createdAt
                                           ).toLocaleString()}
                                         </div>
                                         <div
                                           className={`truncate    text-sm ${
-                                            notification.isRead
+                                            notification.seen.seen
                                               ? "text-gray-600"
                                               : "text-gray-800 font-semibold"
                                           }`}>
-                                          {notification.content}
+                                          {notification.content.message}
                                         </div>
                                       </div>
                                     </div>

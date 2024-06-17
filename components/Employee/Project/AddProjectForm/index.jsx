@@ -135,7 +135,7 @@ const AddProjectForm = ({
         const usersToNotify = [values.projectManager, ...membersToNotify];
         const notificationContent = {
           message: `Un nouveau projet "${values.projectName}" a été créé.`,
-          url: `/${locale}/Employee/Project/Board=${JSON.stringify(response.data)}`, // Ajoutez l'URL appropriée pour accéder au projet
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
         };
         // Utilisez usersToNotify pour envoyer les notifications
         console.log('Users to notify:', usersToNotify);
