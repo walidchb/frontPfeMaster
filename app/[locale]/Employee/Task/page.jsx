@@ -206,6 +206,7 @@ const TaskPage = () => {
   };
   const locale = useLocale();
 
+  const [teamMembres, setTeamMembres] = useState(null);
   const searchParams = useSearchParams();
   const taskDetails = searchParams.get("taskDetails");
   const [Assigned, setAssigned] = useState(false);
@@ -249,13 +250,17 @@ const TaskPage = () => {
     },
   });
 
-  const [userInfo, setUserInfo] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
+  const [organization, setOrganization] = useState(null);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
-      if (userinfo) {
+      const orga = localStorage.getItem("organization");
+      if (userinfo && orga) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
       }
     }
   }, []);
@@ -268,10 +273,25 @@ const TaskPage = () => {
       const taskDat = response.data[0];
       console.log("taskDat = ", response.data[0]);
       setTaskData(taskDat);
+      if(taskDat?.affectedto) setAssigned(true); else setAssigned(false);
+
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
     }
   };
+
+  const fetchTeam = async (teamId) => {
+    try {
+      const response = await axiosInstance.get(`/user/users?team=${teamId}&role=employee`);
+      const teammembers = response.data;
+      console.log("teamMembres = ", response.data);
+      setTeamMembres(teammembers);
+
+    } catch (error) {
+      console.error("Erreur lors de la récupération des membres d'équipe :", error);
+    }
+  };
+  const [reloadAssigned, setReloadAssigned] = useState(false);
   const [reloadComments, setReloadComments] = useState(false);
   useEffect(() => {
     fetchTask(taskId);
@@ -281,7 +301,43 @@ const TaskPage = () => {
     // fetchTask(taskId);
     fetchComments(taskId);
   }, [reloadComments]);
-  useEffect(() => {}, [taskData]);
+
+  useEffect(() => {
+    fetchTask(taskId);
+    fetchComments(taskId);
+  }, [reloadAssigned]);
+
+  useEffect(() => {
+    if(taskData) fetchTeam(taskData?.team?._id)
+  }, [taskData]);
+
+  const assignTask = async (person) =>{
+    try {
+      const response = await axiosInstance.patch(`/task/tasks/${taskId}`, {
+        affectedto: person._id
+      });
+      const taskDat = response.data;
+      console.log("taskassigned = ", response.data);
+        const notificationContent = {
+          message: `La tâche "${response.data.Name}" a été affectée à toi.`,
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+        };
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [person._id],
+          content: notificationContent,
+          type: 'task',
+          organization: organization?._id,
+          seen: [{ userId: person._id, seen: false }]
+        })
+        console.log("notif = ", response1.data)
+      setTaskData(taskDat);
+      setShowAssigneeModal(false)
+      setReloadAssigned(!reloadAssigned)
+
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tache :", error);
+    }
+  }
 
   const fetchComments = async (taskId) => {
     try {
@@ -313,15 +369,28 @@ const TaskPage = () => {
     comment: Yup.string().required("Le commentaire ne doit pas etre vide"),
   });
 
-  const handleAddComment = async (values, resetForm, taskId, userId) => {
+  const handleAddComment = async (values, resetForm, task, userId,) => {
     try {
       const response = await axiosInstance.post(`/comment/comments`, {
         content: values.comment,
-        taskId: taskId,
+        taskId: task._id,
         authorId: userId,
       });
       const comment = response.data;
       console.log("comment = ", response.data);
+      const notificationContent = {
+        message: `Un commentaire a été rajouter sur la tâche "${task.Name}".`,
+        url: JSON.stringify(task), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const response1 = await axiosInstance.post("/notification/notifications", {
+        recipients: [task.projet.boss, task.team.Boss],
+        content: notificationContent,
+        type: 'comment',
+        organization: organization?._id,
+        seen: [{ userId: task.projet.boss, seen: false }, { userId: task.team.Boss, seen: false }]
+      })
+      console.log("notif = ", response1.data)
+
       // fetchComments(taskId);
       setReloadComments(!reloadComments);
       resetForm();
@@ -429,7 +498,7 @@ const TaskPage = () => {
         case "c":
           return "green";
         case "d":
-          return "pink";
+          return "yellow";
         case "e":
           return "gray";
         default:
@@ -654,8 +723,8 @@ const TaskPage = () => {
                                 handleAddComment(
                                   values,
                                   resetForm,
-                                  taskId,
-                                  userInfo?._id
+                                  taskData,
+                                  userInfo?._id,
                                 )
                               }>
                               {({ errors, touched }) => (
@@ -854,14 +923,11 @@ const TaskPage = () => {
                             <p className="w-6/12">Assignee</p>
                             {Assigned ? (
                               <div className="flex">
-                                <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                                <img
-                                  className="bg-white rounded-full w-6 h-6 mr-2"
-                                  src="/images/code-review.png"
-                                  alt=""
-                                  srcset=""
-                                />
-                                <p>value</p>
+                                <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                  {taskData?.affectedto.nom[0].toUpperCase()}    
+                                  {taskData?.affectedto.prenom[0].toUpperCase()}
+                                </button>
+                                <p>{taskData?.affectedto.nom} {taskData?.affectedto.prenom}</p>
                               </div>
                             ) : (
                               <div>
@@ -889,35 +955,78 @@ const TaskPage = () => {
                               </div>
                             )}
                           </div>
-                          {showAssigneeModal ? (
-                            <div className="px-2 w-full h-[38vh]  overflow-auto costumScrollBar">
-                              {people.map((person) => (
-                                <li key={person.name}>
-                                  <div
-                                    style={{ width: "95%" }}
-                                    className=" rounded-md pl-2 py-2 cursor-pointer hover:bg-blue-300 flex items-center justify-between mb-2 gap-x-6">
-                                    <div className="flex items-center">
-                                      <img
-                                        className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
-                                        src={person.imageUrl}
-                                        alt=""
-                                      />
-                                      <div className="flex flex-col justify-center">
-                                        <h3 className="text-base font-semibold  tracking-tight text-gray-900">
-                                          {person.name}
-                                        </h3>
-                                        <p
-                                          style={{ width: "80%" }}
-                                          className="text-sm md:font-semibold truncate   text-indigo-600">
-                                          walidchebbab2001@gmail.com
-                                        </p>
+                          <div
+                            style={{
+                              width: "100vw",
+                              height: "100vh",
+                              backdropFilter: "blur(2px)",
+                              backgroundColor: "rgba(255, 255, 255, 0)",
+                            }}
+                            className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+                              showAssigneeModal ? "opacity-100 visible" : "opacity-0 invisible"
+                            } `}>
+                            <div className="myShadow sm:w-[60vw] w-[90vw] h-[90vh] relative mx-auto   rounded-lg shadow-md bg-white">
+                              <div className="h-[10vh] flex justify-between items-center px-5 border-b border-gray-200">
+                                <span className="text-black font-semibold text-2xl">
+                                  Assign task
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowAssigneeModal(false)}
+                                  className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                  <svg
+                                    className="h-5 w-5"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                              
+                              {teamMembres?.map((person, index) => (
+                                <div
+                                  key={index}
+                                  className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
+                                  <div className="flex ">
+                                    <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                      <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                        {person.nom[0].toUpperCase()}{" "}
+                                        {person.prenom[0].toUpperCase()}
+                                      </button>
+                                    </div>
+                                    <div className=" flex flex-col justify-center ml-4">
+                                      <div className="truncate  text-sm text-gray-600 ">
+                                        {person.nom} {person.prenom} 
+                                      </div>
+                                      <div
+                                        className={`truncate  text-gray-800 font-semibold  text-sm `}>
+                                        {person.email}{" "}
                                       </div>
                                     </div>
                                   </div>
-                                </li>
+
+                                  <div className=" flex justify-center items-center">
+                                    {!Assigned ? (
+                                      <button
+                                        type="button"
+                                        className="text-gray-600  hover:text-blue-500 focus:outline-none "
+                                        onClick={() => assignTask(person)}>
+                                        {/* <FaTrash className="mr-1" /> */}
+                                        Assign to
+                                      </button>
+                                    ) : (
+                                      <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                                    )}
+                                  </div>
+                                </div>
                               ))}
+                              
                             </div>
-                          ) : null}
+                          </div>
                           <div className="my-2 flex justify-start items-center">
                             <p className="w-6/12">Priority </p>{" "}
                             <p
@@ -1119,7 +1228,7 @@ const TaskPage = () => {
                               handleAddComment(
                                 values,
                                 resetForm,
-                                taskId,
+                                taskData,
                                 userInfo?._id
                               )
                             }>
@@ -1312,14 +1421,11 @@ const TaskPage = () => {
                           <p className="w-6/12">Assignee</p>
                           {Assigned ? (
                             <div className="flex">
-                              <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
-                              <img
-                                className="bg-white rounded-full w-6 h-6 mr-2"
-                                src="/images/code-review.png"
-                                alt=""
-                                srcset=""
-                              />
-                              <p>value</p>
+                              <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                {taskData?.affectedto.nom[0].toUpperCase()}    
+                                {taskData?.affectedto.prenom[0].toUpperCase()}
+                              </button>
+                              <p>{taskData?.affectedto.nom} {taskData?.affectedto.prenom}</p>
                             </div>
                           ) : (
                             <div className="">
@@ -1347,35 +1453,77 @@ const TaskPage = () => {
                             </div>
                           )}
                         </div>
-                        {showAssigneeModal ? (
-                          <div className="px-2 w-full h-[38vh]  overflow-auto costumScrollBar">
-                            {people.map((person) => (
-                              <li key={person.name}>
+                        <div
+                          style={{
+                            width: "100vw",
+                            height: "100vh",
+                            backdropFilter: "blur(2px)",
+                            backgroundColor: "rgba(255, 255, 255, 0)",
+                          }}
+                          className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
+                            showAssigneeModal ? "opacity-100 visible" : "opacity-0 invisible"
+                          } `}>
+                          <div className="myShadow sm:w-[60vw] w-[90vw] h-[90vh] relative mx-auto   rounded-lg shadow-md bg-white">
+                            <div className="h-[10vh] flex justify-between items-center px-5 border-b border-gray-200">
+                              <span className="text-black font-semibold text-2xl">
+                                Assign task
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setShowAssigneeModal(false)}
+                                className="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <svg
+                                  className="h-5 w-5"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor">
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10L4.293 5.707a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                            {teamMembres?.map((person, index) => (
                                 <div
-                                  style={{ width: "95%" }}
-                                  className=" rounded-md pl-2 py-2 cursor-pointer hover:bg-blue-300 flex items-center justify-between mb-2 gap-x-6">
-                                  <div className="flex items-center">
-                                    <img
-                                      className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
-                                      src={person.imageUrl}
-                                      alt=""
-                                    />
-                                    <div className="flex flex-col justify-center">
-                                      <h3 className="text-base font-semibold  tracking-tight text-gray-900">
-                                        {person.name}
-                                      </h3>
-                                      <p
-                                        style={{ width: "80%" }}
-                                        className="text-sm md:font-semibold truncate   text-indigo-600">
-                                        walidchebbab2001@gmail.com
-                                      </p>
+                                  key={index}
+                                  className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
+                                  <div className="flex ">
+                                    <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                      <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                        {person.nom[0].toUpperCase()}{" "}
+                                        {person.prenom[0].toUpperCase()}
+                                      </button>
+                                    </div>
+                                    <div className=" flex flex-col justify-center ml-4">
+                                      <div className="truncate  text-sm text-gray-600 ">
+                                        {person.nom} {person.prenom} 
+                                      </div>
+                                      <div
+                                        className={`truncate  text-gray-800 font-semibold  text-sm `}>
+                                        {person.email}{" "}
+                                      </div>
                                     </div>
                                   </div>
+
+                                  <div className=" flex justify-center items-center">
+                                    {!Assigned ? (
+                                      <button
+                                        type="button"
+                                        className="text-gray-600  hover:text-blue-500 focus:outline-none "
+                                        onClick={() => assignTask(person)}>
+                                        {/* <FaTrash className="mr-1" /> */}
+                                        Assign to
+                                      </button>
+                                    ) : (
+                                      <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                                    )}
+                                  </div>
                                 </div>
-                              </li>
-                            ))}
+                              ))}
                           </div>
-                        ) : null}
+                        </div>
+                        
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p
@@ -1561,6 +1709,7 @@ const TaskPage = () => {
               {updateIssueModal && showUpdateTaskForm ? (
                 <UpdateTaskForm
                   task={taskData}
+                  organization={organization && organization}
                   handleCachUpdateTaskForm={handleCachUpdateTaskForm}
                 />
               ) : null}

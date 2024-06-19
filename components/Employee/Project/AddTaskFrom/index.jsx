@@ -51,8 +51,8 @@ const AddTaskForm = ({
       "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
   };
 
-  const organizationId = "66609ae2a974839772c60e7b";
-  const projectId = "666357fcb6ef230e0e262884";
+  // const organizationId = "66609ae2a974839772c60e7b";
+  // const projectId = "666357fcb6ef230e0e262884";
   useEffect(() => {
     const fetchData = async () => {
       const teams = await fetchTeams(parentProject?.organization?._id);
@@ -74,17 +74,39 @@ const AddTaskForm = ({
         priorite: values.priority,
         dateDebutEstim: values.startDate,
         dateFinEstim: values.dueDate,
-        projet: projectId,
+        projet: parentProject?._id,
         team: values.assignedTo,
       });
       console.log("respons = ", response.data);
-      const response1 = await axiosInstance.patch(
+        
+      const response3 = await axiosInstance.patch(
         `/project/projects/${parentProject?._id}`,
         {
           tasks: response.data._id,
         }
       );
-      console.log("respons1 = ", response1.data);
+      console.log("respons1 = ", response3.data);
+      // const response2 = await axiosInstance.get(`/user/users?team=${values.assignedTo}&role=teamBoss`);
+      //   const membersToNotify = response2.data.map(user => user._id);
+      const assignedTeam = availableTeams.find(team => team._id === values.assignedTo);
+      console.log("assigned team = ", assignedTeam)
+      if(assignedTeam?.Boss){
+      const teamBoss = assignedTeam && assignedTeam.Boss._id;
+      console.log("teamBoss = ", teamBoss)
+        const notificationContent = {
+          message: `Une nouvelle tâche "${values.taskName}" a été affectée à votre équipe.`,
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+        };
+        // Utilisez usersToNotify pour envoyer les notifications
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [teamBoss],
+          content: notificationContent,
+          type: 'task',
+          organization: parentProject?.organization?._id,
+          seen: [{ userId: teamBoss, seen: false }]
+        })
+        console.log("notif = ", response1.data)
+      }
       showPopupMessage("Task created successfully!"); // Afficher la pop-up de succès
       formik.resetForm(); // Réinitialiser les valeurs du formulaire
     } catch (error) {

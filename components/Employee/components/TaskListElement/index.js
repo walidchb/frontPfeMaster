@@ -68,7 +68,7 @@ function TaskListElement({ task, project }) {
         case "c":
           return "green";
         case "d":
-          return "pink";
+          return "yellow";
         case "e":
           return "gray";
         default:

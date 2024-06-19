@@ -87,6 +87,7 @@ function SchedulerEmployee() {
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
               params: { 
+                userId: userInfo._id,
                 organizationId: organization._id,
                },
             });
