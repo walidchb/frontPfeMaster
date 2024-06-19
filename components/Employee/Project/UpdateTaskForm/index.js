@@ -87,6 +87,48 @@ const UpdateTaskForm = ({task, organization, handleCachUpdateTaskForm}) => {
         team: values.assignedTo,
       });
       console.log(response.data);
+        // const response2 = await axiosInstance.get(`/user/users?team=${values.assignedTo}&role=teamBoss`);
+        // const membersToNotify = response2.data.map(user => user._id);
+        // const usersToNotify = membersToNotify;
+        let notificationContent;
+        if(values.assignedTo === task?.team._id){
+          notificationContent = {
+            message: `La tâche "${values.taskName}" a été mise à jour.`,
+            url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+          };
+        } else {
+          notificationContent = {
+            message: `Une nouvelle tâche "${values.taskName}" a été affectée à votre équipe.`,
+            url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+          };
+        }
+      const assignedTeam = availableTeams.find(team => team._id === values.assignedTo);
+      console.log("assigned team = ", assignedTeam)
+      if(assignedTeam?.Boss){
+        if(task.affectedto){
+          const teamBoss = assignedTeam && assignedTeam.Boss._id;
+          console.log("teamBoss = ", teamBoss)
+          const response1 = await axiosInstance.post("/notification/notifications", {
+            recipients: [teamBoss, task.affectedto._id],
+            content: notificationContent,
+            type: 'task',
+            organization: organization?._id,
+            seen: [{ userId: teamBoss, seen: false }, { userId: task.affectedto._id, seen: false }]
+          })
+          console.log("notif = ", response1.data)
+        } else {
+          const teamBoss = assignedTeam && assignedTeam.Boss._id;
+          console.log("teamBoss = ", teamBoss)
+          const response1 = await axiosInstance.post("/notification/notifications", {
+            recipients: [teamBoss],
+            content: notificationContent,
+            type: 'task',
+            organization: organization?._id,
+            seen: [{ userId: teamBoss, seen: false }]
+          })
+          console.log("notif = ", response1.data)
+        }
+      }
       showPopupMessage("Task updated successfully!");
       formik.resetForm();
     } catch (error) {

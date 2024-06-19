@@ -93,8 +93,8 @@ const Invitation = () => {
           "organization",
           JSON.stringify(response.data[0])
         );
-
         dispatch(setOrganization(response.data[0]));
+        
       } catch (error) {
         console.error("Error:", error);
       }
@@ -106,6 +106,19 @@ const Invitation = () => {
           }
         );
         console.log("Invitation updated successfully:", response.data);
+        const notificationContent = {
+          message: `"${userInfo.nom} ${userInfo.prenom}" a accepté votre invitation pour rejoindre votre organisation.`,
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder à l'invitation
+        };
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [invitation?.sendby._id],
+          content: notificationContent,
+          type: 'invitation',
+          organization: invitation?.organisation._id,
+          seen: [{ userId: invitation?.sendby._id, seen: false }],
+
+        })
+        console.log("notif = ", response1.data)
         router.push(`/${locale}/Employee/BoardEmployee`);
       } catch (error) {
         console.error(

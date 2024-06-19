@@ -250,8 +250,8 @@ const TaskPage = () => {
     },
   });
 
-  const [userInfo, setUserInfo] = useState({});
-  const [organization, setOrganization] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
+  const [organization, setOrganization] = useState(null);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
@@ -318,6 +318,18 @@ const TaskPage = () => {
       });
       const taskDat = response.data;
       console.log("taskassigned = ", response.data);
+        const notificationContent = {
+          message: `La tâche "${response.data.Name}" a été affectée à toi.`,
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+        };
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [person._id],
+          content: notificationContent,
+          type: 'task',
+          organization: organization?._id,
+          seen: [{ userId: person._id, seen: false }]
+        })
+        console.log("notif = ", response1.data)
       setTaskData(taskDat);
       setShowAssigneeModal(false)
       setReloadAssigned(!reloadAssigned)
@@ -357,15 +369,28 @@ const TaskPage = () => {
     comment: Yup.string().required("Le commentaire ne doit pas etre vide"),
   });
 
-  const handleAddComment = async (values, resetForm, taskId, userId) => {
+  const handleAddComment = async (values, resetForm, task, userId,) => {
     try {
       const response = await axiosInstance.post(`/comment/comments`, {
         content: values.comment,
-        taskId: taskId,
+        taskId: task._id,
         authorId: userId,
       });
       const comment = response.data;
       console.log("comment = ", response.data);
+      const notificationContent = {
+        message: `Un commentaire a été rajouter sur la tâche "${task.Name}".`,
+        url: JSON.stringify(task), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const response1 = await axiosInstance.post("/notification/notifications", {
+        recipients: [task.projet.boss, task.team.Boss],
+        content: notificationContent,
+        type: 'comment',
+        organization: organization?._id,
+        seen: [{ userId: task.projet.boss, seen: false }, { userId: task.team.Boss, seen: false }]
+      })
+      console.log("notif = ", response1.data)
+
       // fetchComments(taskId);
       setReloadComments(!reloadComments);
       resetForm();
@@ -473,7 +498,7 @@ const TaskPage = () => {
         case "c":
           return "green";
         case "d":
-          return "pink";
+          return "yellow";
         case "e":
           return "gray";
         default:
@@ -698,8 +723,8 @@ const TaskPage = () => {
                                 handleAddComment(
                                   values,
                                   resetForm,
-                                  taskId,
-                                  userInfo?._id
+                                  taskData,
+                                  userInfo?._id,
                                 )
                               }>
                               {({ errors, touched }) => (
@@ -1203,7 +1228,7 @@ const TaskPage = () => {
                               handleAddComment(
                                 values,
                                 resetForm,
-                                taskId,
+                                taskData,
                                 userInfo?._id
                               )
                             }>
@@ -1684,7 +1709,7 @@ const TaskPage = () => {
               {updateIssueModal && showUpdateTaskForm ? (
                 <UpdateTaskForm
                   task={taskData}
-                  organization={organization}
+                  organization={organization && organization}
                   handleCachUpdateTaskForm={handleCachUpdateTaskForm}
                 />
               ) : null}

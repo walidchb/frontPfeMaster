@@ -30,6 +30,7 @@ const fetchUsers = async (organizationId) => {
     const response = await axiosInstance.get("/user/users", {
       params: {
         organizations: organizationId,
+        role: "prjctBoss"
       },
     });
     const users = response.data;
@@ -71,7 +72,6 @@ const UpdateProjectForm = ({
       formik.setFieldValue("projectManager", project.boss?._id);
       formik.setFieldValue("teams", project.teams);
     }
-    console.log(projectData);
   }, [project]);
 
   // const organizationId = "665ee35842437a997e99797b";
@@ -114,6 +114,7 @@ const UpdateProjectForm = ({
 
   useEffect(() => {
     fetchAllData();
+    console.log("projet to = ", project)
     // fetchProjectToUpdate(projectId)
   }, []);
 
@@ -134,6 +135,190 @@ const UpdateProjectForm = ({
         }
       );
       console.log(response.data);
+
+      // Comparer les anciennes valeurs avec les nouvelles
+      const oldProjectManager = project.boss._id;
+      const newProjectManager = values.projectManager;
+      const oldTeams = project.teams;
+      console.log("oldTeams = ", oldTeams)
+      const newTeams = values.teams;
+      console.log("newTeams = ", newTeams)
+      const removedTeams = oldTeams.filter(teamId => !newTeams.includes(teamId));
+      console.log("removedTeams = ", removedTeams);
+      const addedTeams = newTeams.filter(teamId => !oldTeams.includes(teamId));
+      console.log("addedTeams = ", addedTeams);
+      const unchangedTeams = oldTeams.filter(teamId => newTeams.includes(teamId));
+      console.log("unchangedTeams = ", unchangedTeams);
+
+      // Cas 1 : Nouveau chef de projet seulement
+      if (oldProjectManager !== newProjectManager && removedTeams.length === 0 && addedTeams.length === 0) {
+        const notificationContent = {
+          message: `Vous avez été affecté en tant que chef de projet pour "${values.projectName}".`,
+          url: JSON.stringify(response.data),
+        };
+        
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [newProjectManager],
+          content: notificationContent,
+          type: 'project',
+          organization: project.organization?._id,
+          seen: [{ userId: newProjectManager, seen: false }]
+        });
+        console.log("notif1 = ", response1.data);
+
+        const notificationContent1 = {
+          message: `Le projet "${values.projectName}" a été mise à jour.`,
+          url: JSON.stringify(response.data),
+        };
+        const teamIds = unchangedTeams.join(',');
+        console.log("ids team = ", teamIds)
+        const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+        const membersToNotify = response2.data.map(user => user._id);
+        if(membersToNotify.length > 0){
+          const response3 = await axiosInstance.post("/notification/notifications", {
+            recipients: membersToNotify,
+            content: notificationContent1,
+            type: 'project',
+            organization: project.organization?._id,
+            seen: membersToNotify.map(userId => ({ userId, seen: false }))
+          });
+          console.log("notif2 = ", response3.data);
+        }
+      }
+
+      // Cas 2 : Changement dans les équipes seulement
+      if (oldProjectManager === newProjectManager && (removedTeams.length > 0 || addedTeams.length > 0)) {
+        const notificationContent = {
+          message: `Le projet "${values.projectName}" a été mis à jour.`,
+          url: JSON.stringify(response.data),
+        };
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [oldProjectManager],
+          content: notificationContent,
+          type: 'project',
+          organization: project.organization?._id,
+          seen: [{ userId: oldProjectManager, seen: false }]
+        });
+        console.log("notif1 = ", response1.data);
+        if(unchangedTeams.length > 0){
+          const notificationContent1 = {
+            message: `Le projet "${values.projectName}" a été mise à jour.`,
+            url: JSON.stringify(response.data),
+          };
+          const teamIds = unchangedTeams.join(',');
+          console.log("ids team = ", teamIds)
+          const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+          const membersToNotify = response2.data.map(user => user._id);
+          if(membersToNotify.length > 0){
+            const response3 = await axiosInstance.post("/notification/notifications", {
+              recipients: membersToNotify,
+              content: notificationContent1,
+              type: 'project',
+              organization: project.organization?._id,
+              seen: membersToNotify.map(userId => ({ userId, seen: false }))
+            });
+            console.log("notif2 = ", response3.data);
+          }
+        }
+        if(addedTeams.length > 0){
+          const notificationContent1 = {
+            message: `Le projet "${values.projectName}" a été affecté à votre équipe.`,
+            url: JSON.stringify(response.data),
+          };
+          const teamIds = addedTeams.join(',');
+          console.log("ids team = ", teamIds)
+          const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+          const membersToNotify = response2.data.map(user => user._id);
+          if(membersToNotify.length > 0){
+            const response3 = await axiosInstance.post("/notification/notifications", {
+              recipients: membersToNotify,
+              content: notificationContent1,
+              type: 'project',
+              organization: project.organization?._id,
+              seen: membersToNotify.map(userId => ({ userId, seen: false }))
+            });
+            console.log("notif3 = ", response3.data);
+          }
+        }
+      }
+
+      // Cas 3 : Nouveau chef de projet et changement dans les équipes
+      if (oldProjectManager !== newProjectManager && (removedTeams.length > 0 || addedTeams.length > 0)) {
+        const notificationContent = {
+          message: `Vous avez été affecté en tant que chef de projet pour "${values.projectName}".`,
+          url: JSON.stringify(response.data),
+        };
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: [newProjectManager],
+          content: notificationContent,
+          type: 'project',
+          organization: project.organization?._id,
+          seen: [{ userId: newProjectManager, seen: false }]
+        });
+        console.log("notif1 = ", response1.data);
+        if(unchangedTeams.length > 0){
+          const notificationContent1 = {
+            message: `Le projet "${values.projectName}" a été mise à jour.`,
+            url: JSON.stringify(response.data),
+          };
+          const teamIds = unchangedTeams.join(',');
+          console.log("ids team = ", teamIds)
+          const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+          const membersToNotify = response2.data.map(user => user._id);
+          if(membersToNotify.length > 0){
+            const response3 = await axiosInstance.post("/notification/notifications", {
+              recipients: membersToNotify,
+              content: notificationContent1,
+              type: 'project',
+              organization: project.organization?._id,
+              seen: membersToNotify.map(userId => ({ userId, seen: false }))
+            });
+            console.log("notif2 = ", response3.data);
+          }
+        }
+        if(addedTeams.length > 0){
+          const notificationContent1 = {
+            message: `Le projet "${values.projectName}" a été affecté à votre équipe.`,
+            url: JSON.stringify(response.data),
+          };
+          const teamIds = addedTeams.join(',');
+          console.log("ids team = ", teamIds)
+          const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+          const membersToNotify = response2.data.map(user => user._id);
+          if(membersToNotify.length > 0){
+            const response3 = await axiosInstance.post("/notification/notifications", {
+              recipients: membersToNotify,
+              content: notificationContent1,
+              type: 'project',
+              organization: project.organization?._id,
+              seen: membersToNotify.map(userId => ({ userId, seen: false }))
+            });
+            console.log("notif3 = ", response3.data);
+          }
+        }
+      }
+
+      // Cas 4 : Aucun changement dans le chef de projet et les équipes
+      if (oldProjectManager === newProjectManager && removedTeams.length === 0 && addedTeams.length === 0) {
+        const notificationContent = {
+          message: `Un projet "${values.projectName}" a été mis à jour.`,
+          url: JSON.stringify(response.data),
+        };
+        const teamIds = unchangedTeams.join(',');
+          console.log("ids team = ", teamIds)
+          const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+          const membersToNotify = response2.data.map(user => user._id);
+        const usersToNotify = [oldProjectManager, ...membersToNotify];
+        const response1 = await axiosInstance.post("/notification/notifications", {
+          recipients: usersToNotify,
+          content: notificationContent,
+          type: 'project',
+          organization: project.organization?._id,
+          seen: usersToNotify.map(userId => ({ userId, seen: false }))
+        });
+        console.log("notif = ", response1.data);
+      }
+
       showPopupMessage("Project updated successfully!");
       formik.resetForm();
     } catch (error) {
@@ -144,6 +329,53 @@ const UpdateProjectForm = ({
       setSubmitting(false);
     }
   };
+  // const sendProjectData = async (values, setSubmitting) => {
+  //   console.log("paaaaatchhhhh");
+  //   setSubmitting(true);
+
+  //   try {
+  //     const response = await axiosInstance.patch(
+  //       `/project/projects/${project?._id}`,
+  //       {
+  //         Name: values.projectName,
+  //         Description: values.description,
+  //         dateDebutEstim: values.startDate,
+  //         dateFinEstim: values.dueDate,
+  //         boss: values.projectManager,
+  //         teams: values.teams,
+  //       }
+  //     );
+  //     console.log(response.data);
+
+  //      const teamIds = values.teams.join(',');
+  //       console.log("ids team = ", teamIds)
+  //       const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
+  //       const membersToNotify = response2.data.map(user => user._id);
+  //       const usersToNotify = [values.projectManager, ...membersToNotify];
+  //       const notificationContent = {
+  //         message: `Un nouveau projet "${values.projectName}" a été créé.`,
+  //         url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+  //       };
+  //       // Utilisez usersToNotify pour envoyer les notifications
+  //       console.log('Users to notify:', usersToNotify);
+  //       const response1 = await axiosInstance.post("/notification/notifications", {
+  //         recipients: usersToNotify,
+  //         content: notificationContent,
+  //         type: 'project',
+  //         organization: organization?._id,
+  //         seen: usersToNotify.map(userId => ({ userId, seen: false }))
+  //       })
+  //       console.log("notif = ", response1.data)
+  //     showPopupMessage("Project updated successfully!");
+  //     formik.resetForm();
+  //   } catch (error) {
+  //     console.error("Error from backend:");
+  //     console.log(error);
+  //     showPopupMessage("An error occurred while updating the project.");
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
   const loginDiv = {
     boxShadow:
       "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",

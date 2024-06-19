@@ -29,6 +29,8 @@ import {
   FaTasks,
   FaUserFriends,
   FaChartBar,
+  FaComment,
+  FaEnvelopeOpenText
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -83,9 +85,11 @@ function NavBarAuth({
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      if (userinfo) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+      }
+      if(orga){
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
       }
@@ -378,7 +382,12 @@ function NavBarAuth({
       case "task":
         router.push(`/${locale}/Employee/Task?task=${JSON.stringify(JSON.parse(notification?.content?.url)._id)}`)
         break;
-    
+      case "comment": 
+          router.push(`/${locale}/Employee/Task?task=${JSON.stringify(JSON.parse(notification?.content?.url)._id)}`)
+        break;
+      case "invitation":
+          router.push(`/${locale}/Employee/Invitation?invitation=${notification?.content?.url}`)
+        break;
       default:
         break;
     }
@@ -668,8 +677,8 @@ function NavBarAuth({
                                         {notification.type === "message" && (
                                           <FaRegEnvelope className="" />
                                         )}
-                                        {notification.type === "event" && (
-                                          <FaCalendarAlt className="" />
+                                        {notification.type === "comment" && (
+                                          <FaComment className="" />
                                         )}
                                         {notification.type === "reminder" && (
                                           <FaBell className="" />
@@ -683,8 +692,8 @@ function NavBarAuth({
                                         {notification.type === "team" && (
                                           <FaUserFriends className="" />
                                         )}
-                                        {notification.type === "report" && (
-                                          <FaChartBar className="" />
+                                        {notification.type === "invitation" && (
+                                          <FaEnvelopeOpenText className="" />
                                         )}
                                         {notification.type}
                                       </div>

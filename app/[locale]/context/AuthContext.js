@@ -83,27 +83,29 @@ export const AuthProvider = ({ children }) => {
           } catch (error) {
             console.error("Error:", error);
           }
-        } else {
-          try {
-            const response = await axiosInstance.get(
-              "/organization/organizations",
-              {
-                params: {
-                  _id: user?.organizations[0]?._id,
-                },
-              }
-            );
-
-            dispatch(setOrganization(response.data[0]));
-            await localStorage.setItem(
-              "organization",
-              JSON.stringify(response.data[0])
-            );
+        } if(user?.role === "individual"){
             router.push(`/${locale}/Employee/BoardEmployee`);
-          } catch (error) {
-            console.error("Error:", error);
+          } else {
+            try {
+              const response = await axiosInstance.get(
+                "/organization/organizations",
+                {
+                  params: {
+                    _id: user?.organizations[0]?._id,
+                  },
+                }
+              );
+
+              dispatch(setOrganization(response.data[0]));
+              await localStorage.setItem(
+                "organization",
+                JSON.stringify(response.data[0])
+              );
+              router.push(`/${locale}/Employee/BoardEmployee`);
+            } catch (error) {
+              console.error("Error:", error);
+            }
           }
-        }
       } catch (error) {
         console.error("Error:", error);
       }

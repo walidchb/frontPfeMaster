@@ -147,13 +147,6 @@ const AddProjectForm = ({
           seen: usersToNotify.map(userId => ({ userId, seen: false }))
         })
         console.log("notif = ", response1.data)
-
-      // const response1 = await axiosInstance.patch(
-      //   `/user/users?id=${values?.projectManager}`,
-      //   {
-      //     role: "prjctBoss",
-      //   }
-      // );
       
       showPopupMessage("Project created successfully!"); // Afficher la pop-up de succès
       
