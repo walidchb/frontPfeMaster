@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:1937",
+  baseURL: "https://back-pfe-master.vercel.app",
   headers: {
     "Content-Type": "application/json",
   },
@@ -78,7 +78,7 @@ const AddTaskForm = ({
         team: values.assignedTo,
       });
       console.log("respons = ", response.data);
-        
+
       const response3 = await axiosInstance.patch(
         `/project/projects/${parentProject?._id}`,
         {
@@ -88,24 +88,29 @@ const AddTaskForm = ({
       console.log("respons1 = ", response3.data);
       // const response2 = await axiosInstance.get(`/user/users?team=${values.assignedTo}&role=teamBoss`);
       //   const membersToNotify = response2.data.map(user => user._id);
-      const assignedTeam = availableTeams.find(team => team._id === values.assignedTo);
-      console.log("assigned team = ", assignedTeam)
-      if(assignedTeam?.Boss){
-      const teamBoss = assignedTeam && assignedTeam.Boss._id;
-      console.log("teamBoss = ", teamBoss)
+      const assignedTeam = availableTeams.find(
+        (team) => team._id === values.assignedTo
+      );
+      console.log("assigned team = ", assignedTeam);
+      if (assignedTeam?.Boss) {
+        const teamBoss = assignedTeam && assignedTeam.Boss._id;
+        console.log("teamBoss = ", teamBoss);
         const notificationContent = {
           message: `Une nouvelle tâche "${values.taskName}" a été affectée à votre équipe.`,
           url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
         };
         // Utilisez usersToNotify pour envoyer les notifications
-        const response1 = await axiosInstance.post("/notification/notifications", {
-          recipients: [teamBoss],
-          content: notificationContent,
-          type: 'task',
-          organization: parentProject?.organization?._id,
-          seen: [{ userId: teamBoss, seen: false }]
-        })
-        console.log("notif = ", response1.data)
+        const response1 = await axiosInstance.post(
+          "/notification/notifications",
+          {
+            recipients: [teamBoss],
+            content: notificationContent,
+            type: "task",
+            organization: parentProject?.organization?._id,
+            seen: [{ userId: teamBoss, seen: false }],
+          }
+        );
+        console.log("notif = ", response1.data);
       }
       showPopupMessage("Task created successfully!"); // Afficher la pop-up de succès
       formik.resetForm(); // Réinitialiser les valeurs du formulaire

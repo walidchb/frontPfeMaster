@@ -244,7 +244,7 @@ const TaskPage = () => {
     setShowUpdateTaskForm(true);
   };
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -273,8 +273,8 @@ const TaskPage = () => {
       const taskDat = response.data[0];
       console.log("taskDat = ", response.data[0]);
       setTaskData(taskDat);
-      if(taskDat?.affectedto) setAssigned(true); else setAssigned(false);
-
+      if (taskDat?.affectedto) setAssigned(true);
+      else setAssigned(false);
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
     }
@@ -282,13 +282,17 @@ const TaskPage = () => {
 
   const fetchTeam = async (teamId) => {
     try {
-      const response = await axiosInstance.get(`/user/users?team=${teamId}&role=employee`);
+      const response = await axiosInstance.get(
+        `/user/users?team=${teamId}&role=employee`
+      );
       const teammembers = response.data;
       console.log("teamMembres = ", response.data);
       setTeamMembres(teammembers);
-
     } catch (error) {
-      console.error("Erreur lors de la récupération des membres d'équipe :", error);
+      console.error(
+        "Erreur lors de la récupération des membres d'équipe :",
+        error
+      );
     }
   };
   const [reloadAssigned, setReloadAssigned] = useState(false);
@@ -308,36 +312,38 @@ const TaskPage = () => {
   }, [reloadAssigned]);
 
   useEffect(() => {
-    if(taskData) fetchTeam(taskData?.team?._id)
+    if (taskData) fetchTeam(taskData?.team?._id);
   }, [taskData]);
 
-  const assignTask = async (person) =>{
+  const assignTask = async (person) => {
     try {
       const response = await axiosInstance.patch(`/task/tasks/${taskId}`, {
-        affectedto: person._id
+        affectedto: person._id,
       });
       const taskDat = response.data;
       console.log("taskassigned = ", response.data);
-        const notificationContent = {
-          message: `La tâche "${response.data.Name}" a été affectée à toi.`,
-          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
-        };
-        const response1 = await axiosInstance.post("/notification/notifications", {
+      const notificationContent = {
+        message: `La tâche "${response.data.Name}" a été affectée à toi.`,
+        url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const response1 = await axiosInstance.post(
+        "/notification/notifications",
+        {
           recipients: [person._id],
           content: notificationContent,
-          type: 'task',
+          type: "task",
           organization: organization?._id,
-          seen: [{ userId: person._id, seen: false }]
-        })
-        console.log("notif = ", response1.data)
+          seen: [{ userId: person._id, seen: false }],
+        }
+      );
+      console.log("notif = ", response1.data);
       setTaskData(taskDat);
-      setShowAssigneeModal(false)
-      setReloadAssigned(!reloadAssigned)
-
+      setShowAssigneeModal(false);
+      setReloadAssigned(!reloadAssigned);
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la tache :", error);
     }
-  }
+  };
 
   const fetchComments = async (taskId) => {
     try {
@@ -369,7 +375,7 @@ const TaskPage = () => {
     comment: Yup.string().required("Le commentaire ne doit pas etre vide"),
   });
 
-  const handleAddComment = async (values, resetForm, task, userId,) => {
+  const handleAddComment = async (values, resetForm, task, userId) => {
     try {
       const response = await axiosInstance.post(`/comment/comments`, {
         content: values.comment,
@@ -382,14 +388,20 @@ const TaskPage = () => {
         message: `Un commentaire a été rajouter sur la tâche "${task.Name}".`,
         url: JSON.stringify(task), // Ajoutez l'URL appropriée pour accéder au projet
       };
-      const response1 = await axiosInstance.post("/notification/notifications", {
-        recipients: [task.projet.boss, task.team.Boss],
-        content: notificationContent,
-        type: 'comment',
-        organization: organization?._id,
-        seen: [{ userId: task.projet.boss, seen: false }, { userId: task.team.Boss, seen: false }]
-      })
-      console.log("notif = ", response1.data)
+      const response1 = await axiosInstance.post(
+        "/notification/notifications",
+        {
+          recipients: [task.projet.boss, task.team.Boss],
+          content: notificationContent,
+          type: "comment",
+          organization: organization?._id,
+          seen: [
+            { userId: task.projet.boss, seen: false },
+            { userId: task.team.Boss, seen: false },
+          ],
+        }
+      );
+      console.log("notif = ", response1.data);
 
       // fetchComments(taskId);
       setReloadComments(!reloadComments);
@@ -724,7 +736,7 @@ const TaskPage = () => {
                                   values,
                                   resetForm,
                                   taskData,
-                                  userInfo?._id,
+                                  userInfo?._id
                                 )
                               }>
                               {({ errors, touched }) => (
@@ -924,10 +936,13 @@ const TaskPage = () => {
                             {Assigned ? (
                               <div className="flex">
                                 <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                  {taskData?.affectedto.nom[0].toUpperCase()}    
+                                  {taskData?.affectedto.nom[0].toUpperCase()}
                                   {taskData?.affectedto.prenom[0].toUpperCase()}
                                 </button>
-                                <p>{taskData?.affectedto.nom} {taskData?.affectedto.prenom}</p>
+                                <p>
+                                  {taskData?.affectedto.nom}{" "}
+                                  {taskData?.affectedto.prenom}
+                                </p>
                               </div>
                             ) : (
                               <div>
@@ -963,7 +978,9 @@ const TaskPage = () => {
                               backgroundColor: "rgba(255, 255, 255, 0)",
                             }}
                             className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
-                              showAssigneeModal ? "opacity-100 visible" : "opacity-0 invisible"
+                              showAssigneeModal
+                                ? "opacity-100 visible"
+                                : "opacity-0 invisible"
                             } `}>
                             <div className="myShadow sm:w-[60vw] w-[90vw] h-[90vh] relative mx-auto   rounded-lg shadow-md bg-white">
                               <div className="h-[10vh] flex justify-between items-center px-5 border-b border-gray-200">
@@ -986,7 +1003,7 @@ const TaskPage = () => {
                                   </svg>
                                 </button>
                               </div>
-                              
+
                               {teamMembres?.map((person, index) => (
                                 <div
                                   key={index}
@@ -1000,7 +1017,7 @@ const TaskPage = () => {
                                     </div>
                                     <div className=" flex flex-col justify-center ml-4">
                                       <div className="truncate  text-sm text-gray-600 ">
-                                        {person.nom} {person.prenom} 
+                                        {person.nom} {person.prenom}
                                       </div>
                                       <div
                                         className={`truncate  text-gray-800 font-semibold  text-sm `}>
@@ -1024,7 +1041,6 @@ const TaskPage = () => {
                                   </div>
                                 </div>
                               ))}
-                              
                             </div>
                           </div>
                           <div className="my-2 flex justify-start items-center">
@@ -1422,10 +1438,13 @@ const TaskPage = () => {
                           {Assigned ? (
                             <div className="flex">
                               <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                {taskData?.affectedto.nom[0].toUpperCase()}    
+                                {taskData?.affectedto.nom[0].toUpperCase()}
                                 {taskData?.affectedto.prenom[0].toUpperCase()}
                               </button>
-                              <p>{taskData?.affectedto.nom} {taskData?.affectedto.prenom}</p>
+                              <p>
+                                {taskData?.affectedto.nom}{" "}
+                                {taskData?.affectedto.prenom}
+                              </p>
                             </div>
                           ) : (
                             <div className="">
@@ -1461,7 +1480,9 @@ const TaskPage = () => {
                             backgroundColor: "rgba(255, 255, 255, 0)",
                           }}
                           className={` fixed inset-0 z-50  overflow-y-auto justify-center items-center flex     ${
-                            showAssigneeModal ? "opacity-100 visible" : "opacity-0 invisible"
+                            showAssigneeModal
+                              ? "opacity-100 visible"
+                              : "opacity-0 invisible"
                           } `}>
                           <div className="myShadow sm:w-[60vw] w-[90vw] h-[90vh] relative mx-auto   rounded-lg shadow-md bg-white">
                             <div className="h-[10vh] flex justify-between items-center px-5 border-b border-gray-200">
@@ -1485,45 +1506,45 @@ const TaskPage = () => {
                               </button>
                             </div>
                             {teamMembres?.map((person, index) => (
-                                <div
-                                  key={index}
-                                  className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
-                                  <div className="flex ">
-                                    <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-                                      <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                        {person.nom[0].toUpperCase()}{" "}
-                                        {person.prenom[0].toUpperCase()}
-                                      </button>
-                                    </div>
-                                    <div className=" flex flex-col justify-center ml-4">
-                                      <div className="truncate  text-sm text-gray-600 ">
-                                        {person.nom} {person.prenom} 
-                                      </div>
-                                      <div
-                                        className={`truncate  text-gray-800 font-semibold  text-sm `}>
-                                        {person.email}{" "}
-                                      </div>
-                                    </div>
+                              <div
+                                key={index}
+                                className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
+                                <div className="flex ">
+                                  <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                    <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                      {person.nom[0].toUpperCase()}{" "}
+                                      {person.prenom[0].toUpperCase()}
+                                    </button>
                                   </div>
-
-                                  <div className=" flex justify-center items-center">
-                                    {!Assigned ? (
-                                      <button
-                                        type="button"
-                                        className="text-gray-600  hover:text-blue-500 focus:outline-none "
-                                        onClick={() => assignTask(person)}>
-                                        {/* <FaTrash className="mr-1" /> */}
-                                        Assign to
-                                      </button>
-                                    ) : (
-                                      <GrValidate className="mr-1 h-6 w-6 text-green-500" />
-                                    )}
+                                  <div className=" flex flex-col justify-center ml-4">
+                                    <div className="truncate  text-sm text-gray-600 ">
+                                      {person.nom} {person.prenom}
+                                    </div>
+                                    <div
+                                      className={`truncate  text-gray-800 font-semibold  text-sm `}>
+                                      {person.email}{" "}
+                                    </div>
                                   </div>
                                 </div>
-                              ))}
+
+                                <div className=" flex justify-center items-center">
+                                  {!Assigned ? (
+                                    <button
+                                      type="button"
+                                      className="text-gray-600  hover:text-blue-500 focus:outline-none "
+                                      onClick={() => assignTask(person)}>
+                                      {/* <FaTrash className="mr-1" /> */}
+                                      Assign to
+                                    </button>
+                                  ) : (
+                                    <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                                  )}
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                        
+
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p

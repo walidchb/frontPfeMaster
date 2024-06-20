@@ -49,33 +49,36 @@ function Scheduler() {
     }
   }, []);
   useEffect(() => {
-    
-      let Tasks;
-      switch (userInfo?.role) {
-        case "employee":
-          Tasks = project.tasks?.filter((task) => task?.affectedto === userInfo?._id).map((task) => task);
-          setTasks(Tasks)
-          break;
-        case "teamBoss":
-          Tasks = project.tasks?.filter((task) => task?.team === teamId).map((task) => task);
-          setTasks(Tasks)
-          break;
-        default:
-          console.log("project tasks =", project.tasks)
-          Tasks = project.tasks;
-          setTasks(Tasks)
-          break;
-      }
+    let Tasks;
+    switch (userInfo?.role) {
+      case "employee":
+        Tasks = project.tasks
+          ?.filter((task) => task?.affectedto === userInfo?._id)
+          .map((task) => task);
+        setTasks(Tasks);
+        break;
+      case "teamBoss":
+        Tasks = project.tasks
+          ?.filter((task) => task?.team === teamId)
+          .map((task) => task);
+        setTasks(Tasks);
+        break;
+      default:
+        console.log("project tasks =", project.tasks);
+        Tasks = project.tasks;
+        setTasks(Tasks);
+        break;
+    }
 
-      // try {
-      //   const response = await axiosInstance.get(`/task/tasks?_id=${taskIds.join('&_id=')}`);
-      //   setTasks(response.data);
-      // } catch (error) {
-      //   console.error("Erreur lors de la récupération des tâches :", error);
-      // }
+    // try {
+    //   const response = await axiosInstance.get(`/task/tasks?_id=${taskIds.join('&_id=')}`);
+    //   setTasks(response.data);
+    // } catch (error) {
+    //   console.error("Erreur lors de la récupération des tâches :", error);
+    // }
   }, [project, userInfo, teamId]);
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -84,13 +87,12 @@ function Scheduler() {
   // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
-    
     try {
       const response = await axiosInstance.get(
         `/project/projects?_id=${projectId}`
       );
       const projectData = response.data[0];
-      
+
       setProject(projectData);
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
@@ -120,7 +122,7 @@ function Scheduler() {
           style={{ height: "90vh" }}
           className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={2} />
-          <CalendrierView tasks={tasks}/>
+          <CalendrierView tasks={tasks} />
         </div>
       </div>
     </div>

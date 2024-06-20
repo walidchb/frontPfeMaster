@@ -7,7 +7,7 @@ import axios from "axios";
 import Loader from "@/components/Loader";
 const KanbanBoard = ({ project, user, teamId }) => {
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -18,10 +18,14 @@ const KanbanBoard = ({ project, user, teamId }) => {
       let taskIds;
       switch (user?.role) {
         case "employee":
-          taskIds = project.tasks?.filter((task) => task?.affectedto === user._id).map((task) => task._id);
+          taskIds = project.tasks
+            ?.filter((task) => task?.affectedto === user._id)
+            .map((task) => task._id);
           break;
         case "teamBoss":
-          taskIds = project.tasks?.filter((task) => task?.team === teamId).map((task) => task._id);
+          taskIds = project.tasks
+            ?.filter((task) => task?.team === teamId)
+            .map((task) => task._id);
           break;
         default:
           taskIds = project.tasks?.map((task) => task._id);
@@ -29,7 +33,9 @@ const KanbanBoard = ({ project, user, teamId }) => {
       }
 
       try {
-        const response = await axiosInstance.get(`/task/tasks?_id=${taskIds.join('&_id=')}`);
+        const response = await axiosInstance.get(
+          `/task/tasks?_id=${taskIds.join("&_id=")}`
+        );
         setTasks(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des tâches :", error);
@@ -85,7 +91,6 @@ const KanbanBoard = ({ project, user, teamId }) => {
   );
 
   const getTasksForStatus = (status) => {
-    
     const tasksForStatus =
       tasks?.filter((task) => task?.status === status) || [];
     return tasksForStatus.sort((a, b) => {
@@ -98,48 +103,48 @@ const KanbanBoard = ({ project, user, teamId }) => {
 
   return (
     <>
-    {tasks.length > 0 ? (
-    <div
-      style={{ height: "90vh" }}
-      className="flex flex-col lg:flex-row w-full  overflow-auto costumScrollBar">
-      <div className="w-full lg:ml-50 p-4">
-        <h1 className="text-3xl font-bold mb-4">Tasks</h1>
-        <div className="flex flex-wrap -mx-4">
-          <Column
-            title="Todo"
-            tasks={getTasksForStatus("Todo")}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            status="Todo"
-          />
-          <Column
-            title="In progress"
-            tasks={getTasksForStatus("Inprogress")}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            status="Inprogress"
-          />
-          <Column
-            title="In Review"
-            tasks={getTasksForStatus("Inreview")}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            status="Inreview"
-          />
-          <Column
-            title="Done"
-            tasks={getTasksForStatus("Done")}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            status="Done"
-          />
+      {tasks.length > 0 ? (
+        <div
+          style={{ height: "90vh" }}
+          className="flex flex-col lg:flex-row w-full  overflow-auto costumScrollBar">
+          <div className="w-full lg:ml-50 p-4">
+            <h1 className="text-3xl font-bold mb-4">Tasks</h1>
+            <div className="flex flex-wrap -mx-4">
+              <Column
+                title="Todo"
+                tasks={getTasksForStatus("Todo")}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                status="Todo"
+              />
+              <Column
+                title="In progress"
+                tasks={getTasksForStatus("Inprogress")}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                status="Inprogress"
+              />
+              <Column
+                title="In Review"
+                tasks={getTasksForStatus("Inreview")}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                status="Inreview"
+              />
+              <Column
+                title="Done"
+                tasks={getTasksForStatus("Done")}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                status="Done"
+              />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  ) : (
-    <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
-  )}
-  </>
+      ) : (
+        <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
+      )}
+    </>
   );
 };
 

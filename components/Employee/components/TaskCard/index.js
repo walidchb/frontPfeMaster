@@ -15,7 +15,7 @@ import { useLocale } from "next-intl";
 
 const TaskCard = (task) => {
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -38,7 +38,7 @@ const TaskCard = (task) => {
   const locale = useLocale();
   useEffect(() => {
     // fetchTask(task?._id);
-    setTaskData(task)
+    setTaskData(task);
   }, [task]);
 
   const priorityClasses = {

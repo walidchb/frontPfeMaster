@@ -39,14 +39,12 @@ const Invitation = () => {
   const accepteInvitation = async () => {
     setSubmitting(true);
     const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
+      baseURL: "https://back-pfe-master.vercel.app",
       headers: {
         "Content-Type": "application/json",
       },
     });
     console.log(0);
-
-    
 
     try {
       console.log(1);
@@ -89,12 +87,8 @@ const Invitation = () => {
 
         console.log(response.data[0]);
         // localStorage.removeItem("organization");
-        localStorage.setItem(
-          "organization",
-          JSON.stringify(response.data[0])
-        );
+        localStorage.setItem("organization", JSON.stringify(response.data[0]));
         dispatch(setOrganization(response.data[0]));
-        
       } catch (error) {
         console.error("Error:", error);
       }
@@ -110,15 +104,17 @@ const Invitation = () => {
           message: `"${userInfo.nom} ${userInfo.prenom}" a accepté votre invitation pour rejoindre votre organisation.`,
           url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder à l'invitation
         };
-        const response1 = await axiosInstance.post("/notification/notifications", {
-          recipients: [invitation?.sendby._id],
-          content: notificationContent,
-          type: 'invitation',
-          organization: invitation?.organisation._id,
-          seen: [{ userId: invitation?.sendby._id, seen: false }],
-
-        })
-        console.log("notif = ", response1.data)
+        const response1 = await axiosInstance.post(
+          "/notification/notifications",
+          {
+            recipients: [invitation?.sendby._id],
+            content: notificationContent,
+            type: "invitation",
+            organization: invitation?.organisation._id,
+            seen: [{ userId: invitation?.sendby._id, seen: false }],
+          }
+        );
+        console.log("notif = ", response1.data);
         router.push(`/${locale}/Employee/BoardEmployee`);
       } catch (error) {
         console.error(
@@ -135,7 +131,6 @@ const Invitation = () => {
       );
     }
 
-    
     // setSubmitting(false);
   };
 

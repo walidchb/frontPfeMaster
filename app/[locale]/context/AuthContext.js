@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       console.log("signed is");
       console.log(email);
       const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
+        baseURL: "https://back-pfe-master.vercel.app",
         headers: {
           "Content-Type": "application/json",
         },
@@ -83,29 +83,30 @@ export const AuthProvider = ({ children }) => {
           } catch (error) {
             console.error("Error:", error);
           }
-        } if(user?.role === "individual"){
-            router.push(`/${locale}/Employee/BoardEmployee`);
-          } else {
-            try {
-              const response = await axiosInstance.get(
-                "/organization/organizations",
-                {
-                  params: {
-                    _id: user?.organizations[0]?._id,
-                  },
-                }
-              );
+        }
+        if (user?.role === "individual") {
+          router.push(`/${locale}/Employee/BoardEmployee`);
+        } else {
+          try {
+            const response = await axiosInstance.get(
+              "/organization/organizations",
+              {
+                params: {
+                  _id: user?.organizations[0]?._id,
+                },
+              }
+            );
 
-              dispatch(setOrganization(response.data[0]));
-              await localStorage.setItem(
-                "organization",
-                JSON.stringify(response.data[0])
-              );
-              router.push(`/${locale}/Employee/BoardEmployee`);
-            } catch (error) {
-              console.error("Error:", error);
-            }
+            dispatch(setOrganization(response.data[0]));
+            await localStorage.setItem(
+              "organization",
+              JSON.stringify(response.data[0])
+            );
+            router.push(`/${locale}/Employee/BoardEmployee`);
+          } catch (error) {
+            console.error("Error:", error);
           }
+        }
       } catch (error) {
         console.error("Error:", error);
       }

@@ -30,7 +30,7 @@ import {
   FaUserFriends,
   FaChartBar,
   FaComment,
-  FaEnvelopeOpenText
+  FaEnvelopeOpenText,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -52,9 +52,8 @@ function NavBarAuth({
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
 }) {
-
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -66,7 +65,7 @@ function NavBarAuth({
   const [organization, setOrganization] = useState(null);
   useEffect(() => {
     console.log("yawwwww rani hnaaa");
-    console.log("localstor = ", localStorage)
+    console.log("localstor = ", localStorage);
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
@@ -89,7 +88,7 @@ function NavBarAuth({
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
       }
-      if(orga){
+      if (orga) {
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
       }
@@ -108,7 +107,6 @@ function NavBarAuth({
   const [notifications, setNotifications] = useState(null);
   useEffect(() => {
     const getinvitations = async (values) => {
-      
       const user = JSON.parse(localStorage.getItem("userInfo"));
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
@@ -131,7 +129,7 @@ function NavBarAuth({
     //         recipient: userInfo?._id,
     //         organization: organization?._id
     //       }
-    //     }); 
+    //     });
     //     setNotifacations(response.data);
     //   } catch (error) {
     //     console.error('Error fetching user notifications:', error);
@@ -145,7 +143,6 @@ function NavBarAuth({
   }, [userInfo]);
   useEffect(() => {
     const getinvitations = async (values) => {
-
       try {
         const response = await axiosInstance.get("/invitation/invitations", {
           params: {
@@ -167,7 +164,7 @@ function NavBarAuth({
     //         recipient: userInfo?._id,
     //         organization: organization?._id
     //       }
-    //     }); 
+    //     });
     //     setNotifacations(response.data);
     //   } catch (error) {
     //     console.error('Error fetching user notifications:', error);
@@ -182,23 +179,27 @@ function NavBarAuth({
   useEffect(() => {
     const getNotifications = async () => {
       try {
-        if (userInfo && organization) { // Vérifier si userInfo et organization ne sont pas null
-          const response = await axiosInstance.get('/notification/notifications', {
-            params: {
-              recipient: userInfo._id,
-              organization: organization._id
+        if (userInfo && organization) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+                organization: organization._id,
+              },
             }
-          });
+          );
           setNotifications(response.data);
         } else {
-          console.error('userInfo or organization is null');
+          console.error("userInfo or organization is null");
         }
       } catch (error) {
-        console.error('Error fetching user notifications:', error);
+        console.error("Error fetching user notifications:", error);
         throw error;
       }
-    }
-  
+    };
+
     if (userInfo) {
       getNotifications();
     }
@@ -206,23 +207,27 @@ function NavBarAuth({
   useEffect(() => {
     const getNotifications = async () => {
       try {
-        if (userInfo && organization) { // Vérifier si userInfo et organization ne sont pas null
-          const response = await axiosInstance.get('/notification/notifications', {
-            params: {
-              recipient: userInfo._id,
-              organization: organization._id
+        if (userInfo && organization) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+                organization: organization._id,
+              },
             }
-          });
+          );
           setNotifications(response.data);
         } else {
-          console.error('userInfo or organization is null');
+          console.error("userInfo or organization is null");
         }
       } catch (error) {
-        console.error('Error fetching user notifications:', error);
+        console.error("Error fetching user notifications:", error);
         throw error;
       }
-    }
-  
+    };
+
     if (userInfo) {
       getNotifications();
     }
@@ -283,7 +288,7 @@ function NavBarAuth({
     };
   }, []);
 
-  // const notifications = 
+  // const notifications =
   // [
   //   {
   //     id: 1,
@@ -380,30 +385,43 @@ function NavBarAuth({
         router.push(`/${locale}/Employee/Project/Board`);
         break;
       case "task":
-        router.push(`/${locale}/Employee/Task?task=${JSON.stringify(JSON.parse(notification?.content?.url)._id)}`)
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(
+            JSON.parse(notification?.content?.url)._id
+          )}`
+        );
         break;
-      case "comment": 
-          router.push(`/${locale}/Employee/Task?task=${JSON.stringify(JSON.parse(notification?.content?.url)._id)}`)
+      case "comment":
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(
+            JSON.parse(notification?.content?.url)._id
+          )}`
+        );
         break;
       case "invitation":
-          router.push(`/${locale}/Employee/Invitation?invitation=${notification?.content?.url}`)
+        router.push(
+          `/${locale}/Employee/Invitation?invitation=${notification?.content?.url}`
+        );
         break;
       default:
         break;
     }
-    if(!notification?.seen?.seen){
-      try{
-        const response = await axiosInstance.patch('/notification/notifications', {
-          notificationId: notification?._id,
-          userId: userInfo._id,
-        });
-        console.log("notification mis à jour")   
-      }catch(error){
-        console.log(error)
+    if (!notification?.seen?.seen) {
+      try {
+        const response = await axiosInstance.patch(
+          "/notification/notifications",
+          {
+            notificationId: notification?._id,
+            userId: userInfo._id,
+          }
+        );
+        console.log("notification mis à jour");
+      } catch (error) {
+        console.log(error);
       }
     }
-    setReload(!reload)
-  }
+    setReload(!reload);
+  };
 
   const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
@@ -498,7 +516,8 @@ function NavBarAuth({
                               <div
                                 onClick={async () => {
                                   const axiosInstance = axios.create({
-                                    baseURL: "http://localhost:1937",
+                                    baseURL:
+                                      "https://back-pfe-master.vercel.app",
                                     headers: {
                                       "Content-Type": "application/json",
                                     },
@@ -654,7 +673,9 @@ function NavBarAuth({
                               <Menu.Item key={index}>
                                 {({ active }) => (
                                   <div
-                                    onClick={() => GotoNotifacations(notification)}
+                                    onClick={() =>
+                                      GotoNotifacations(notification)
+                                    }
                                     className={classNames(
                                       !notification.seen[0].seen
                                         ? "bg-blue-300" // Appliquer la classe bg-blue-300 si notification.seen.seen est false

@@ -49,7 +49,7 @@ function Board() {
     }
   }, []);
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -94,7 +94,6 @@ function Board() {
           {/* Vérifier si project n'est pas vide avant de rendre les composants */}
           {Object.keys(project).length > 0 ? (
             <>
-
               <ProjectDetails
                 project={project}
                 reloadpage={reloadpage}
@@ -106,7 +105,6 @@ function Board() {
                 reloadpage={reloadpage}
                 reload={reload}
               />
-              
             </>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré

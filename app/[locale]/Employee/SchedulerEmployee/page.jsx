@@ -47,10 +47,10 @@ function SchedulerEmployee() {
         case "employee":
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
-              params: { 
+              params: {
                 userId: userInfo._id,
                 teamId: teamId,
-               },
+              },
             });
             setTasks(response.data);
           } catch (error) {
@@ -60,36 +60,36 @@ function SchedulerEmployee() {
         case "teamBoss":
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
-              params: { 
+              params: {
                 userId: userInfo._id,
                 teamId: teamId,
-               },
-            });
-            setTasks(response.data);
-          } catch (error) {
-            console.error("Erreur lors de la récupération des tâches :", error);
-          }  
-          break;
-        case "prjctBoss":
-          try {
-            const response = await axiosInstance.get(`/user/userTasks`, {
-              params: { 
-                userId: userInfo._id,
-                organizationId: organization._id,
-               },
+              },
             });
             setTasks(response.data);
           } catch (error) {
             console.error("Erreur lors de la récupération des tâches :", error);
           }
-         break;
+          break;
+        case "prjctBoss":
+          try {
+            const response = await axiosInstance.get(`/user/userTasks`, {
+              params: {
+                userId: userInfo._id,
+                organizationId: organization._id,
+              },
+            });
+            setTasks(response.data);
+          } catch (error) {
+            console.error("Erreur lors de la récupération des tâches :", error);
+          }
+          break;
         case "orgBoss":
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
-              params: { 
+              params: {
                 userId: userInfo._id,
                 organizationId: organization._id,
-               },
+              },
             });
             setTasks(response.data);
           } catch (error) {
@@ -97,14 +97,12 @@ function SchedulerEmployee() {
           }
           break;
       }
-
-      
     };
 
     fetchTasks();
   }, [userInfo, teamId, organization]);
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -126,7 +124,7 @@ function SchedulerEmployee() {
         ) : null}
         {/* <MainProject sideBarEmployeeShow={sideBarEmployeeShow} /> */}
 
-        <CalendrierView tasks={tasks}/>
+        <CalendrierView tasks={tasks} />
       </div>
     </div>
   );

@@ -47,7 +47,7 @@ function Kanban() {
     }
   }, []);
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -56,13 +56,12 @@ function Kanban() {
   // const projectId = "666357fcb6ef230e0e262884";
 
   const fetchProject = async (projectId) => {
-    
     try {
       const response = await axiosInstance.get(
         `/project/projects?_id=${projectId}`
       );
       const projectData = response.data[0];
-      
+
       setProject(projectData);
     } catch (error) {
       console.error("Erreur lors de la récupération des équipes :", error);
@@ -90,7 +89,7 @@ function Kanban() {
         <div className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={1} />
           {Object.keys(project).length > 0 ? (
-          <KanbanBoard project={project} user={userInfo} teamId={teamId} />
+            <KanbanBoard project={project} user={userInfo} teamId={teamId} />
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
           )}
