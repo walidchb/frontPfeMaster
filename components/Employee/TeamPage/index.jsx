@@ -47,7 +47,7 @@ function TeamPage() {
   useEffect(() => {
     const getTeams = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -73,7 +73,7 @@ function TeamPage() {
   useEffect(() => {
     const getTeamMembers = async () => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },

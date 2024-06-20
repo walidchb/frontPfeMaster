@@ -10,12 +10,13 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import axios from "axios";
-
+import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
 const TaskCard = (task) => {
+  const router = useRouter();
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -129,16 +130,17 @@ const TaskCard = (task) => {
         </button>
       </div>
       <div className="flex justify-center mt-4">
-        <Link
-          href={{
-            pathname: `/${locale}/Employee/Task`,
-            query: { taskDetails: encodeURIComponent(JSON.stringify(task)) },
+        <button
+          onClick={() => {
+            router.push(
+              `/${locale}/Employee/Task?task=${JSON.stringify(task?._id)}`
+            );
           }}
           className="bg-[#314155] text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none inline-flex items-center"
           style={{ maxWidth: "fit-content" }}>
           <FaEye className="mr-2" />
           <span>Voir</span>
-        </Link>
+        </button>
       </div>
     </div>
   );

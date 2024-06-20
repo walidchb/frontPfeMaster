@@ -37,6 +37,7 @@ function MainEmployee() {
   const [inProgressTasks, setInProgressTasks] = useState([]);
   const [inReviewTasks, setInReviewTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);
+  const [cancelTasks, setCancelTasks] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [reload, setReload] = useState(false); // State to trigger rerender
   const fetchTasks = async (userId) => {
@@ -55,11 +56,12 @@ function MainEmployee() {
     setInProgressTasks(tasks.filter((task) => task.status === "Inprogress"));
     setInReviewTasks(tasks.filter((task) => task.status === "Inreview"));
     setDoneTasks(tasks.filter((task) => task.status === "Done"));
+    setCancelTasks(tasks.filter((task) => task.status === "Cancel"));
   };
 
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -346,6 +348,7 @@ function MainEmployee() {
     { value: "In Progress", label: "In Progress" },
     { value: "In Review", label: "In Review" },
     { value: "Done", label: "Done" },
+    { value: "Cancel", label: "Canceled" }
   ];
   const defaultStatus = { value: "worked on", label: "Worked On" };
   const [navigation, setNavigation] = useState([
@@ -353,6 +356,7 @@ function MainEmployee() {
     { name: "In Progress", href: "#", current: false },
     { name: "In Review", href: `#`, current: false },
     { name: "Done", href: `#`, current: false },
+    { name: "Canceled", href: `#`, current: false }
   ]);
   const [curScreen, setCurScreen] = useState(0);
   // /const [showAddProjectFrom, setShowAddProjectFrom] = useState(false);
@@ -500,6 +504,20 @@ function MainEmployee() {
             ) : curScreen === 3 ? (
               <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
                 Your Task list is empty for "Done" tasks
+              </div>
+            ) : null}
+
+            {curScreen === 4 && cancelTasks.length > 0 ? (
+              cancelTasks.map((task, taskIndex) => (
+                <TaskListElement
+                  key={taskIndex}
+                  task={task}
+                  project={task.projet}
+                />
+              ))
+            ) : curScreen === 4 ? (
+              <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+                Your Task list is empty for "Canceled" tasks
               </div>
             ) : null}
           </div>

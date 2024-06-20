@@ -57,6 +57,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
   const [doneTasks, setDoneTasks] = useState(0);
+  const [cancelTasks, setCancelTasks] = useState(0);
   const [updateProjectModal, setUpdateProjectModal] = useState(false);
   const [showUpdateProjectForm, setShowUpdateProjectForm] = useState(false);
   const [windowSize, setWindowSize] = useState({
@@ -110,6 +111,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
 
   useEffect(() => {
     setDoneTasks(project.tasks.filter((task) => task.status === "Done"));
+    setCancelTasks(project.tasks.filter((task) => task.status === "Cancel"));
   }, [project]);
 
   useEffect(() => {
@@ -186,7 +188,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
           </div>
           <ProgressCircle
             completed={doneTasks?.length}
-            total={project.tasks?.length}
+            total={project.tasks?.length-cancelTasks?.length}
           />
         </div>
 

@@ -51,7 +51,16 @@ function TaskListElement({ task, project }) {
           srcSet=""
         />
       );
-
+      break;
+    case "cancel":
+      icon = (
+        <img
+          className="h-8 mr-2 w-auto"
+          src="/images/croix-rouge.png"
+          alt=""
+          srcSet=""
+        />
+      );
       break;
     default:
       icon = null;

@@ -21,12 +21,14 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
     { id: 2, image: "development", number: true },
     { id: 3, image: "code-review", number: true },
     { id: 4, image: "checkbox", number: false },
+    { id: 5, image: "croix-rouge", number: false }
   ]);
   const [taskFeteched, setTaskFeteched] = useState(false);
   const [filtreDone, setfiltreDone] = useState(false);
   const [filtreTodo, setfiltreTodo] = useState(false);
   const [filtreInreview, setfiltreInreview] = useState(false);
   const [filtreInprogress, setfiltreInprogress] = useState(false);
+  const [filtreCancel, setfiltreCancel] = useState(false);
   const [showBoard, setShowBoard] = useState(true);
   const [createIssueModal, setCreateIssueModal] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -58,6 +60,7 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
       filtreTodo,
       filtreInreview,
       filtreInprogress,
+      filtreCancel
     ];
     if (statusFilters.some((filter) => filter)) {
       filteredTasks = filteredTasks.filter((task) => {
@@ -65,7 +68,8 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
           (filtreDone && task.status === "Done") ||
           (filtreTodo && task.status === "Todo") ||
           (filtreInreview && task.status === "Inreview") ||
-          (filtreInprogress && task.status === "Inprogress");
+          (filtreInprogress && task.status === "Inprogress") ||
+          (filtreCancel && task.status === "Cancel");
 
         // Si aucune case n'est cochée, afficher toutes les tâches
         if (!statusFilters.some((filter) => filter)) {
@@ -92,6 +96,7 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
     filtreTodo,
     filtreInreview,
     filtreInprogress,
+    filtreCancel,
     taskFeteched,
     user?.role,
     teamId,
@@ -139,6 +144,10 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
   const handleFilterInprogressChange = () => {
     setfiltreInprogress(!filtreInprogress);
   };
+
+  const handleFilterCancelChange = () => {
+    setfiltreCancel(!filtreCancel);
+  }
   const handleShowAddTaskForm = () => {
     setCreateIssueModal(true);
     setShowAddTaskForm(true);
@@ -205,7 +214,8 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
                     (item.id === 4 && filtreDone) ||
                     (item.id === 1 && filtreTodo) ||
                     (item.id === 3 && filtreInreview) ||
-                    (item.id === 2 && filtreInprogress)
+                    (item.id === 2 && filtreInprogress) ||
+                    (item.id === 5 && filtreCancel)
                   }
                   onChange={
                     item.id === 4
@@ -214,7 +224,9 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
                       ? handleFilterTodoChange
                       : item.id === 3
                       ? handleFilterInreviewChange
-                      : handleFilterInprogressChange
+                      : item.id === 2
+                      ? handleFilterInprogressChange
+                      : handleFilterCancelChange
                   }
                   className="cursor-pointer mx-2 w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />

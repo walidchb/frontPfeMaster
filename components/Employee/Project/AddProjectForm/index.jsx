@@ -16,7 +16,7 @@ import {
 import "./style.css";
 
 const axiosInstance = axios.create({
-  baseURL: "https://back-pfe-master.vercel.app",
+  baseURL: "http://localhost:1937",
   headers: {
     "Content-Type": "application/json",
   },
@@ -222,7 +222,7 @@ const AddProjectForm = ({
   useEffect(() => {
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -248,7 +248,7 @@ const AddProjectForm = ({
   useEffect(() => {
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -275,7 +275,7 @@ const AddProjectForm = ({
   useEffect(() => {
     const getPeople = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -309,7 +309,7 @@ const AddProjectForm = ({
   useEffect(() => {
     const getPeople = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },

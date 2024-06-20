@@ -14,6 +14,7 @@ import {
   FaUserFriends,
   FaExclamationCircle,
   FaUserCircle,
+  FaTimes,
   FaTasks,
   FaClock,
   FaClipboardCheck,
@@ -180,6 +181,7 @@ const TaskPage = () => {
     // More people...
   ];
   const [Details, setDetails] = useState(false);
+  const [showPopUp, setShowPopUp] = useState(false);
   const Status = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
@@ -232,6 +234,9 @@ const TaskPage = () => {
       case "Done":
         return "Done";
         break;
+      case "Cancel":
+        return "Canceled"
+        break;
     }
   };
 
@@ -244,7 +249,7 @@ const TaskPage = () => {
     setShowUpdateTaskForm(true);
   };
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -556,11 +561,21 @@ const TaskPage = () => {
         );
 
         break;
-      case "ione":
+      case "done":
         return (
           <img
             className="h-6 mr-2 w-auto"
             src="/images/checkbox.png"
+            alt=""
+            srcSet=""
+          />
+        );
+        break;
+      case "cancel":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/croix-rouge.png"
             alt=""
             srcSet=""
           />
@@ -829,6 +844,7 @@ const TaskPage = () => {
                               />
                             </Menu.Button>
                           </div>
+                          {((userInfo?.role === "employee" || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
                           <Transition
                             as={Fragment}
                             enter="transition ease-out duration-100"
@@ -838,81 +854,108 @@ const TaskPage = () => {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95">
                             <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Todo")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/list.png"
-                                      alt=""
-                                    />
-                                    To Do
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() =>
-                                      patchTaskStatus("Inprogress")
-                                    }
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/development.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    In Progress
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Inreview")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/code-review.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    In Review
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Done")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/checkbox.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    Done
-                                  </div>
-                                )}
-                              </Menu.Item>
+                              {((userInfo?.role === "employee" && taskData?.status === "Todo") || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Todo")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/list.png"
+                                        alt=""
+                                      />
+                                      To Do
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
+                              {((userInfo?.role === "employee" && (taskData?.status === "Todo" || taskData?.status === "Inprogress")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Inprogress")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/development.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      In Progress
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
+                              {((userInfo?.role === "employee" && (taskData?.status === "Inprogress" || taskData?.status === "Inreview")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Inreview")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/code-review.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      In Review
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
+                              {((userInfo?.role === "teamBoss" && (taskData?.status === "Done" || taskData?.status === "Inreview")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Done")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/checkbox.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      Done
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
+                              {userInfo?.role === "teamBoss" && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => setShowPopUp(true)}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/croix-rouge.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      Canceled
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
                             </Menu.Items>
                           </Transition>
+                        )}
                         </Menu>
                         <FaShare
                           onClick={() => setShowShareModal(true)}
@@ -1112,6 +1155,39 @@ const TaskPage = () => {
                           <p>Delete</p>
                         </div>
                       </div>
+                      {showPopUp ? (
+                        <div className="text-white fixed inset-0 flex items-center justify-center z-50">
+                          <div className="bg-gray-700 rounded-lg shadow-lg p-6 relative">
+                            <button
+                              type="button"
+                              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                              onClick={() => setShowPopUp(false)}>
+                              <FaTimes color="white" />
+                            </button>
+                            <div className="mb-4 text-lg font-semibold">Confirmation</div>
+                            <div className="mb-4">
+                              Êtes-vous sûr de vouloir annuler cette tâche ?
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                type="button"
+                                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                                onClick={() => setShowPopUp(false)}>
+                                Annuler
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-[#fc4545] text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-600"
+                                onClick={() => {
+                                  patchTaskStatus("Cancel")
+                                  setShowPopUp(false)
+                                }}>
+                                Oui
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ): null}
                     </div>
                   )}
                 </div>
@@ -1333,88 +1409,118 @@ const TaskPage = () => {
                             />
                           </Menu.Button>
                         </div>
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-100"
-                          enterFrom="transform opacity-0 scale-95"
-                          enterTo="transform opacity-100 scale-100"
-                          leave="transition ease-in duration-75"
-                          leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95">
-                          <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Todo")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/list.png"
-                                    alt=""
-                                  />
-                                  To Do
-                                </div>
+                        {((userInfo?.role === "employee" || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95">
+                            <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              {((userInfo?.role === "employee" && taskData?.status === "Todo") || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Todo")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/list.png"
+                                        alt=""
+                                      />
+                                      To Do
+                                    </div>
+                                  )}
+                                </Menu.Item>
                               )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Inprogress")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/development.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Progress
-                                </div>
+                              {((userInfo?.role === "employee" && (taskData?.status === "Todo" || taskData?.status === "Inprogress")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Inprogress")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/development.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      In Progress
+                                    </div>
+                                  )}
+                                </Menu.Item>
                               )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Inreview")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/code-review.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Review
-                                </div>
+                              {((userInfo?.role === "employee" && (taskData?.status === "Inprogress" || taskData?.status === "Inreview")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Inreview")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/code-review.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      In Review
+                                    </div>
+                                  )}
+                                </Menu.Item>
                               )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Done")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/checkbox.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  Done
-                                </div>
+                              {((userInfo?.role === "teamBoss" && (taskData?.status === "Done" || taskData?.status === "Inreview")) || userInfo?.role === "teamBoss") && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => patchTaskStatus("Done")}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/checkbox.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      Done
+                                    </div>
+                                  )}
+                                </Menu.Item>
                               )}
-                            </Menu.Item>
-                          </Menu.Items>
-                        </Transition>
+                              {userInfo?.role === "teamBoss" && (
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={() => setShowPopUp(true)}
+                                      className={classNames(
+                                        active ? "bg-blue-300" : "",
+                                        " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                      )}>
+                                      <img
+                                        className="w-6 h-6 mr-2"
+                                        src="/images/croix-rouge.png"
+                                        alt=""
+                                        srcset=""
+                                      />{" "}
+                                      Canceled
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              )}
+                            </Menu.Items>
+                          </Transition>
+                        )}
                       </Menu>
                       <FaShare
                         onClick={() => setShowShareModal(true)}
@@ -1615,11 +1721,45 @@ const TaskPage = () => {
                       </div>
                     </div>
                   </div>
+                  {showPopUp ? (
+                    <div className="text-white fixed inset-0 flex items-center justify-center z-50">
+                      <div className="bg-gray-700 rounded-lg shadow-lg p-6 relative">
+                        <button
+                          type="button"
+                          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                          onClick={() => setShowPopUp(false)}>
+                          <FaTimes color="white" />
+                        </button>
+                        <div className="mb-4 text-lg font-semibold">Confirmation</div>
+                        <div className="mb-4">
+                          Êtes-vous sûr de vouloir annuler cette tâche ?
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                            onClick={() => setShowPopUp(false)}>
+                            Annuler
+                          </button>
+                          <button
+                            type="button"
+                            className="bg-[#fc4545] text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-600"
+                            onClick={() => {
+                              patchTaskStatus("Cancel")
+                              setShowPopUp(false)
+                            }}>
+                            Oui
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ): null}
                 </div>
               )}
             </div>
           </div>
         </div>
+        
 
         <div
           style={{
