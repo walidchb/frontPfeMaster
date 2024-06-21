@@ -13,7 +13,11 @@ import {
 import React, { useState, useEffect } from "react";
 import "./style.css";
 
-function NotificationListElement({ notification }) {
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
+function NotificationListElement({ notification, GotoNotifacations }) {
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
@@ -38,46 +42,78 @@ function NotificationListElement({ notification }) {
   }, []);
   return (
     <div
-      key={notification.id}
-      className="NotificationListElement  w-full  my-2 rounded-xl flex justify-between items-center p-2   border-gray-200 last:border-b-0 last:border-0">
-      <div className="flex ">
-        <div
-          style={{
-            minWidth:
-              windowSize.width <= 450
-                ? "20vw"
-                : windowSize.width <= 650
-                ? "15vw"
-                : windowSize.width <= 850
-                ? "12vw"
-                : "8vw",
-          }}
-          className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-          {notification.type === "message" && <FaRegEnvelope className="" />}
-          {notification.type === "event" && <FaCalendarAlt className="" />}
-          {notification.type === "reminder" && <FaBell className="" />}
-          {notification.type === "project" && <FaClipboardList className="" />}
-          {notification.type === "task" && <FaTasks className="" />}
-          {notification.type === "team" && <FaUserFriends className="" />}
-          {notification.type === "report" && <FaChartBar className="" />}
-          {notification.type}
-        </div>
-        <div style={{ width: "50vw" }} className="">
-          <div className="truncate text-sm text-gray-600 mb-2">
-            {new Date(notification.date).toLocaleString()}
-          </div>
-          <div
-            className={`truncate    text-sm ${
-              notification.isRead
-                ? "text-gray-600"
-                : "text-gray-800 font-semibold"
-            }`}>
-            {notification.content}
-          </div>
-        </div>
-      </div>
+                                    onClick={() =>
+                                      GotoNotifacations(notification)
+                                    }
+                                    className={classNames(
+                                      !notification?.seen[0].seen
+                                        ? "bg-blue-300" // Appliquer la classe bg-blue-300 si notification.seen.seen est false
+                                        : "bg-gray-100", // Appliquer la classe bg-gray-100 si notification.seen.seen est true
+                                      "cursor-pointer NotificationListElement w-full my-2 rounded-xl flex justify-between items-center p-2 border-gray-200 last:border-b-0 last:border-0"
+                                    )}>
+                                    <div className="flex ">
+                                      <div
+                                        style={{
+                                          minWidth:
+                                            windowSize.width <= 450
+                                              ? "20vw"
+                                              : windowSize.width <= 650
+                                              ? "15vw"
+                                              : windowSize.width <= 850
+                                              ? "12vw"
+                                              : "8vw",
+                                        }}
+                                        className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
+                                        {notification?.type === "message" && (
+                                          <FaRegEnvelope className="" />
+                                        )}
+                                        {notification?.type === "comment" && (
+                                          <FaComment className="" />
+                                        )}
+                                        {notification?.type === "reminder" && (
+                                          <FaBell className="" />
+                                        )}
+                                        {notification?.type === "project" && (
+                                          <FaClipboardList className="" />
+                                        )}
+                                        {notification?.type === "task" && (
+                                          <FaTasks className="" />
+                                        )}
+                                        {notification?.type === "team" && (
+                                          <FaUserFriends className="" />
+                                        )}
+                                        {notification?.type === "invitation" && (
+                                          <FaEnvelopeOpenText className="" />
+                                        )}
+                                        {notification?.type}
+                                      </div>
+                                      <div
+                                        style={{
+                                          width:
+                                            windowSize.width <= 550
+                                              ? "50vw"
+                                              : windowSize.width <= 850
+                                              ? "40vw"
+                                              : "50vw",
+                                        }}
+                                        className="">
+                                        <div className="truncate text-sm text-gray-600 mb-2">
+                                          {new Date(
+                                            notification?.createdAt
+                                          ).toLocaleString()}
+                                        </div>
+                                        <div
+                                          className={`truncate    text-sm ${
+                                            notification?.seen.seen
+                                              ? "text-gray-600"
+                                              : "text-gray-800 font-semibold"
+                                          }`}>
+                                          {notification?.content.message}
+                                        </div>
+                                      </div>
+                                    </div>
 
-      <div className=" flex justify-center items-center">
+      {/*<div className=" flex justify-center items-center">
         <button
           type="button"
           className="text-gray-600  hover:text-blue-500 focus:outline-none "
@@ -119,6 +155,7 @@ function NotificationListElement({ notification }) {
           </div>
         </div>
       )}
+        */}
     </div>
   );
 }
