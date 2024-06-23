@@ -31,6 +31,7 @@ import {
   FaChartBar,
   FaComment,
   FaEnvelopeOpenText,
+  FaExchangeAlt,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -60,7 +61,6 @@ function NavBarAuth({
   });
   // <<<<<<< HEAD
   const [reload, setReload] = useState(false);
-
   const [userInfo, setUserInfo] = useState(null);
   const [organization, setOrganization] = useState(null);
   useEffect(() => {
@@ -95,6 +95,8 @@ function NavBarAuth({
     }
   }, [reload]);
 
+
+
   // =======
 
   // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
@@ -105,133 +107,112 @@ function NavBarAuth({
   const organisations = [1, 2, 4, 5];
   const [invitaions, setInvitaions] = useState([]);
   const [notifications, setNotifications] = useState(null);
-  useEffect(() => {
-    const getinvitations = async (values) => {
-      const user = JSON.parse(localStorage.getItem("userInfo"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            sendto: userInfo._id,
-          },
-        });
-        // console.log("invitaions");
+  const [nbrNotifNot, setNbrNotifNot] = useState(0);
+  const [nbrInvitNot, setInvitNot] = useState(0);
+  const [nbrNotif, setNbrNotif] = useState(0);
+  const getinvitations = async (values) => {
+    try {
+      const response = await axiosInstance.get("/invitation/invitations", {
+        params: {
+          sendto: userInfo?._id,
+        },
+      });
+      // console.log("invitaions");
 
-        // console.log(response.data);
-        setInvitaions(response.data);
+      // console.log(response.data);
+      const sortedInvitations = response.data.sort(sortByDate);
+      setInvitaions(sortedInvitations);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const getNotifications = async () => {
+    if(userInfo?.role === "individual"){
+      try {
+        
+        if (userInfo) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+              },
+            }
+          );
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
+        } else {
+          console.error("userInfo or organization is null");
+        }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching user notifications:", error);
+        throw error;
       }
-    };
-    // const getNotifications = async () => {
-    //   try {
-    //     const response = await axiosInstance.get('/notification/notifications', {
-    //       data: {
-    //         recipient: userInfo?._id,
-    //         organization: organization?._id
-    //       }
-    //     });
-    //     setNotifacations(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching user notifications:', error);
-    //     throw error;
-    //   }
-    // }
+    }else{
+      try {
+        
+        if (userInfo && organization) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+                organization: organization._id,
+              },
+            }
+          );
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
+        } else {
+          console.error("userInfo or organization is null");
+        }
+      } catch (error) {
+        console.error("Error fetching user notifications:", error);
+        throw error;
+      }
+    }
+  };
+  useEffect(() => {
     if (userInfo) {
-      // getNotifications();
+      getNotifications();
       getinvitations();
     }
   }, [userInfo]);
   useEffect(() => {
-    const getinvitations = async (values) => {
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            sendto: userInfo?._id,
-          },
-        });
-        // console.log("invitaions");
-
-        // console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-    // const getNotifications = async () => {
-    //   try {
-    //     const response = await axiosInstance.get('/notification/notifications', {
-    //       data: {
-    //         recipient: userInfo?._id,
-    //         organization: organization?._id
-    //       }
-    //     });
-    //     setNotifacations(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching user notifications:', error);
-    //     throw error;
-    //   }
-    // }
+    
     if (userInfo) {
-      // getNotifications();
+      getNotifications();
       getinvitations();
     }
   }, [reload]);
   useEffect(() => {
-    const getNotifications = async () => {
-      try {
-        if (userInfo && organization) {
-          // Vérifier si userInfo et organization ne sont pas null
-          const response = await axiosInstance.get(
-            "/notification/notifications",
-            {
-              params: {
-                recipient: userInfo._id,
-                organization: organization._id,
-              },
-            }
-          );
-          setNotifications(response.data);
-        } else {
-          console.error("userInfo or organization is null");
-        }
-      } catch (error) {
-        console.error("Error fetching user notifications:", error);
-        throw error;
-      }
-    };
-
-    if (userInfo) {
-      getNotifications();
-    }
-  }, [reload]);
-  useEffect(() => {
-    const getNotifications = async () => {
-      try {
-        if (userInfo && organization) {
-          // Vérifier si userInfo et organization ne sont pas null
-          const response = await axiosInstance.get(
-            "/notification/notifications",
-            {
-              params: {
-                recipient: userInfo._id,
-                organization: organization._id,
-              },
-            }
-          );
-          setNotifications(response.data);
-        } else {
-          console.error("userInfo or organization is null");
-        }
-      } catch (error) {
-        console.error("Error fetching user notifications:", error);
-        throw error;
-      }
-    };
-
     if (userInfo) {
       getNotifications();
     }
   }, [userInfo, organization]);
+
+  useEffect(() => {
+    if(notifications && invitaions){
+      const notifsNotSeen = (notifications || []).filter(notification => notification?.seen?.[0]?.seen === false);
+          console.log("notifNot = ", notifsNotSeen);
+          setNbrNotifNot(notifsNotSeen.length)
+          
+          const invitsNotSeen = (invitaions || []).filter(invitation => invitation?.accepted === false);
+          console.log("invitNot = ", invitsNotSeen);
+          setInvitNot(invitsNotSeen.length)
+          
+          const total = notifsNotSeen.length + invitsNotSeen.length;
+          setNbrNotif(total);
+          console.log("nbr notif = ", total);
+    }
+  }, [notifications, invitaions]);
+
+
+
+  const sortByDate = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+
   const locales = ["en", "fr"];
   const localePrefix = "always"; // Default
   const { usePathname } = createSharedPathnamesNavigation({
@@ -288,91 +269,6 @@ function NavBarAuth({
     };
   }, []);
 
-  // const notifications =
-  // [
-  //   {
-  //     id: 1,
-  //     date: new Date("2021-12-25T10:30:00"),
-  //     content:
-  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-  //     type: "project",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 2,
-  //     date: new Date("2021-12-20T14:00:00"),
-  //     content: "Meeting Agenda for Monday",
-  //     type: "task",
-  //     isRead: true,
-  //   },
-  //   {
-  //     id: 3,
-  //     date: new Date("2021-12-19T09:15:00"),
-  //     content: "Weekly update from project team",
-  //     type: "reminder",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 4,
-  //     date: new Date("2021-12-25T10:30:00"),
-  //     content:
-  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-  //     type: "message",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 1,
-  //     date: new Date("2021-12-25T10:30:00"),
-  //     content:
-  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-  //     type: "project",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 2,
-  //     date: new Date("2021-12-20T14:00:00"),
-  //     content: "Meeting Agenda for Monday",
-  //     type: "task",
-  //     isRead: true,
-  //   },
-  //   {
-  //     id: 3,
-  //     date: new Date("2021-12-19T09:15:00"),
-  //     content: "Weekly update from project team",
-  //     type: "reminder",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 4,
-  //     date: new Date("2021-12-25T10:30:00"),
-  //     content:
-  //       "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-  //     type: "message",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 5,
-  //     date: new Date("2021-12-20T14:00:00"),
-  //     content: "Meeting Agenda for Monday",
-  //     type: "event",
-  //     isRead: true,
-  //   },
-  //   {
-  //     id: 6,
-  //     date: new Date("2021-12-19T09:15:00"),
-  //     content: "Weekly update from project team",
-  //     type: "team",
-  //     isRead: false,
-  //   },
-  //   {
-  //     id: 7,
-  //     date: new Date("2021-12-19T09:15:00"),
-  //     content: "Weekly update from project team",
-  //     type: "report",
-  //     isRead: false,
-  //   },
-  // ];
-
   const GotoNotifacations = async (notification) => {
     switch (notification.type) {
       case "project":
@@ -401,6 +297,13 @@ function NavBarAuth({
       case "invitation":
         router.push(
           `/${locale}/Employee/Invitation?invitation=${notification?.content?.url}`
+        );
+        break;
+      case "delegation":
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(
+            JSON.parse(notification?.content?.url)._id
+          )}`
         );
         break;
       default:
@@ -609,14 +512,21 @@ function NavBarAuth({
                 <Menu as="div" className=" relative ml-3">
                   <div>
                     <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">View notifications</span>
+                    <span className="absolute -inset-1.5" />
+                    <span className="sr-only">View notifications</span>
+                    <div className="relative">
                       <BellIcon
                         color="white"
                         className="h-6 w-6"
                         aria-hidden="true"
                       />
-                    </Menu.Button>
+                      {nbrNotif > 0 && (
+                        <span className="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                          {nbrNotif}
+                        </span>
+                      )}
+                    </div>
+                  </Menu.Button>
                   </div>
                   <Transition
                     as={Fragment}
@@ -643,7 +553,7 @@ function NavBarAuth({
                               ? "bg-blue-300 text-white"
                               : ""
                           }`}>
-                          notifications
+                          Notifications {nbrNotifNot > 0 && `(${nbrNotifNot})`}
                         </p>
                         <p
                           onClick={() => setActivePageIndex(2)}
@@ -652,7 +562,7 @@ function NavBarAuth({
                               ? "bg-blue-300 text-white"
                               : ""
                           }`}>
-                          invitations
+                          Invitations {nbrInvitNot > 0 && `(${nbrInvitNot})`}
                         </p>
                       </div>
                       {/* ))} */}
@@ -715,6 +625,9 @@ function NavBarAuth({
                                         )}
                                         {notification.type === "invitation" && (
                                           <FaEnvelopeOpenText className="" />
+                                        )}
+                                        {notification?.type === "delegation" && (
+                                          <FaExchangeAlt className="" />
                                         )}
                                         {notification.type}
                                       </div>
@@ -828,7 +741,7 @@ function NavBarAuth({
                                         </div>
                                         <div
                                           className={`truncate    text-sm ${
-                                            invitation?.isRead
+                                            invitation?.accepted
                                               ? "text-gray-600"
                                               : "text-gray-800 font-semibold"
                                           }`}>

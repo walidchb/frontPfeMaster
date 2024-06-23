@@ -82,7 +82,8 @@ const Notification = () => {
               },
             }
           );
-          setNotifications(response.data);
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
         } else {
           console.error("userInfo or organization is null");
         }
@@ -110,7 +111,8 @@ const Notification = () => {
               },
             }
           );
-          setNotifications(response.data);
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
         } else {
           console.error("userInfo or organization is null");
         }
@@ -124,6 +126,8 @@ const Notification = () => {
       getNotifications();
     }
   }, [userInfo, organization]);
+
+  const sortByDate = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
 
   const GotoNotifacations = async (notification) => {
     switch (notification.type) {

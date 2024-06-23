@@ -66,9 +66,9 @@ function TeamPage() {
         console.error("Error:", error);
       }
     };
-
-    getTeams();
-    // <<<<<<< HEAD
+    if (teamId) {
+      getTeams();
+    }
   }, [teamId]);
   useEffect(() => {
     const getTeamMembers = async () => {

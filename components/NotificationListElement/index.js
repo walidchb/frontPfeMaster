@@ -9,6 +9,9 @@ import {
   FaTasks,
   FaUserFriends,
   FaChartBar,
+  FaComment,
+  FaEnvelopeOpenText,
+  FaExchangeAlt
 } from "react-icons/fa";
 import React, { useState, useEffect } from "react";
 import "./style.css";
@@ -84,6 +87,9 @@ function NotificationListElement({ notification, GotoNotifacations }) {
                                         )}
                                         {notification?.type === "invitation" && (
                                           <FaEnvelopeOpenText className="" />
+                                        )}
+                                        {notification?.type === "delegation" && (
+                                          <FaExchangeAlt className="" />
                                         )}
                                         {notification?.type}
                                       </div>

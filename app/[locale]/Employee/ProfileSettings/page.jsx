@@ -10,6 +10,9 @@ import {
   FaEyeSlash,
   FaBars,
   FaEdit,
+  FaUserTie,
+  FaBuilding,
+  FaUsers
 } from "react-icons/fa";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -64,9 +67,15 @@ const ProfileSettings = () => {
               <h2 className="text-lg text-black font-semibold font-serif mb-1">
                 walid chebbab
               </h2>
-              <p className="text-gray-500">Développeur</p>
-              <p className="text-gray-500">ID: 00014A</p>
-              <p className="text-gray-500 font-bold">34 ans</p>
+              <p className="text-gray-500 flex items-center">
+                <FaUserTie className="mr-2" /> Chef de projet
+              </p>
+              <p className="text-gray-500 flex items-center">
+                <FaBuilding className="mr-2" /> Organisation 1
+              </p>
+              <p className="text-gray-500 flex items-center">
+                <FaUsers className="mr-2" /> Equipe A
+              </p>
             </div>
             {!isEditMode && (
               <div className="relative">

@@ -18,6 +18,7 @@ import {
   FaTasks,
   FaClock,
   FaClipboardCheck,
+  FaCheck,
 } from "react-icons/fa";
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
@@ -61,6 +62,62 @@ function classNames(...classes) {
 }
 
 const TaskPage = () => {
+  const [showDelegationRequest, setShowDelegationRequest] = useState(false);
+  const [userFullName, setUserFullName] = useState("Nom Prénom"); // Remplacez par les données appropriées
+  const [idDelegation, setIdDelegation] = useState(null)
+  const [userId, setUserId] = useState(null)
+  const [reload, setReload] = useState(false);
+    const handleAccept = async () => {
+      try{
+        const reponse1 = await axiosInstance.patch(`/task/tasks/${taskId}`, {
+          affectedto : userInfo?._id
+        })
+        console.log("taskUpdated = ", reponse1.data)  
+        const notificationContent = {
+          message: `"${userInfo?.nom} ${userInfo?.prenom}" a accepté votre demande pour lui déléguer la tâche "${taskData?.Name}".`,
+          url: JSON.stringify(taskData), // Ajoutez l'URL appropriée pour accéder au projet
+        };      
+        const reponse2 = await axiosInstance.post(
+          "/notification/notifications",
+          {
+            recipients: [userId],
+            content: notificationContent,
+            type: "delegation",
+            organization: organization?._id,
+            seen: [{ userId: userId, seen: false }],
+          }
+        );
+        console.log("Notif après accept = ", reponse2.data)
+        const reponse3 = await axiosInstance.patch(`delegation/delegations/${idDelegation}`, {
+          annuler: false,
+          accepted: true
+        })
+        console.log("accepter = ", reponse3.data)
+        const reponse4 = await axiosInstance.patch(`delegation/delegations/updateDelegations/${taskData?._id}/${userId}`, {
+          annuler: true,
+          accepted: false
+        })
+        setShowDelegationRequest(false);
+        setReload(!reload)
+      } catch(error) {
+        console.log(error)
+      }
+    };
+
+    const handleDecline = async () => {
+      try{
+        const reponse = await axiosInstance.patch(`delegation/delegations/${idDelegation}`, {
+          annuler: true,
+          accepted: false
+        })
+        console.log("annuler = ", reponse.data)
+        setShowDelegationRequest(false);
+
+      } catch(error) {
+        console.log(error)
+      }
+      
+    };
   const images = [
     {
       original: "/images/team.jpeg",
@@ -93,93 +150,7 @@ const TaskPage = () => {
       thumbnail: "/walid.pdf",
     },
   ];
-  const people = [
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    // More people...
-  ];
+  const [delegationStatus, setDelegationStatus] = useState({});
   const [Details, setDetails] = useState(false);
   const [showPopUp, setShowPopUp] = useState(false);
   const Status = [
@@ -328,8 +299,6 @@ const TaskPage = () => {
       }
     }
   }, []);
-  // const taskId = "66646ed63b4dbc2fc5fe9596";
-  // const userId = "666435387431e9b597dd7282";
 
   const fetchTask = async (taskId) => {
     try {
@@ -361,6 +330,7 @@ const TaskPage = () => {
   };
   const [reloadAssigned, setReloadAssigned] = useState(false);
   const [reloadComments, setReloadComments] = useState(false);
+  const [reloadDelegation, setReloadDelegation] = useState(false);
   useEffect(() => {
     fetchTask(taskId);
     fetchComments(taskId);
@@ -373,10 +343,12 @@ const TaskPage = () => {
   useEffect(() => {
     fetchTask(taskId);
     fetchComments(taskId);
-  }, [reloadAssigned]);
+  }, [reloadAssigned, reloadDelegation, reload]);
 
   useEffect(() => {
-    if (taskData) fetchTeam(taskData?.team?._id);
+    if (taskData?.team?._id){ 
+      fetchTeam(taskData?.team?._id);
+    }
   }, [taskData]);
 
   const assignTask = async (person) => {
@@ -408,6 +380,74 @@ const TaskPage = () => {
       console.error("Erreur lors de la mise à jour de la tache :", error);
     }
   };
+
+  const delegatedTask = async (person) => {
+    try {
+      const response = await axiosInstance.post(`/delegation/delegations`, {
+        sendby: userInfo?._id,
+        sendto: person._id,
+        task: taskData?._id,
+        team: taskData?.team?._id,
+        organisation: organization?._id,
+      });
+      const delegDat = response.data;
+      console.log("demande delegation = ", response.data);
+      const notificationContent = {
+        message: `"${person.nom} ${person.prenom}" vous a envoyé une demande pour vous déléguer la tâche "${taskData?.Name}".`,
+        url: JSON.stringify(taskData), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const response1 = await axiosInstance.post(
+        "/notification/notifications",
+        {
+          recipients: [person._id],
+          content: notificationContent,
+          type: "delegation",
+          organization: organization?._id,
+          seen: [{ userId: person._id, seen: false }],
+        }
+      );
+      console.log("notif = ", response1.data);
+      setReloadDelegation(!reloadDelegation);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tache :", error);
+    }
+  };
+
+
+  const loadDelegationStatuses = async () => {
+    const statuses = {};
+    for (const person of teamMembres) {
+      try {
+        const response = await axiosInstance.get(`/delegation/delegations`, {
+          params: {
+            sendto: person._id,
+            task: taskData?._id,
+          },
+        });
+        statuses[person._id] = response.data.length > 0;
+        if(response.data.length > 0 && person._id === response.data[0].sendto._id && person._id === userInfo?._id && response.data[0].accepted === false && response.data[0].annuler === false){
+          const fullName = `${response.data[0].sendby.nom} ${response.data[0].sendby.prenom}`
+          setUserFullName(fullName)
+          setUserId(response.data[0].sendby._id)
+          setIdDelegation(response.data[0]._id)
+          setShowDelegationRequest(true)
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération du statut de délégation :", error);
+        statuses[person._id] = false;
+      }
+    }
+    setDelegationStatus(statuses);
+    // if(delegationStatus[userInfo?._id]){
+    //   setShowDelegationRequest(true)
+    // }
+  };
+
+  useEffect(() => {
+    if (teamMembres && taskData) {
+      loadDelegationStatuses();
+    }
+  }, [teamMembres, taskData]);
 
   const fetchComments = async (taskId) => {
     try {
@@ -651,6 +691,25 @@ const TaskPage = () => {
     return (
       <div className="bg-[url('/BG.jpeg')] ">
         <NavBarAuth />
+        {showDelegationRequest && taskData?.status === "Todo" && (
+                <div className="notification text-center bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">{userFullName} vous a envoyé une demande de délégation de cette tâche.</span>
+                    <div className="mt-2 flex justify-center space-x-2">
+                        <button 
+                            onClick={handleAccept} 
+                            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 flex items-center">
+                            <FaCheck className="mr-2" />
+                            Accepter
+                        </button>
+                        <button 
+                            onClick={handleDecline} 
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <FaTimes className="mr-2" />
+                            Refuser
+                        </button>
+                    </div>
+                </div>
+            )}
         <div
           style={{ height: "90vh" }}
           className="   mx-auto flex justify-center items-center ">
@@ -905,7 +964,7 @@ const TaskPage = () => {
                               />
                             </Menu.Button>
                           </div>
-                          {((userInfo?.role === "employee" || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
+                          {(((userInfo?.role === "employee" && userInfo?._id === taskData?.affectedto._id) || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-100"
@@ -1473,7 +1532,7 @@ const TaskPage = () => {
                             />
                           </Menu.Button>
                         </div>
-                        {((userInfo?.role === "employee" || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
+                        {(((userInfo?.role === "employee" && userInfo?._id === taskData?.affectedto?._id) || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-100"
@@ -1610,12 +1669,12 @@ const TaskPage = () => {
                           {Assigned ? (
                             <div className="flex">
                               <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                {taskData?.affectedto.nom[0].toUpperCase()}
-                                {taskData?.affectedto.prenom[0].toUpperCase()}
+                                {taskData?.affectedto?.nom[0].toUpperCase()}
+                                {taskData?.affectedto?.prenom[0].toUpperCase()}
                               </button>
                               <p>
-                                {taskData?.affectedto.nom}{" "}
-                                {taskData?.affectedto.prenom}
+                                {taskData?.affectedto?.nom}{" "}
+                                {taskData?.affectedto?.prenom}
                               </p>
                             </div>
                           ) : (
@@ -1624,7 +1683,7 @@ const TaskPage = () => {
                                 <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
                                 <p>
                                   {taskData?.affectedto
-                                    ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}`
+                                    ? `${taskData?.affectedto?.nom} ${taskData?.affectedto?.prenom}`
                                     : "Unassigned"}
                                 </p>
                               </div>
@@ -1857,32 +1916,44 @@ const TaskPage = () => {
                 </svg>
               </button>
             </div>
-            <div className="px-2 w-full h-[80vh]  overflow-auto costumScrollBar">
-              {people.map((person) => (
-                <li key={person.name}>
-                  <div className=" rounded-md px-2 py-2 cursor-pointer  flex items-center justify-between mb-2 gap-x-6">
-                    <div className="flex items-center">
-                      <img
-                        className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
-                        src={person.imageUrl}
-                        alt=""
-                      />
-                      <div className="flex flex-col justify-center">
-                        <h3 className="text-base font-semibold  tracking-tight text-gray-900">
-                          {person.name}
-                        </h3>
-                        <p className="text-sm md:font-semibold truncate   text-indigo-600">
-                          walidchebbab2001@gmail.com
-                        </p>
+            <div className="px-2 w-full h-[80vh] overflow-auto costumScrollBar">
+              {teamMembres?.map((person, index) => (
+                person._id !== userInfo._id && (
+                  <div
+                    key={index}
+                    className="border-b-2 border-gray-400 w-full my-2 rounded-xl flex justify-between items-center p-2">
+                    <div className="flex">
+                      <div className="flex flex-col justify-center items-center text-sm font-semibold text-gray-800">
+                        <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          {person.nom[0].toUpperCase()} {person.prenom[0].toUpperCase()}
+                        </button>
+                      </div>
+                      <div className="flex flex-col justify-center ml-4">
+                        <div className="truncate text-sm text-gray-600">
+                          {person.nom} {person.prenom}
+                        </div>
+                        <div className="truncate text-gray-800 font-semibold text-sm">
+                          {person.email}
+                        </div>
                       </div>
                     </div>
-                    {sent ? (
-                      <GrValidate className="text-green-400 h-6 w-6" />
-                    ) : (
-                      <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
-                    )}
+
+                    <div className="flex justify-center items-center">
+                      {delegationStatus[person._id] === undefined ? (
+                        <span>Chargement...</span>
+                      ) : delegationStatus[person._id] ? (
+                        <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-gray-600 hover:text-blue-500 focus:outline-none"
+                          onClick={() => delegatedTask(person)}>
+                          Delegate to
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </li>
+                )
               ))}
             </div>
           </div>
