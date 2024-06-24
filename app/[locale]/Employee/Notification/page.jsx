@@ -13,99 +13,170 @@ import {
 } from "react-icons/fa";
 import "./style.css";
 import ProtectedRoute from "@/components/ProtectedRoute";
-
+import axios from "axios";
 import NotificationListElement from "@/components/NotificationListElement";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+
+
+
 const Notification = () => {
-  const notifications = [
-    {
-      id: 1,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "project",
-      isRead: false,
-    },
-    {
-      id: 2,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "task",
-      isRead: true,
-    },
-    {
-      id: 3,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "reminder",
-      isRead: false,
-    },
-    {
-      id: 4,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "message",
-      isRead: false,
-    },
-    {
-      id: 1,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "project",
-      isRead: false,
-    },
-    {
-      id: 2,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "task",
-      isRead: true,
-    },
-    {
-      id: 3,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "reminder",
-      isRead: false,
-    },
-    {
-      id: 4,
-      date: new Date("2021-12-25T10:30:00"),
-      content:
-        "Congratulations on having the most tasks completed at the end of the year! @you #tasks #management",
-      type: "message",
-      isRead: false,
-    },
-    {
-      id: 5,
-      date: new Date("2021-12-20T14:00:00"),
-      content: "Meeting Agenda for Monday",
-      type: "event",
-      isRead: true,
-    },
-    {
-      id: 6,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "team",
-      isRead: false,
-    },
-    {
-      id: 7,
-      date: new Date("2021-12-19T09:15:00"),
-      content: "Weekly update from project team",
-      type: "report",
-      isRead: false,
-    },
-  ];
+  const [notifications, setNotifications] = useState(null);
+  const [reload, setReload] = useState(false);
 
-  const [notificationsList, setNotificationsList] = useState(notifications);
+  const [userInfo, setUserInfo] = useState(null);
+  const [organization, setOrganization] = useState(null);
+  const locale = useLocale();
+  const router = useRouter();
+  
+  const axiosInstance = axios.create({
+    baseURL: "https://back-pfe-master.vercel.app",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  useEffect(() => {
+    console.log("yawwwww rani hnaaa");
+    console.log("localstor = ", localStorage);
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (userinfo && orga) {
+        let userJson = JSON.parse(userinfo);
+        console.log("userJson");
 
-  const handleDeleteNotification = (index) => {
-    setNotificationsList(notificationsList.filter((_, i) => i !== index));
+        console.log(userJson);
+        setUserInfo(userJson);
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      if (userinfo) {
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+      }
+      if (orga) {
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+    }
+  }, [reload]);
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        if (userInfo && organization) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+                organization: organization._id,
+              },
+            }
+          );
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
+        } else {
+          console.error("userInfo or organization is null");
+        }
+      } catch (error) {
+        console.error("Error fetching user notifications:", error);
+        throw error;
+      }
+    };
+
+    if (userInfo) {
+      getNotifications();
+    }
+  }, [reload]);
+  useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        if (userInfo && organization) {
+          // Vérifier si userInfo et organization ne sont pas null
+          const response = await axiosInstance.get(
+            "/notification/notifications",
+            {
+              params: {
+                recipient: userInfo._id,
+                organization: organization._id,
+              },
+            }
+          );
+          const sortedNotifications = response.data.sort(sortByDate);
+          setNotifications(sortedNotifications);
+        } else {
+          console.error("userInfo or organization is null");
+        }
+      } catch (error) {
+        console.error("Error fetching user notifications:", error);
+        throw error;
+      }
+    };
+
+    if (userInfo) {
+      getNotifications();
+    }
+  }, [userInfo, organization]);
+
+  const sortByDate = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+
+  const GotoNotifacations = async (notification) => {
+    switch (notification.type) {
+      case "project":
+        const projectInfo = localStorage.getItem("project");
+        if (projectInfo) {
+          localStorage.removeItem("project");
+        }
+
+        await localStorage.setItem("project", notification?.content?.url);
+        router.push(`/${locale}/Employee/Project/Board`);
+        break;
+      case "task":
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(
+            JSON.parse(notification?.content?.url)._id
+          )}`
+        );
+        break;
+      case "comment":
+        router.push(
+          `/${locale}/Employee/Task?task=${JSON.stringify(
+            JSON.parse(notification?.content?.url)._id
+          )}`
+        );
+        break;
+      case "invitation":
+        router.push(
+          `/${locale}/Employee/Invitation?invitation=${notification?.content?.url}`
+        );
+        break;
+      default:
+        break;
+    }
+    if (!notification?.seen?.seen) {
+      try {
+        const response = await axiosInstance.patch(
+          "/notification/notifications",
+          {
+            notificationId: notification?._id,
+            userId: userInfo._id,
+          }
+        );
+        console.log("notification mis à jour");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    setReload(!reload);
   };
 
   return (
@@ -116,11 +187,11 @@ const Notification = () => {
         style={{ height: "90vh" }}
         className="flex flex-col items-center bg-white  overflow-auto costumScrollBar shadow-md  px-4">
         <div className=" w-full text-black text-2xl px-4 my-4  font-semibold">
-          Notifications :
+          Notifications ({notifications ? notifications?.length : 0}):
         </div>
-        {notifications.length > 0 ? (
-          notifications.map((notification, index) => (
-            <NotificationListElement key={index} notification={notification} />
+        {notifications?.length > 0 ? (
+          notifications?.map((notification, index) => (
+            <NotificationListElement key={index} notification={notification} GotoNotifacations={GotoNotifacations}/>
           ))
         ) : (
           <div className="w-full rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center text-gray-500 border-gray-600  border-2 border-dashed">

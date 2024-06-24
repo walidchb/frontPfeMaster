@@ -5,7 +5,7 @@ import "./style.css";
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Loader from "@/components/Loader";
-const KanbanBoard = ({ project, user, teamId }) => {
+const KanbanBoard = ({ project, user, teamId, role }) => {
   const axiosInstance = axios.create({
     baseURL: "https://back-pfe-master.vercel.app",
     headers: {
@@ -16,7 +16,7 @@ const KanbanBoard = ({ project, user, teamId }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       let taskIds;
-      switch (user?.role) {
+      switch (role) {
         case "employee":
           taskIds = project.tasks
             ?.filter((task) => task?.affectedto === user._id)
@@ -43,7 +43,7 @@ const KanbanBoard = ({ project, user, teamId }) => {
     };
 
     fetchTasks();
-  }, [project, user, teamId]);
+  }, [project, user, teamId, role]);
 
   const onDragOver = (e) => {
     e.preventDefault(); // Nécessaire pour permettre le drop

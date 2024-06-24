@@ -29,12 +29,22 @@ const fetchUsers = async (organizationId) => {
   try {
     const response = await axiosInstance.get("/user/users", {
       params: {
-        organizations: organizationId,
-        role: "prjctBoss",
+        "roles.role": "prjctBoss",
+        "roles.organization": organizationId,
       },
     });
     const users = response.data;
-    return users;
+    
+    // Filtrage côté client
+    const filteredUsers = users.filter(user => 
+      user.roles.some(role => 
+        role.role === "prjctBoss" && 
+        role.organization && 
+        role.organization._id === organizationId
+      )
+    );
+
+    return filteredUsers;
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs :", error);
     return [];

@@ -19,7 +19,7 @@ function About() {
               <div className="col-md-6">
                 <h2>À propos de nous</h2>
                 <p>
-                  Notre entreprise a été fondée en 2018 avec pour mission de
+                  Notre entreprise a été fondée en 2023 avec pour mission de
                   fournir des solutions logicielles innovantes pour simplifier
                   la vie des gens. Nous croyons en la puissance de la
                   technologie pour résoudre les problèmes du monde moderne.
