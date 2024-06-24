@@ -6,10 +6,12 @@ import axios from "axios";
 import UserCard from "../userCard";
 
 function TeamPage() {
-  // const findObjectById = (array, id) => {
-  //   return array.find((obj) => obj.id === id);
-  // };
-  // <<<<<<< HEAD
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   const [team, setTeam] = useState({});
   const [teamId, setTeamId] = useState(null);
   const [people, setPeople] = useState([]);
@@ -44,12 +46,6 @@ function TeamPage() {
 
   useEffect(() => {
     const getTeams = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
       try {
         const response = await axiosInstance.get("/team/teams", {
           params: {
@@ -64,18 +60,12 @@ function TeamPage() {
         console.error("Error:", error);
       }
     };
-
-    getTeams();
-    // <<<<<<< HEAD
+    if (teamId) {
+      getTeams();
+    }
   }, [teamId]);
   useEffect(() => {
     const getTeamMembers = async () => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
       try {
         const response = await axiosInstance.get("/user/users", {
           params: {

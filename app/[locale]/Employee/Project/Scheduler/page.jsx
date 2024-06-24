@@ -19,6 +19,7 @@ function Scheduler() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [projectId, setProjectId] = useState(null);
   const [userInfo, setUserInfo] = useState({});
+  const [userRole, setUserRole] = useState("");
   const [project, setProject] = useState({});
   const [reload, setReload] = useState(false);
   const [organization, setOrganization] = useState({});
@@ -33,9 +34,11 @@ function Scheduler() {
       const orga = localStorage.getItem("organization");
       const projectinfo = localStorage.getItem("project");
       const userinfo = localStorage.getItem("userInfo");
-      if (userinfo && orga && projectinfo) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && projectinfo && role) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
         let projectJson = JSON.parse(projectinfo);
         setProjectId(projectJson?._id);
         let orgaJson = JSON.parse(orga);
@@ -50,7 +53,22 @@ function Scheduler() {
   }, []);
   useEffect(() => {
     let Tasks;
-    switch (userInfo?.role) {
+    // <<<<<<< HEAD
+    // switch (userInfo?.role) {
+    // case "employee":
+    //   Tasks = project.tasks
+    //     ?.filter((task) => task?.affectedto === userInfo?._id)
+    //     .map((task) => task);
+    //   setTasks(Tasks);
+    //   break;
+    // case "teamBoss":
+    //   Tasks = project.tasks
+    //     ?.filter((task) => task?.team === teamId)
+    //     .map((task) => task);
+    //   setTasks(Tasks);
+    //   break;
+    // =======
+    switch (userRole) {
       // case "employee":
       //   Tasks = project.tasks
       //     ?.filter((task) => task?.affectedto === userInfo?._id)
@@ -63,6 +81,7 @@ function Scheduler() {
       //     .map((task) => task);
       //   setTasks(Tasks);
       //   break;
+      // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
       default:
         console.log("project tasks =", project.tasks);
         Tasks = project.tasks;
@@ -76,7 +95,7 @@ function Scheduler() {
     // } catch (error) {
     //   console.error("Erreur lors de la récupération des tâches :", error);
     // }
-  }, [project, userInfo, teamId]);
+  }, [project, userInfo, teamId, userRole]);
   const axiosInstance = axios.create({
     baseURL: "http://localhost:1937",
     headers: {

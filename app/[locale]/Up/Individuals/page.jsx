@@ -27,14 +27,25 @@ import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/config";
 import { useRouter } from "next/navigation";
 
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:1937",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 const deleteUser = async (email) => {
   try {
-    const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // <<<<<<< HEAD
+    //     const axiosInstance = axios.create({
+    //       baseURL: "http://localhost:1937",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+    // =======
+
+    // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
     const response = await axiosInstance.delete(`/user/users?email=${email}`, {
       // Optional headers (e.g., authentication tokens)
     });
@@ -119,16 +130,19 @@ function Individuals() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values, actions) => {
-      // alert(JSON.stringify(values, null, 2));
-      // console.log(JSON.stringify(values, null, 2));
-      // Create an instance of Axios with default headers
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // <<<<<<< HEAD
+      //       // alert(JSON.stringify(values, null, 2));
+      //       // console.log(JSON.stringify(values, null, 2));
+      //       // Create an instance of Axios with default headers
+      //       const axiosInstance = axios.create({
+      //         baseURL: "http://localhost:1937",
+      //         headers: {
+      //           "Content-Type": "application/json",
+      //         },
+      //       });
 
+      // =======
+      // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
       // Function to send the POST request
       const sendUserData = async (values) => {
         try {
@@ -136,7 +150,7 @@ function Individuals() {
             nom: values.firstName,
             prenom: values.lastName,
             email: values.email,
-            role: "individual",
+            roles: [{ role: "individual", organization: null }],
             phoneNumber: values.phoneNumber,
             gender: values.gender,
             password: values.password,
@@ -157,8 +171,13 @@ function Individuals() {
           createUserWithEmailAndPassword(auth, values.email, values.password)
             .then(async (res) => {
               console.log("sucess");
+              localStorage.removeItem("organization");
+              localStorage.removeItem("user");
+              localStorage.removeItem("userInfo");
+              localStorage.removeItem("userRole");
               localStorage.setItem("user", true);
               await localStorage.setItem("userInfo", JSON.stringify(userInfo));
+              await localStorage.setItem("userRole", "individual");
               dispatch(setUserInfo(userInfo));
 
               console.log(res);
@@ -407,13 +426,13 @@ function Individuals() {
           </form>
         </div>
 
-        <h1 className="mb-4 text-l">or continue with :</h1>
+        {/*<h1 className="mb-4 text-l">or continue with :</h1>
         <button
           type="button"
           className="w-5/6   text-white   bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between dark:focus:ring-[#4285F4]/55 mr-2 mb-2">
           <FaGoogle className="mr-2 -ml-1 w-4 h-4" />
           Sign up with Google<div></div>
-        </button>
+        </button>*/}
         <p className="w-8/12 text-gray-600 text-center ">
           Have an Account ?{" "}
           <Link

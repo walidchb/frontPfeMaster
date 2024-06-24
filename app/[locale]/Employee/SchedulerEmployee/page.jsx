@@ -16,6 +16,7 @@ import axios from "axios";
 function SchedulerEmployee() {
   const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
   const [userInfo, setUserInfo] = useState({});
+  const [userRole, setUserRole] = useState("");
   const [reload, setReload] = useState(false);
   const [organization, setOrganization] = useState({});
   const [teamId, setTeamId] = useState("");
@@ -28,11 +29,13 @@ function SchedulerEmployee() {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && role) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
+        setUserRole(role);
 
         const team = userJson?.team.find(
           (obj) => obj.Organization === orgaJson._id
@@ -43,7 +46,7 @@ function SchedulerEmployee() {
   }, []);
   useEffect(() => {
     const fetchTasks = async () => {
-      switch (userInfo?.role) {
+      switch (userRole) {
         case "employee":
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {

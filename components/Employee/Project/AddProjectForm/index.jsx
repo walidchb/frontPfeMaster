@@ -39,12 +39,23 @@ const fetchUsers = async (organizationId) => {
   try {
     const response = await axiosInstance.get("/user/users", {
       params: {
-        organizations: organizationId,
-        role: "prjctBoss",
+        "roles.role": "prjctBoss",
+        "roles.organization": organizationId,
       },
     });
     const users = response.data;
-    return users;
+
+    // Filtrage côté client
+    const filteredUsers = users.filter((user) =>
+      user.roles.some(
+        (role) =>
+          role.role === "prjctBoss" &&
+          role.organization &&
+          role.organization._id === organizationId
+      )
+    );
+
+    return filteredUsers;
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs :", error);
     return [];
@@ -70,7 +81,7 @@ const AddProjectForm = ({
   const locale = useLocale();
 
   function invitationSent(array, value) {
-    return array.some((item) => item.sendto._id === value);
+    return array.some((item) => item?.sendto?._id === value);
   }
 
   const handlePopupClose = () => {
@@ -90,11 +101,8 @@ const AddProjectForm = ({
       const teams = await fetchTeams(organization?._id);
       console.log("teams = ", teams);
       const users = await fetchUsers(organization?._id);
-      const projectBossesAndEmployees = users.filter(
-        (user) => user.role === "prjctBoss" || user.role === "employee"
-      );
       setAvailableTeams(teams);
-      setAvailableUsers(projectBossesAndEmployees);
+      setAvailableUsers(users);
     };
 
     fetchData();
@@ -204,7 +212,7 @@ const AddProjectForm = ({
     console.log(organization);
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss?._id,
+        sendby: organization?.Boss,
         sendto: person._id,
         roleinvitedto: "prjctBoss",
         organisation: organization?._id,
@@ -219,124 +227,102 @@ const AddProjectForm = ({
   };
 
   // get invitations
-  useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
+  // <<<<<<< HEAD
+  //   useEffect(() => {
+  //     const getinvitations = async (values) => {
+  //       const axiosInstance = axios.create({
+  //         baseURL: "http://localhost:1937",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  // =======
+  const getinvitations = async (values) => {
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    try {
+      const response = await axiosInstance.get("/invitation/invitations", {
+        params: {
+          organisation: organization?._id,
+          // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         },
       });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
+      console.log("invitaions");
 
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+      console.log(response.data);
+      setInvitaions(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  useEffect(() => {
     getinvitations();
   }, []);
+  //   useEffect(() => {
+  // <<<<<<< HEAD
+  //     const getinvitations = async (values) => {
+  //       const axiosInstance = axios.create({
+  //         baseURL: "http://localhost:1937",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+  //       const organization = JSON.parse(localStorage.getItem("organization"));
+  //       try {
+  //         const response = await axiosInstance.get("/invitation/invitations", {
+  //           params: {
+  //             organisation: organization?._id,
+  //           },
+  //         });
+  //         console.log("invitaions");
+
+  //         console.log(response.data);
+  //         setInvitaions(response.data);
+  //       } catch (error) {
+  //         console.error("Error:", error);
+  //       }
+  //     };
+
+  //     getinvitations();
+  //   }, [reloadInvit]);
+
   useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
-
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+    //     const getPeople = async (values) => {
+    //       const axiosInstance = axios.create({
+    //         baseURL: "http://localhost:1937",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    // =======
     getinvitations();
   }, [reloadInvit]);
 
-  useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
+  const getPeople = async (values) => {
+    const roles = ["prjctBoss", "teamBoss", "employee", "individual"]; // Vous pouvez ajuster cette liste selon vos besoins
+
+    try {
+      const response = await axiosInstance.get("/user/users", {
+        params: {
+          roles: roles.join(","),
+          // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         },
       });
-      const roles = ["prjctBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
+      const filterPeopleNotInOrganization = response.data.filter(
+        (user) =>
+          !user.roles.some(
+            (role) =>
+              role.organization && role.organization._id === organization?._id
+          )
+      );
 
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
+      console.log("people ", filterPeopleNotInOrganization);
+      setAllPeople(filterPeopleNotInOrganization);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+  useEffect(() => {
     getPeople();
   }, []);
 
   useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const roles = ["prjctBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
-
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
-
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
     getPeople();
   }, [personFetched]);
 

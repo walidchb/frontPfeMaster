@@ -5,7 +5,7 @@ import "./style.css";
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Loader from "@/components/Loader";
-const KanbanBoard = ({ project, user, teamId }) => {
+const KanbanBoard = ({ project, user, teamId, role }) => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:1937",
     headers: {
@@ -16,7 +16,20 @@ const KanbanBoard = ({ project, user, teamId }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       let taskIds;
-      switch (user?.role) {
+      // <<<<<<< HEAD
+      //       switch (user?.role) {
+      // case "employee":
+      //   taskIds = project.tasks
+      //     ?.filter((task) => task?.affectedto === user._id)
+      //     .map((task) => task._id);
+      //   break;
+      // case "teamBoss":
+      //   taskIds = project.tasks
+      //     ?.filter((task) => task?.team === teamId)
+      //     .map((task) => task._id);
+      //   break;
+      // =======
+      switch (role) {
         // case "employee":
         //   taskIds = project.tasks
         //     ?.filter((task) => task?.affectedto === user._id)
@@ -27,6 +40,7 @@ const KanbanBoard = ({ project, user, teamId }) => {
         //     ?.filter((task) => task?.team === teamId)
         //     .map((task) => task._id);
         //   break;
+        // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         default:
           taskIds = project.tasks?.map((task) => task._id);
           break;
@@ -43,7 +57,7 @@ const KanbanBoard = ({ project, user, teamId }) => {
     };
 
     fetchTasks();
-  }, [project, user, teamId]);
+  }, [project, user, teamId, role]);
 
   const onDragOver = (e) => {
     e.preventDefault(); // Nécessaire pour permettre le drop

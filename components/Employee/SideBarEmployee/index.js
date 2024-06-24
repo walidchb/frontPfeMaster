@@ -21,12 +21,14 @@ function classNames(...classes) {
 
 function SideBarEmployee({ fromEmployee, currentPage }) {
   const [user, setUser] = useState({});
+  const [userRole, setUserRole] = useState("");
 
   
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
-    
+    const role = localStorage.getItem("userRole");
     setUser(user);
+    setUserRole(role);
   }, []);
 
   const locale = useLocale();
@@ -110,7 +112,7 @@ function SideBarEmployee({ fromEmployee, currentPage }) {
           </li> */}
         </ul>
       </div>
-      {user?.role != "orgBoss" ? (
+      {userRole != "orgBoss" && userRole != "prjctBoss" ? (
         <li
           onClick={() => router.push(`/${locale}/Employee/TeamEmployee`)}
           className={`flex justify-center cursor-pointer items-center flex-col

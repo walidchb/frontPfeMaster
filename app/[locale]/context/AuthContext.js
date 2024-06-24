@@ -8,6 +8,7 @@ import { setOrganization } from "@/store/features/organization/organizationSlice
 // Assuming you have a userSlice.js file
 import { auth } from "../firebase/config";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 
 import {
   signInWithEmailAndPassword,
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   const locale = useLocale();
-
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,84 +36,92 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    // <<<<<<< HEAD
     // const dispatch = useDispatch();
+    // try {
+    //   setLoading(true);
+    //   await signInWithEmailAndPassword(auth, email, password);
+    //   console.log("signed is");
+    //   console.log(email);
+    //   const axiosInstance = axios.create({
+    //     baseURL: "http://localhost:1937",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    // =======
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("signed is");
-      console.log(email);
+      console.log("signed in");
+
       const axiosInstance = axios.create({
         baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      try {
-        const response = await axiosInstance.get("/user/me", {
-          params: {
-            email: email,
-          },
-        });
 
-        let user = response.data;
-        await localStorage.setItem("userInfo", JSON.stringify(user));
-        dispatch(setUserInfo(user)); // Dispatch action with fetched data
-        if (user?.role === "orgBoss") {
-          try {
-            const response = await axiosInstance.get(
-              "/organization/organizations",
-              {
-                params: {
-                  Boss: user._id,
-                },
-              }
-            );
-            console.log("organization to dispatch");
+      const response = await axiosInstance.get("/user/me", {
+        params: { email: email },
+      });
 
-            console.log(response.data[0]);
-            dispatch(setOrganization(response.data[0]));
+      let user = response.data;
+      await localStorage.setItem("userInfo", JSON.stringify(user));
+      dispatch(setUserInfo(user));
+
+      // Check user role
+      const userRole = user.roles[0]?.role; // Assuming the first role is the primary role
+
+      // Store userRole in localStorage
+      localStorage.setItem("userRole", userRole);
+
+      if (userRole === "orgBoss") {
+        const orgResponse = await axiosInstance.get(
+          "/organization/organizations",
+          {
+            params: { Boss: user._id },
+            // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
+          }
+        );
+
+        if (orgResponse.data[0]) {
+          dispatch(setOrganization(orgResponse.data[0]));
+          await localStorage.setItem(
+            "organization",
+            JSON.stringify(orgResponse.data[0])
+          );
+        }
+
+        router.push(`/${locale}/Employee/BoardEmployee`);
+      } else if (userRole === "individual") {
+        router.push(`/${locale}/Employee/BoardEmployee`);
+      } else {
+        // For other roles (employee, teamBoss, prjctBoss)
+        if (user.roles[0]?.organization) {
+          const orgResponse = await axiosInstance.get(
+            "/organization/organizations",
+            {
+              params: { _id: user.roles[0].organization._id },
+            }
+          );
+
+          if (orgResponse.data[0]) {
+            dispatch(setOrganization(orgResponse.data[0]));
             await localStorage.setItem(
               "organization",
-              JSON.stringify(response.data[0])
+              JSON.stringify(orgResponse.data[0])
             );
-
-            sessionStorage.setItem("user", true);
-            localStorage.setItem("user", true);
-            router.push(`/${locale}/Employee/BoardEmployee`);
-            // dispatch(setUser(response.data)); // Dispatch action with fetched data
-          } catch (error) {
-            console.error("Error:", error);
           }
         }
-        if (user?.role === "individual") {
-          router.push(`/${locale}/Employee/BoardEmployee`);
-        } else {
-          try {
-            const response = await axiosInstance.get(
-              "/organization/organizations",
-              {
-                params: {
-                  _id: user?.organizations[0]?._id,
-                },
-              }
-            );
 
-            dispatch(setOrganization(response.data[0]));
-            await localStorage.setItem(
-              "organization",
-              JSON.stringify(response.data[0])
-            );
-            router.push(`/${locale}/Employee/BoardEmployee`);
-          } catch (error) {
-            console.error("Error:", error);
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
+        router.push(`/${locale}/Employee/BoardEmployee`);
       }
+
+      sessionStorage.setItem("user", "true");
+      localStorage.setItem("user", "true");
     } catch (error) {
-      // Handle error (e.g., show error message to the user)
       console.error("Error logging in:", error);
+      // Handle error (e.g., show error message to the user)
     } finally {
       setLoading(false);
     }
@@ -126,6 +135,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("userInfo");
     localStorage.removeItem("organization");
+    localStorage.removeItem("userRole");
 
     setLoading(false);
   };

@@ -36,15 +36,23 @@ function TeamsPage() {
   const [userCardInfo, setUserCardInfo] = useState({});
   const [allPeople, setAllPeople] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-
+  const [userRole, setUserRole] = useState("");
   const [personFetched, setPersonFetched] = useState(false);
   const [organization, setOrganization] = useState({}); // State to trigger rerender
   const [userInfo, setUserInfo] = useState({});
+
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const orga = localStorage.getItem("organization");
       const userinfo = localStorage.getItem("userInfo");
+      const role = localStorage.getItem("userRole");
       console.log("orgaJson");
 
       console.log(orga);
@@ -60,39 +68,44 @@ function TeamsPage() {
         setOrganization(orgaJson);
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
       }
     }
   }, []);
   const [reload, setReload] = useState(false); // State to trigger rerender
   const [invitaions, setInvitaions] = useState([]);
   // get invitations
-  useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
+  // <<<<<<< HEAD
+  // useEffect(() => {
+  //   const getinvitations = async (values) => {
+  // const axiosInstance = axios.create({
+  //   baseURL: "http://localhost:1937",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  // =======
+  const getinvitations = async (values) => {
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    try {
+      const response = await axiosInstance.get("/invitation/invitations", {
+        params: {
+          organisation: organization?._id,
+          // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         },
       });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
+      console.log("invitaions");
 
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+      console.log(response.data);
+      setInvitaions(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
+  useEffect(() => {
     getinvitations();
   }, []);
   useEffect(() => {
+    // <<<<<<< HEAD
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
         baseURL: "http://localhost:1937",
@@ -116,59 +129,75 @@ function TeamsPage() {
       }
     };
 
+    // =======
+    // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
     getinvitations();
   }, [reload]);
 
   //  get jsp
-  useEffect(() => {
-    const getTeams = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      if (userInfo?.role === "orgBoss") {
-        try {
-          const response = await axiosInstance.get("/team/teams", {
-            params: {
-              Organization: organization?._id,
-            },
-          });
-          console.log("teams from orgboss");
+  // <<<<<<< HEAD
+  // useEffect(() => {
+  //   const getTeams = async (values) => {
+  //     const axiosInstance = axios.create({
+  //       baseURL: "http://localhost:1937",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const organization = JSON.parse(localStorage.getItem("organization"));
+  //     if (userInfo?.role === "orgBoss") {
+  //       try {
+  //         const response = await axiosInstance.get("/team/teams", {
+  //           params: {
+  //             Organization: organization?._id,
+  //           },
+  //         });
+  //         console.log("teams from orgboss");
+  // =======
+  const getTeams = async (values) => {
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    if (userRole === "orgBoss") {
+      try {
+        const response = await axiosInstance.get("/team/teams", {
+          params: {
+            Organization: organization?._id,
+          },
+        });
+        console.log("teams from orgboss");
+        // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
 
-          console.log(response.data);
-          setTeams(response.data);
+        console.log(response.data);
+        setTeams(response.data);
 
-          // Create an array of false values with the same length as response.data
-          const newShowTeam = new Array(response.data.length).fill(false);
-          setShowTeam(newShowTeam);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      } else if (userInfo?.role === "prjctBoss") {
-        try {
-          const response = await axiosInstance.get("/team/teamsByBoss", {
-            params: {
-              projectBossId: userInfo?._id,
-            },
-          });
-          console.log("teams");
-
-          console.log(response.data);
-          setTeams(response.data);
-
-          // Create an array of false values with the same length as response.data
-          const newShowTeam = new Array(response.data.length).fill(false);
-          setShowTeam(newShowTeam);
-        } catch (error) {
-          console.error("Error:", error);
-        }
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
       }
-    };
+    } else if (userRole === "prjctBoss") {
+      try {
+        const response = await axiosInstance.get("/team/teamsByBoss", {
+          params: {
+            projectBossId: userInfo?._id,
+          },
+        });
+        console.log("teams");
 
+        console.log(response.data);
+        setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+  useEffect(() => {
     getTeams();
+    // <<<<<<< HEAD
   }, [userInfo, organization, reload]);
   // useEffect(() => {
   //   const getTeams = async (values) => {
@@ -220,158 +249,52 @@ function TeamsPage() {
 
   //   getTeams();
   // }, [reload]);
-  const people = [
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    // More people...
-  ];
-  useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
+
+  //   useEffect(() => {
+  //     // const getPeople = async (values) => {
+  //     //   const axiosInstance = axios.create({
+  //     //     baseURL: "http://localhost:1937",
+  //     //     headers: {
+  //     //       "Content-Type": "application/json",
+  // // =======
+  //   }, [userInfo, organization, userRole, reload]);
+
+  const getPeople = async (values) => {
+    const roles = ["prjctBoss", "teamBoss", "employee", "individual"]; // Vous pouvez ajuster cette liste selon vos besoins
+
+    try {
+      const response = await axiosInstance.get("/user/users", {
+        params: {
+          roles: roles.join(","),
+          // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         },
       });
-      const roles = ["employee", "teamBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
+      const filterPeopleNotInOrganization = response.data.filter(
+        (user) =>
+          !user.roles.some(
+            (role) =>
+              role.organization && role.organization._id === organization?._id
+          )
+      );
 
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
+      console.log("people ", filterPeopleNotInOrganization);
+      setAllPeople(filterPeopleNotInOrganization);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    getPeople();
-  }, []);
   useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const roles = ["employee", "teamBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
+    if (organization?._id) {
+      getPeople();
+    }
+  }, [organization, userInfo, userRole]);
 
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
-
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    getPeople();
+  useEffect(() => {
+    if (organization?._id) {
+      getPeople();
+    }
+    // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
   }, [personFetched]);
 
   const [teamLead, setTeamLead] = useState(true);
@@ -383,15 +306,19 @@ function TeamsPage() {
   const [showCreateNewTeam, setShowCreateNewTeam] = useState(false);
   const initialValues = { teamName: "" };
   function invitationSent(array, value) {
-    return array.some((item) => item.sendto._id === value);
+    return array.some((item) => item?.sendto?._id === value);
   }
   const handleSubmit = async (values, { setSubmitting }) => {
-    const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // <<<<<<< HEAD
+    //     const axiosInstance = axios.create({
+    //       baseURL: "http://localhost:1937",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+    // =======
+
+    // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
     try {
       const response = await axiosInstance.post("/team/teams", {
         Name: values.teamName,
@@ -412,12 +339,6 @@ function TeamsPage() {
 
   const initialValuesSearchPerson = { email: "" };
   const handleSubmitSearchPerson = async (values, { setSubmitting }) => {
-    const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
     try {
       const response = await axiosInstance.get("/user/users", {
         params: {
@@ -439,16 +360,9 @@ function TeamsPage() {
   };
 
   const sendInvitaion = async (person) => {
-    console.log(organization);
-    const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss?._id,
+        sendby: organization?.Boss,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,
@@ -466,12 +380,6 @@ function TeamsPage() {
 
   useEffect(() => {
     const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
       try {
         const response = await axiosInstance.get("/user/users", {
           params: {
@@ -491,12 +399,6 @@ function TeamsPage() {
   }, [team]);
 
   const makeUserTeamBoss = async (team, person) => {
-    const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
     console.log(0);
 
     try {
@@ -504,7 +406,12 @@ function TeamsPage() {
       const response = await axiosInstance.patch(
         `/user/users?id=${person?._id}`,
         {
-          role: "teamBoss",
+          roles: [
+            {
+              role: "teamBoss",
+              organization: organization?._id,
+            },
+          ],
         }
       );
       console.log("user updated successfuly");

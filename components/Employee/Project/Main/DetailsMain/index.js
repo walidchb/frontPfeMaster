@@ -58,10 +58,15 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
+  // <<<<<<< HEAD
   const [doneTasks, setDoneTasks] = useState([]);
   const [todoTasks, setTodoTasks] = useState([]);
   const [inreviewTasks, setInreviewTasks] = useState([]);
   const [inprogressTasks, setInprogressTasks] = useState([]);
+  // =======
+  // const [doneTasks, setDoneTasks] = useState(0);
+  const [cancelTasks, setCancelTasks] = useState(0);
+  // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
   const [updateProjectModal, setUpdateProjectModal] = useState(false);
   const [showUpdateProjectForm, setShowUpdateProjectForm] = useState(false);
   const [windowSize, setWindowSize] = useState({
@@ -117,6 +122,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   useEffect(() => {
     console.log(JSON.stringify(project.tasks));
     setDoneTasks(project.tasks.filter((task) => task.status === "Done"));
+    // <<<<<<< HEAD
     setTodoTasks(project.tasks.filter((task) => task.status === "Todo"));
     setInreviewTasks(
       project.tasks.filter((task) => task.status === "Inreview")
@@ -130,6 +136,9 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
         new Date(task.dateFinEstim) < currentDate && task.status !== "Done"
     ).length;
     setPastDueTasks(count);
+    // =======
+    setCancelTasks(project.tasks.filter((task) => task.status === "Cancel"));
+    // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
   }, [project]);
 
   useEffect(() => {
@@ -417,7 +426,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
           </div>
           <ProgressCircle
             completed={doneTasks?.length}
-            total={project.tasks?.length}
+            total={project.tasks?.length - cancelTasks?.length}
           />
         </div>
 

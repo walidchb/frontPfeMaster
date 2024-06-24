@@ -37,6 +37,7 @@ function MainEmployee({ reloadPage }) {
   const [inProgressTasks, setInProgressTasks] = useState([]);
   const [inReviewTasks, setInReviewTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);
+  const [cancelTasks, setCancelTasks] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [reload, setReload] = useState(false); // State to trigger rerender
   const fetchTasks = async (userId) => {
@@ -55,6 +56,7 @@ function MainEmployee({ reloadPage }) {
     setInProgressTasks(tasks.filter((task) => task.status === "Inprogress"));
     setInReviewTasks(tasks.filter((task) => task.status === "Inreview"));
     setDoneTasks(tasks.filter((task) => task.status === "Done"));
+    setCancelTasks(tasks.filter((task) => task.status === "Cancel"));
   };
 
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
@@ -67,13 +69,15 @@ function MainEmployee({ reloadPage }) {
 
   const [userInfo, setUserInfo] = useState({});
   const [organization, setOrganization] = useState({});
+  const [userRole, setUserRole] = useState("");
   const [teamId, setTeamId] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && role) {
         console.log("userinfoooooooooooooooooooooooooooo");
 
         let userJson = JSON.parse(userinfo);
@@ -81,6 +85,7 @@ function MainEmployee({ reloadPage }) {
         setUserInfo(userJson);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
+        setUserRole(role);
 
         const team = userJson?.team?.find(
           (obj) => obj.Organization === orgaJson._id
@@ -90,7 +95,7 @@ function MainEmployee({ reloadPage }) {
     }
   }, []);
   const fetchProjectsAndTasks = async (organizationId, userId) => {
-    if (userInfo?.role === "orgBoss") {
+    if (userInfo && userRole === "orgBoss") {
       try {
         const response = await axiosInstance.get(
           `/project/projects?organization=${organizationId}`
@@ -110,7 +115,7 @@ function MainEmployee({ reloadPage }) {
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
-    } else if (userInfo?.role === "prjctBoss") {
+    } else if (userInfo && userRole === "prjctBoss") {
       try {
         // Récupérer les projets
         const projectsResponse = await axiosInstance.get(
@@ -142,7 +147,7 @@ function MainEmployee({ reloadPage }) {
           error
         );
       }
-    } else if (userInfo?.role === "teamBoss") {
+    } else if (userInfo && userRole === "teamBoss") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
           params: { userId: userId, organizationId: organization?._id },
@@ -159,7 +164,7 @@ function MainEmployee({ reloadPage }) {
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
-    } else if (userInfo?.role === "employee") {
+    } else if (userInfo && userRole === "employee") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
           params: { userId: userInfo?._id, organizationId: organization?._id },
@@ -170,50 +175,13 @@ function MainEmployee({ reloadPage }) {
         const tasksResponse = await axiosInstance.get(`/user/userTasks`, {
           params: {
             userId: userId,
+            organizationId: organization?._id,
             teamId: teamId,
           },
         });
         const tasks = tasksResponse.data;
         setAllTasks(tasks);
         filterTasks(tasks);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    }
-  };
-  const fetchProject = async (organizationId) => {
-    if (userInfo?.role === "orgBoss") {
-      try {
-        const response = await axiosInstance.get(
-          `/project/projects?organization=${organizationId}`
-        );
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    } else if (userInfo?.role === "prjctBoss") {
-      try {
-        const response = await axiosInstance.get(
-          `/project/projects?organization=${organizationId}&boss=${userInfo?._id}`
-        );
-        const response1 = await axiosInstance.get(
-          `/task/userTasks?userId=${userId}`
-        );
-        setAllTasks(response1.data);
-        filterTasks(response1.data);
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    } else {
-      try {
-        const response = await axiosInstance.get(`/user/userProjects`, {
-          params: { userId: userInfo?._id },
-        });
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
@@ -232,8 +200,12 @@ function MainEmployee({ reloadPage }) {
     if (userInfo?._id && organization?._id) {
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
-  }, [organization, userInfo, teamId, reload, reloadPage]);
+    // <<<<<<< HEAD
+    // }, [organization, userInfo, teamId, reload, reloadPage]);
 
+    // =======
+  }, [organization, userInfo, userRole, teamId, reload]);
+  // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
   useEffect(() => {
     function handleResize() {
       // Adjust the number of slides to show based on screen width
@@ -347,6 +319,7 @@ function MainEmployee({ reloadPage }) {
     { value: "In Progress", label: "In Progress" },
     { value: "In Review", label: "In Review" },
     { value: "Done", label: "Done" },
+    { value: "Cancel", label: "Canceled" },
   ];
   const defaultStatus = { value: "worked on", label: "Worked On" };
   const [navigation, setNavigation] = useState([
@@ -354,6 +327,7 @@ function MainEmployee({ reloadPage }) {
     { name: "In Progress", href: "#", current: false },
     { name: "In Review", href: `#`, current: false },
     { name: "Done", href: `#`, current: false },
+    { name: "Canceled", href: `#`, current: false },
   ]);
   const [curScreen, setCurScreen] = useState(0);
   // /const [showAddProjectFrom, setShowAddProjectFrom] = useState(false);
@@ -501,6 +475,20 @@ function MainEmployee({ reloadPage }) {
             ) : curScreen === 3 ? (
               <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
                 Your Task list is empty for "Done" tasks
+              </div>
+            ) : null}
+
+            {curScreen === 4 && cancelTasks.length > 0 ? (
+              cancelTasks.map((task, taskIndex) => (
+                <TaskListElement
+                  key={taskIndex}
+                  task={task}
+                  project={task.projet}
+                />
+              ))
+            ) : curScreen === 4 ? (
+              <div className="w-full my-4 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
+                Your Task list is empty for "Canceled" tasks
               </div>
             ) : null}
           </div>

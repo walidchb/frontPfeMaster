@@ -14,12 +14,24 @@ function Contact() {
       const { name, email, message } = values;
       const subject = `Message de votre application`;
 
+      // <<<<<<< HEAD
       const response = await axios.post("http://localhost:1937/send-email", {
         name,
         email,
         subject,
         message,
       });
+      // =======
+      // const response = await axios.post(
+      //   "http://localhost:1937/send-email",
+      //   {
+      //     name,
+      //     email,
+      //     subject,
+      //     message,
+      //   }
+      // );
+      // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
 
       console.log(response.data);
       alert("Votre message a été envoyé avec succès !");

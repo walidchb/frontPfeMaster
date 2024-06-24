@@ -14,9 +14,11 @@ import {
   FaUserFriends,
   FaExclamationCircle,
   FaUserCircle,
+  FaTimes,
   FaTasks,
   FaClock,
   FaClipboardCheck,
+  FaCheck,
 } from "react-icons/fa";
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
@@ -61,8 +63,71 @@ function classNames(...classes) {
 }
 
 const TaskPage = () => {
+  // <<<<<<< HEAD
   const [showUserCard, setShowUserCard] = useState(false);
   const [userCardInfo, setUserCardInfo] = useState({});
+  // =======
+  const [showDelegationRequest, setShowDelegationRequest] = useState(false);
+  const [userFullName, setUserFullName] = useState("Nom Prénom"); // Remplacez par les données appropriées
+  const [idDelegation, setIdDelegation] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [reload, setReload] = useState(false);
+  const handleAccept = async () => {
+    try {
+      const reponse1 = await axiosInstance.patch(`/task/tasks/${taskId}`, {
+        affectedto: userInfo?._id,
+      });
+      console.log("taskUpdated = ", reponse1.data);
+      const notificationContent = {
+        message: `"${userInfo?.nom} ${userInfo?.prenom}" a accepté votre demande pour lui déléguer la tâche "${taskData?.Name}".`,
+        url: JSON.stringify(taskData), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const reponse2 = await axiosInstance.post("/notification/notifications", {
+        recipients: [userId],
+        content: notificationContent,
+        type: "delegation",
+        organization: organization?._id,
+        seen: [{ userId: userId, seen: false }],
+      });
+      console.log("Notif après accept = ", reponse2.data);
+      const reponse3 = await axiosInstance.patch(
+        `delegation/delegations/${idDelegation}`,
+        {
+          annuler: false,
+          accepted: true,
+        }
+      );
+      console.log("accepter = ", reponse3.data);
+      const reponse4 = await axiosInstance.patch(
+        `delegation/delegations/updateDelegations/${taskData?._id}/${userId}`,
+        {
+          annuler: true,
+          accepted: false,
+        }
+      );
+      setShowDelegationRequest(false);
+      setReload(!reload);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDecline = async () => {
+    try {
+      const reponse = await axiosInstance.patch(
+        `delegation/delegations/${idDelegation}`,
+        {
+          annuler: true,
+          accepted: false,
+        }
+      );
+      console.log("annuler = ", reponse.data);
+      setShowDelegationRequest(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
   const images = [
     {
       original: "/images/team.jpeg",
@@ -95,107 +160,86 @@ const TaskPage = () => {
       thumbnail: "/walid.pdf",
     },
   ];
-  const people = [
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    // More people...
-  ];
+  const [delegationStatus, setDelegationStatus] = useState({});
   const [Details, setDetails] = useState(false);
+  const [showPopUp, setShowPopUp] = useState(false);
   const Status = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
   ];
   const patchTaskStatus = async (newStatus) => {
+    let valeurs;
+    let message;
+    const currentDate = new Date().toISOString();
+    switch (taskData?.status) {
+      case "Todo":
+        valeurs = {
+          status: newStatus,
+          dateDebutReel: currentDate,
+        };
+        if (newStatus === "Cancel") {
+          message = `La tache ${taskData?.Name} a été annulée.`;
+        }
+        break;
+      case "Inprogress":
+        valeurs = {
+          status: newStatus,
+          dateFinReel: currentDate,
+        };
+        if (newStatus === "Cancel") {
+          message = `La tache ${taskData?.Name} a été annulée.`;
+        } else
+          message = `La tache ${taskData?.Name} est mise pour votre validation.`;
+        break;
+      case "Inreview":
+        valeurs = {
+          status: newStatus,
+        };
+        if (newStatus === "Cancel") {
+          message = `La tache ${taskData?.Name} a été annulée.`;
+        } else if (newStatus === "Done") {
+          message = `La tache ${taskData?.Name} a été validée par le chef d'équipe.`;
+        } else
+          message = `La tache ${taskData?.Name} a été refusée par le chef d'équipe, vous devez la refaire.`;
+        break;
+      default:
+        valeurs = {
+          status: newStatus,
+        };
+        message = null;
+        break;
+    }
+
     try {
-      const response = await axiosInstance.patch(`/task/tasks/${taskId}`, {
-        status: newStatus,
-      });
+      const response = await axiosInstance.patch(
+        `/task/tasks/${taskId}`,
+        valeurs
+      );
       const updatedTask = response.data;
       console.log("taskupdate ", response.data);
-
       fetchTask(taskId);
+      if (message) {
+        const notificationContent = {
+          message: message,
+          url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
+        };
+        let usersToNotify;
+        if (newStatus === "Inreview") {
+          usersToNotify = response.data?.team.Boss;
+        } else usersToNotify = response.data?.affectedto;
+
+        const response1 = await axiosInstance.post(
+          "/notification/notifications",
+          {
+            recipients: [usersToNotify],
+            content: notificationContent,
+            type: "task",
+            organization: organization?._id,
+            seen: [{ userId: usersToNotify, seen: false }],
+          }
+        );
+        console.log("notif = ", response1.data);
+      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut :", error);
     }
@@ -235,6 +279,9 @@ const TaskPage = () => {
       case "Done":
         return "Done";
         break;
+      case "Cancel":
+        return "Canceled";
+        break;
     }
   };
 
@@ -255,20 +302,21 @@ const TaskPage = () => {
 
   const [userInfo, setUserInfo] = useState(null);
   const [organization, setOrganization] = useState(null);
+  const [userRole, setUserRole] = useState("");
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && role) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
       }
     }
   }, []);
-  // const taskId = "66646ed63b4dbc2fc5fe9596";
-  // const userId = "666435387431e9b597dd7282";
 
   const fetchTask = async (taskId) => {
     try {
@@ -283,14 +331,29 @@ const TaskPage = () => {
     }
   };
 
-  const fetchTeam = async (teamId) => {
+  const fetchTeam = async (teamId, organizationId) => {
     try {
+      // Utiliser la requête existante
       const response = await axiosInstance.get(
-        `/user/users?team=${teamId}&role=employee`
+        `/user/users?team=${teamId}&roles.role=employee`
       );
-      const teammembers = response.data;
-      console.log("teamMembres = ", response.data);
-      setTeamMembres(teammembers);
+      const allTeamMembers = response.data;
+      console.log("Tous les membres d'équipe = ", allTeamMembers);
+
+      // Filtrer côté client pour obtenir les membres spécifiques à l'organisation
+      const filteredTeamMembers = allTeamMembers.filter(
+        (user) =>
+          user.team.includes(teamId) && // Vérifier que l'utilisateur est dans l'équipe
+          user.roles.some(
+            (role) =>
+              role.role === "employee" &&
+              role.organization &&
+              role.organization._id === organizationId
+          )
+      );
+
+      console.log("Membres d'équipe filtrés = ", filteredTeamMembers);
+      setTeamMembres(response.data);
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des membres d'équipe :",
@@ -300,6 +363,7 @@ const TaskPage = () => {
   };
   const [reloadAssigned, setReloadAssigned] = useState(false);
   const [reloadComments, setReloadComments] = useState(false);
+  const [reloadDelegation, setReloadDelegation] = useState(false);
   useEffect(() => {
     fetchTask(taskId);
     fetchComments(taskId);
@@ -312,10 +376,12 @@ const TaskPage = () => {
   useEffect(() => {
     fetchTask(taskId);
     fetchComments(taskId);
-  }, [reloadAssigned]);
+  }, [reloadAssigned, reloadDelegation, reload]);
 
   useEffect(() => {
-    if (taskData) fetchTeam(taskData?.team?._id);
+    if (taskData?.team?._id) {
+      fetchTeam(taskData?.team?._id, organization?._id);
+    }
   }, [taskData]);
 
   const assignTask = async (person) => {
@@ -347,6 +413,82 @@ const TaskPage = () => {
       console.error("Erreur lors de la mise à jour de la tache :", error);
     }
   };
+
+  const delegatedTask = async (person) => {
+    try {
+      const response = await axiosInstance.post(`/delegation/delegations`, {
+        sendby: userInfo?._id,
+        sendto: person._id,
+        task: taskData?._id,
+        team: taskData?.team?._id,
+        organisation: organization?._id,
+      });
+      const delegDat = response.data;
+      console.log("demande delegation = ", response.data);
+      const notificationContent = {
+        message: `"${person.nom} ${person.prenom}" vous a envoyé une demande pour vous déléguer la tâche "${taskData?.Name}".`,
+        url: JSON.stringify(taskData), // Ajoutez l'URL appropriée pour accéder au projet
+      };
+      const response1 = await axiosInstance.post(
+        "/notification/notifications",
+        {
+          recipients: [person._id],
+          content: notificationContent,
+          type: "delegation",
+          organization: organization?._id,
+          seen: [{ userId: person._id, seen: false }],
+        }
+      );
+      console.log("notif = ", response1.data);
+      setReloadDelegation(!reloadDelegation);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tache :", error);
+    }
+  };
+
+  const loadDelegationStatuses = async () => {
+    const statuses = {};
+    for (const person of teamMembres) {
+      try {
+        const response = await axiosInstance.get(`/delegation/delegations`, {
+          params: {
+            sendto: person._id,
+            task: taskData?._id,
+          },
+        });
+        statuses[person._id] = response.data.length > 0;
+        if (
+          response.data.length > 0 &&
+          person._id === response.data[0].sendto._id &&
+          person._id === userInfo?._id &&
+          response.data[0].accepted === false &&
+          response.data[0].annuler === false
+        ) {
+          const fullName = `${response.data[0].sendby.nom} ${response.data[0].sendby.prenom}`;
+          setUserFullName(fullName);
+          setUserId(response.data[0].sendby._id);
+          setIdDelegation(response.data[0]._id);
+          setShowDelegationRequest(true);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération du statut de délégation :",
+          error
+        );
+        statuses[person._id] = false;
+      }
+    }
+    setDelegationStatus(statuses);
+    // if(delegationStatus[userInfo?._id]){
+    //   setShowDelegationRequest(true)
+    // }
+  };
+
+  useEffect(() => {
+    if (teamMembres && taskData) {
+      loadDelegationStatuses();
+    }
+  }, [teamMembres, taskData]);
 
   const fetchComments = async (taskId) => {
     try {
@@ -559,11 +701,21 @@ const TaskPage = () => {
         );
 
         break;
-      case "ione":
+      case "done":
         return (
           <img
             className="h-6 mr-2 w-auto"
             src="/images/checkbox.png"
+            alt=""
+            srcSet=""
+          />
+        );
+        break;
+      case "cancel":
+        return (
+          <img
+            className="h-6 mr-2 w-auto"
+            src="/images/croix-rouge.png"
             alt=""
             srcSet=""
           />
@@ -580,6 +732,30 @@ const TaskPage = () => {
     return (
       <div className="bg-[url('/BG.jpeg')] ">
         <NavBarAuth />
+        {showDelegationRequest && taskData?.status === "Todo" && (
+          <div
+            className="notification text-center bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative"
+            role="alert">
+            <span className="block sm:inline">
+              {userFullName} vous a envoyé une demande de délégation de cette
+              tâche.
+            </span>
+            <div className="mt-2 flex justify-center space-x-2">
+              <button
+                onClick={handleAccept}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 flex items-center">
+                <FaCheck className="mr-2" />
+                Accepter
+              </button>
+              <button
+                onClick={handleDecline}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                <FaTimes className="mr-2" />
+                Refuser
+              </button>
+            </div>
+          </div>
+        )}
         <div
           style={{ height: "90vh" }}
           className="   mx-auto flex justify-center items-center ">
@@ -731,47 +907,49 @@ const TaskPage = () => {
                         {/* <h3 className="text-xl font-bold my-2">Commentaires</h3> */}
                         {ShowComments ? (
                           <div>
-                            <Formik
-                              initialValues={{ comment: "" }}
-                              validationSchema={validationSchema}
-                              onSubmit={(values, { resetForm }) =>
-                                handleAddComment(
-                                  values,
-                                  resetForm,
-                                  taskData,
-                                  userInfo?._id
-                                )
-                              }>
-                              {({ errors, touched }) => (
-                                <Form>
-                                  <div className="relative  mb-4">
-                                    <Field
-                                      as="textarea"
-                                      name="comment"
-                                      type="text"
-                                      rows={4} // Number of visible rows
-                                      cols={50} // Number of visible columns
-                                      className={`h-24 w-full border ${
-                                        errors.comment && touched.comment
-                                          ? "border-red-500"
-                                          : "border-gray-300"
-                                      } flex justify-start rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                      placeholder="Ajouter un commentaire"
-                                    />
-                                    <button
-                                      type="submit"
-                                      className="absolute bottom-1 right-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none">
-                                      <FaPaperPlane />
-                                    </button>
-                                  </div>
-                                  {errors.comment && touched.comment && (
-                                    <div className="text-red-500 mb-4">
-                                      {errors.comment}
+                            {userRole !== "orgBoss" && userRole !== "" ? (
+                              <Formik
+                                initialValues={{ comment: "" }}
+                                validationSchema={validationSchema}
+                                onSubmit={(values, { resetForm }) =>
+                                  handleAddComment(
+                                    values,
+                                    resetForm,
+                                    taskData,
+                                    userInfo?._id
+                                  )
+                                }>
+                                {({ errors, touched }) => (
+                                  <Form>
+                                    <div className="relative  mb-4">
+                                      <Field
+                                        as="textarea"
+                                        name="comment"
+                                        type="text"
+                                        rows={4} // Number of visible rows
+                                        cols={50} // Number of visible columns
+                                        className={`h-24 w-full border ${
+                                          errors.comment && touched.comment
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                        } flex justify-start rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        placeholder="Ajouter un commentaire"
+                                      />
+                                      <button
+                                        type="submit"
+                                        className="absolute bottom-1 right-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none">
+                                        <FaPaperPlane />
+                                      </button>
                                     </div>
-                                  )}
-                                </Form>
-                              )}
-                            </Formik>
+                                    {errors.comment && touched.comment && (
+                                      <div className="text-red-500 mb-4">
+                                        {errors.comment}
+                                      </div>
+                                    )}
+                                  </Form>
+                                )}
+                              </Formik>
+                            ) : null}
                             {comments.length > 0 ? (
                               <ul className="">
                                 {comments.map((comment, index) => (
@@ -832,95 +1010,144 @@ const TaskPage = () => {
                               />
                             </Menu.Button>
                           </div>
-                          <Transition
-                            as={Fragment}
-                            enter="transition ease-out duration-100"
-                            enterFrom="transform opacity-0 scale-95"
-                            enterTo="transform opacity-100 scale-100"
-                            leave="transition ease-in duration-75"
-                            leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95">
-                            <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Todo")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/list.png"
-                                      alt=""
-                                    />
-                                    To Do
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() =>
-                                      patchTaskStatus("Inprogress")
-                                    }
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/development.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    In Progress
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Inreview")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/code-review.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    In Review
-                                  </div>
-                                )}
-                              </Menu.Item>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={() => patchTaskStatus("Done")}
-                                    className={classNames(
-                                      active ? "bg-blue-300" : "",
-                                      " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                    )}>
-                                    <img
-                                      className="w-6 h-6 mr-2"
-                                      src="/images/checkbox.png"
-                                      alt=""
-                                      srcset=""
-                                    />{" "}
-                                    Done
-                                  </div>
-                                )}
-                              </Menu.Item>
-                            </Menu.Items>
-                          </Transition>
+                          {((userRole === "employee" &&
+                            userInfo?._id === taskData?.affectedto._id) ||
+                            userRole === "teamBoss") &&
+                            taskData?.status !== "Cancel" && (
+                              <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95">
+                                <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                  {userRole === "teamBoss" &&
+                                    taskData?.status === "Inreview" && (
+                                      <Menu.Item>
+                                        {({ active }) => (
+                                          <div
+                                            onClick={() =>
+                                              patchTaskStatus("Todo")
+                                            }
+                                            className={classNames(
+                                              active ? "bg-blue-300" : "",
+                                              "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                            )}>
+                                            <img
+                                              className="w-6 h-6 mr-2"
+                                              src="/images/list.png"
+                                              alt=""
+                                            />
+                                            To Do
+                                          </div>
+                                        )}
+                                      </Menu.Item>
+                                    )}
+                                  {userRole === "employee" &&
+                                    taskData?.status === "Todo" && (
+                                      <Menu.Item>
+                                        {({ active }) => (
+                                          <div
+                                            onClick={() =>
+                                              patchTaskStatus("Inprogress")
+                                            }
+                                            className={classNames(
+                                              active ? "bg-blue-300" : "",
+                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                            )}>
+                                            <img
+                                              className="w-6 h-6 mr-2"
+                                              src="/images/development.png"
+                                              alt=""
+                                              srcset=""
+                                            />{" "}
+                                            In Progress
+                                          </div>
+                                        )}
+                                      </Menu.Item>
+                                    )}
+                                  {userRole === "employee" &&
+                                    taskData?.status === "Inprogress" && (
+                                      <Menu.Item>
+                                        {({ active }) => (
+                                          <div
+                                            onClick={() =>
+                                              patchTaskStatus("Inreview")
+                                            }
+                                            className={classNames(
+                                              active ? "bg-blue-300" : "",
+                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                            )}>
+                                            <img
+                                              className="w-6 h-6 mr-2"
+                                              src="/images/code-review.png"
+                                              alt=""
+                                              srcset=""
+                                            />{" "}
+                                            In Review
+                                          </div>
+                                        )}
+                                      </Menu.Item>
+                                    )}
+                                  {userRole === "teamBoss" &&
+                                    taskData?.status === "Inreview" && (
+                                      <Menu.Item>
+                                        {({ active }) => (
+                                          <div
+                                            onClick={() =>
+                                              patchTaskStatus("Done")
+                                            }
+                                            className={classNames(
+                                              active ? "bg-blue-300" : "",
+                                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                            )}>
+                                            <img
+                                              className="w-6 h-6 mr-2"
+                                              src="/images/checkbox.png"
+                                              alt=""
+                                              srcset=""
+                                            />{" "}
+                                            Done
+                                          </div>
+                                        )}
+                                      </Menu.Item>
+                                    )}
+                                  {userRole === "teamBoss" && (
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <div
+                                          onClick={() => setShowPopUp(true)}
+                                          className={classNames(
+                                            active ? "bg-blue-300" : "",
+                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                          )}>
+                                          <img
+                                            className="w-6 h-6 mr-2"
+                                            src="/images/croix-rouge.png"
+                                            alt=""
+                                            srcset=""
+                                          />{" "}
+                                          Canceled
+                                        </div>
+                                      )}
+                                    </Menu.Item>
+                                  )}
+                                </Menu.Items>
+                              </Transition>
+                            )}
                         </Menu>
-                        <FaShare
-                          onClick={() => setShowShareModal(true)}
-                          className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
-                        />
+                        {userRole === "employee" &&
+                        taskData?.affectedto?._id === userInfo?._id &&
+                        (taskData?.priorite === "D" ||
+                          taskData?.priorite === "E") &&
+                        taskData?.status === "Todo" ? (
+                          <FaShare
+                            onClick={() => setShowShareModal(true)}
+                            className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
+                          />
+                        ) : null}
                       </div>
                       <div
                         onClick={() => setShowDetails(!ShowDetails)}
@@ -1112,18 +1339,51 @@ const TaskPage = () => {
                           </div>
                         </div>
                       ) : null}
-                      <div className="flex justify-end px-2 py-1">
-                        <div
-                          onClick={handleShowUpdateTaskForm}
-                          className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
-                          <MdEditDocument className="h-5 w-5 mr-1" />
-                          <p>Edit</p>
+                      {userRole === "prjctBoss" ? (
+                        <div className="flex justify-end px-2 py-1">
+                          <div
+                            onClick={handleShowUpdateTaskForm}
+                            className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                            <MdEditDocument className="h-5 w-5 mr-1" />
+                            <p>Edit</p>
+                          </div>
                         </div>
-                        <div className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
-                          <MdDelete className="h-5 w-5 mr-1" />
-                          <p>Delete</p>
+                      ) : null}
+                      {showPopUp ? (
+                        <div className="text-white fixed inset-0 flex items-center justify-center z-50">
+                          <div className="bg-gray-700 rounded-lg shadow-lg p-6 relative">
+                            <button
+                              type="button"
+                              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                              onClick={() => setShowPopUp(false)}>
+                              <FaTimes color="white" />
+                            </button>
+                            <div className="mb-4 text-lg font-semibold">
+                              Confirmation
+                            </div>
+                            <div className="mb-4">
+                              Êtes-vous sûr de vouloir annuler cette tâche ?
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                type="button"
+                                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                                onClick={() => setShowPopUp(false)}>
+                                Annuler
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-[#fc4545] text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-600"
+                                onClick={() => {
+                                  patchTaskStatus("Cancel");
+                                  setShowPopUp(false);
+                                }}>
+                                Oui
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -1249,47 +1509,49 @@ const TaskPage = () => {
                       {/* <h3 className="text-xl font-bold my-2">Commentaires</h3> */}
                       {ShowComments ? (
                         <div>
-                          <Formik
-                            initialValues={{ comment: "" }}
-                            validationSchema={validationSchema}
-                            onSubmit={(values, { resetForm }) =>
-                              handleAddComment(
-                                values,
-                                resetForm,
-                                taskData,
-                                userInfo?._id
-                              )
-                            }>
-                            {({ errors, touched }) => (
-                              <Form>
-                                <div className="relative  mb-4">
-                                  <Field
-                                    as="textarea"
-                                    name="comment"
-                                    type="text"
-                                    rows={4} // Number of visible rows
-                                    cols={50} // Number of visible columns
-                                    className={`h-24 w-full border ${
-                                      errors.comment && touched.comment
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                    } flex justify-start rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                    placeholder="Ajouter un commentaire"
-                                  />
-                                  <button
-                                    type="submit"
-                                    className="absolute bottom-1 right-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none">
-                                    <FaPaperPlane />
-                                  </button>
-                                </div>
-                                {errors.comment && touched.comment && (
-                                  <div className="text-red-500 mb-4">
-                                    {errors.comment}
+                          {userRole !== "orgBoss" && userRole !== "" ? (
+                            <Formik
+                              initialValues={{ comment: "" }}
+                              validationSchema={validationSchema}
+                              onSubmit={(values, { resetForm }) =>
+                                handleAddComment(
+                                  values,
+                                  resetForm,
+                                  taskData,
+                                  userInfo?._id
+                                )
+                              }>
+                              {({ errors, touched }) => (
+                                <Form>
+                                  <div className="relative  mb-4">
+                                    <Field
+                                      as="textarea"
+                                      name="comment"
+                                      type="text"
+                                      rows={4} // Number of visible rows
+                                      cols={50} // Number of visible columns
+                                      className={`h-24 w-full border ${
+                                        errors.comment && touched.comment
+                                          ? "border-red-500"
+                                          : "border-gray-300"
+                                      } flex justify-start rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                      placeholder="Ajouter un commentaire"
+                                    />
+                                    <button
+                                      type="submit"
+                                      className="absolute bottom-1 right-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md focus:outline-none">
+                                      <FaPaperPlane />
+                                    </button>
                                   </div>
-                                )}
-                              </Form>
-                            )}
-                          </Formik>
+                                  {errors.comment && touched.comment && (
+                                    <div className="text-red-500 mb-4">
+                                      {errors.comment}
+                                    </div>
+                                  )}
+                                </Form>
+                              )}
+                            </Formik>
+                          ) : null}
                           {comments.length > 0 ? (
                             <ul className="">
                               {comments.map((comment, index) => (
@@ -1345,93 +1607,144 @@ const TaskPage = () => {
                             />
                           </Menu.Button>
                         </div>
-                        <Transition
-                          as={Fragment}
-                          enter="transition ease-out duration-100"
-                          enterFrom="transform opacity-0 scale-95"
-                          enterTo="transform opacity-100 scale-100"
-                          leave="transition ease-in duration-75"
-                          leaveFrom="transform opacity-100 scale-100"
-                          leaveTo="transform opacity-0 scale-95">
-                          <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Todo")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/list.png"
-                                    alt=""
-                                  />
-                                  To Do
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Inprogress")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/development.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Progress
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Inreview")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/code-review.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  In Review
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  onClick={() => patchTaskStatus("Done")}
-                                  className={classNames(
-                                    active ? "bg-blue-300" : "",
-                                    " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
-                                  )}>
-                                  <img
-                                    className="w-6 h-6 mr-2"
-                                    src="/images/checkbox.png"
-                                    alt=""
-                                    srcset=""
-                                  />{" "}
-                                  Done
-                                </div>
-                              )}
-                            </Menu.Item>
-                          </Menu.Items>
-                        </Transition>
+                        {((userRole === "employee" &&
+                          userInfo?._id === taskData?.affectedto?._id) ||
+                          userRole === "teamBoss") &&
+                          taskData?.status !== "Cancel" && (
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-100"
+                              enterFrom="transform opacity-0 scale-95"
+                              enterTo="transform opacity-100 scale-100"
+                              leave="transition ease-in duration-75"
+                              leaveFrom="transform opacity-100 scale-100"
+                              leaveTo="transform opacity-0 scale-95">
+                              <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                {userRole === "teamBoss" &&
+                                  taskData?.status === "Inreview" && (
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <div
+                                          onClick={() =>
+                                            patchTaskStatus("Todo")
+                                          }
+                                          className={classNames(
+                                            active ? "bg-blue-300" : "",
+                                            "px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                          )}>
+                                          <img
+                                            className="w-6 h-6 mr-2"
+                                            src="/images/list.png"
+                                            alt=""
+                                          />
+                                          To Do
+                                        </div>
+                                      )}
+                                    </Menu.Item>
+                                  )}
+                                {userRole === "employee" &&
+                                  taskData?.status === "Todo" && (
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <div
+                                          onClick={() =>
+                                            patchTaskStatus("Inprogress")
+                                          }
+                                          className={classNames(
+                                            active ? "bg-blue-300" : "",
+                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                          )}>
+                                          <img
+                                            className="w-6 h-6 mr-2"
+                                            src="/images/development.png"
+                                            alt=""
+                                            srcset=""
+                                          />{" "}
+                                          In Progress
+                                        </div>
+                                      )}
+                                    </Menu.Item>
+                                  )}
+                                {userRole === "employee" &&
+                                  taskData?.status === "Inprogress" && (
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <div
+                                          onClick={() =>
+                                            patchTaskStatus("Inreview")
+                                          }
+                                          className={classNames(
+                                            active ? "bg-blue-300" : "",
+                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                          )}>
+                                          <img
+                                            className="w-6 h-6 mr-2"
+                                            src="/images/code-review.png"
+                                            alt=""
+                                            srcset=""
+                                          />{" "}
+                                          In Review
+                                        </div>
+                                      )}
+                                    </Menu.Item>
+                                  )}
+                                {userRole === "teamBoss" &&
+                                  taskData?.status === "Inreview" && (
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <div
+                                          onClick={() =>
+                                            patchTaskStatus("Done")
+                                          }
+                                          className={classNames(
+                                            active ? "bg-blue-300" : "",
+                                            " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                          )}>
+                                          <img
+                                            className="w-6 h-6 mr-2"
+                                            src="/images/checkbox.png"
+                                            alt=""
+                                            srcset=""
+                                          />{" "}
+                                          Done
+                                        </div>
+                                      )}
+                                    </Menu.Item>
+                                  )}
+                                {userRole === "teamBoss" && (
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <div
+                                        onClick={() => setShowPopUp(true)}
+                                        className={classNames(
+                                          active ? "bg-blue-300" : "",
+                                          " px-4 py-2 text-sm text-gray-700 flex justify-start items-center"
+                                        )}>
+                                        <img
+                                          className="w-6 h-6 mr-2"
+                                          src="/images/croix-rouge.png"
+                                          alt=""
+                                          srcset=""
+                                        />{" "}
+                                        Canceled
+                                      </div>
+                                    )}
+                                  </Menu.Item>
+                                )}
+                              </Menu.Items>
+                            </Transition>
+                          )}
                       </Menu>
-                      <FaShare
-                        onClick={() => setShowShareModal(true)}
-                        className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
-                      />
+                      {userRole === "employee" &&
+                      taskData?.affectedto?._id === userInfo?._id &&
+                      (taskData?.priorite === "D" ||
+                        taskData?.priorite === "E") &&
+                      taskData?.status === "Todo" ? (
+                        <FaShare
+                          onClick={() => setShowShareModal(true)}
+                          className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
+                        />
+                      ) : null}
                     </div>
                     <div
                       onClick={() => setShowDetails(!ShowDetails)}
@@ -1458,9 +1771,14 @@ const TaskPage = () => {
                                 {taskData?.affectedto.nom[0].toUpperCase()}
                                 {taskData?.affectedto.prenom[0].toUpperCase()}
                               </button>
+
+                              <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                {taskData?.affectedto?.nom[0].toUpperCase()}
+                                {taskData?.affectedto?.prenom[0].toUpperCase()}
+                              </button>
                               <p>
-                                {taskData?.affectedto.nom}{" "}
-                                {taskData?.affectedto.prenom}
+                                {taskData?.affectedto?.nom}{" "}
+                                {taskData?.affectedto?.prenom}
                               </p>
                             </div>
                           ) : (
@@ -1469,7 +1787,7 @@ const TaskPage = () => {
                                 <FaUserCircle className=" rounded-full w-6 h-6 mr-2" />
                                 <p>
                                   {taskData?.affectedto
-                                    ? `${taskData?.affectedto.nom} ${taskData?.affectedto.prenom}`
+                                    ? `${taskData?.affectedto?.nom} ${taskData?.affectedto?.prenom}`
                                     : "Unassigned"}
                                 </p>
                               </div>
@@ -1627,19 +1945,52 @@ const TaskPage = () => {
                         </div>
                       </div>
                     ) : null}
-                    <div className="flex justify-end px-2 py-1">
-                      <div
-                        onClick={handleShowUpdateTaskForm}
-                        className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
-                        <MdEditDocument className="h-5 w-5 mr-1" />
-                        <p>Edit</p>
+                    {userRole === "prjctBoss" ? (
+                      <div className="flex justify-end px-2 py-1">
+                        <div
+                          onClick={handleShowUpdateTaskForm}
+                          className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
+                          <MdEditDocument className="h-5 w-5 mr-1" />
+                          <p>Edit</p>
+                        </div>
                       </div>
-                      <div className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline ">
-                        <MdDelete className="h-5 w-5 mr-1" />
-                        <p>Delete</p>
+                    ) : null}
+                  </div>
+                  {showPopUp ? (
+                    <div className="text-white fixed inset-0 flex items-center justify-center z-50">
+                      <div className="bg-gray-700 rounded-lg shadow-lg p-6 relative">
+                        <button
+                          type="button"
+                          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                          onClick={() => setShowPopUp(false)}>
+                          <FaTimes color="white" />
+                        </button>
+                        <div className="mb-4 text-lg font-semibold">
+                          Confirmation
+                        </div>
+                        <div className="mb-4">
+                          Êtes-vous sûr de vouloir annuler cette tâche ?
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                            onClick={() => setShowPopUp(false)}>
+                            Annuler
+                          </button>
+                          <button
+                            type="button"
+                            className="bg-[#fc4545] text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-600"
+                            onClick={() => {
+                              patchTaskStatus("Cancel");
+                              setShowPopUp(false);
+                            }}>
+                            Oui
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               )}
             </div>
@@ -1677,33 +2028,47 @@ const TaskPage = () => {
                 </svg>
               </button>
             </div>
-            <div className="px-2 w-full h-[80vh]  overflow-auto costumScrollBar">
-              {people.map((person) => (
-                <li key={person.name}>
-                  <div className=" rounded-md px-2 py-2 cursor-pointer  flex items-center justify-between mb-2 gap-x-6">
-                    <div className="flex items-center">
-                      <img
-                        className="h-10 w-10 lg:h-12 lg:w-12 rounded-full mr-2"
-                        src={person.imageUrl}
-                        alt=""
-                      />
-                      <div className="flex flex-col justify-center">
-                        <h3 className="text-base font-semibold  tracking-tight text-gray-900">
-                          {person.name}
-                        </h3>
-                        <p className="text-sm md:font-semibold truncate   text-indigo-600">
-                          walidchebbab2001@gmail.com
-                        </p>
+            <div className="px-2 w-full h-[80vh] overflow-auto costumScrollBar">
+              {teamMembres?.map(
+                (person, index) =>
+                  person._id !== userInfo._id && (
+                    <div
+                      key={index}
+                      className="border-b-2 border-gray-400 w-full my-2 rounded-xl flex justify-between items-center p-2">
+                      <div className="flex">
+                        <div className="flex flex-col justify-center items-center text-sm font-semibold text-gray-800">
+                          <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                            {person.nom[0].toUpperCase()}{" "}
+                            {person.prenom[0].toUpperCase()}
+                          </button>
+                        </div>
+                        <div className="flex flex-col justify-center ml-4">
+                          <div className="truncate text-sm text-gray-600">
+                            {person.nom} {person.prenom}
+                          </div>
+                          <div className="truncate text-gray-800 font-semibold text-sm">
+                            {person.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center items-center">
+                        {delegationStatus[person._id] === undefined ? (
+                          <span>Chargement...</span>
+                        ) : delegationStatus[person._id] ? (
+                          <GrValidate className="mr-1 h-6 w-6 text-green-500" />
+                        ) : (
+                          <button
+                            type="button"
+                            className="text-gray-600 hover:text-blue-500 focus:outline-none"
+                            onClick={() => delegatedTask(person)}>
+                            Delegate to
+                          </button>
+                        )}
                       </div>
                     </div>
-                    {sent ? (
-                      <GrValidate className="text-green-400 h-6 w-6" />
-                    ) : (
-                      <FaShare className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110" />
-                    )}
-                  </div>
-                </li>
-              ))}
+                  )
+              )}
             </div>
           </div>
         </div>
