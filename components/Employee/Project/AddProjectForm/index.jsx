@@ -16,7 +16,7 @@ import {
 import "./style.css";
 
 const axiosInstance = axios.create({
-  baseURL: "https://back-pfe-master.vercel.app",
+  baseURL: "http://localhost:1937",
   headers: {
     "Content-Type": "application/json",
   },
@@ -226,67 +226,32 @@ const AddProjectForm = ({
   };
 
   // get invitations
-  useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
+  const getinvitations = async (values) => {
+    
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    try {
+      const response = await axiosInstance.get("/invitation/invitations", {
+        params: {
+          organisation: organization?._id,
         },
       });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
+      console.log("invitaions");
 
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+      console.log(response.data);
+      setInvitaions(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  useEffect(() => {
     getinvitations();
   }, []);
   useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
-
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
     getinvitations();
   }, [reloadInvit]);
 
   const getPeople = async (values) => {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    
+        
     const roles = ["prjctBoss", "teamBoss", "employee", "individual"]; // Vous pouvez ajuster cette liste selon vos besoins
     
     try {

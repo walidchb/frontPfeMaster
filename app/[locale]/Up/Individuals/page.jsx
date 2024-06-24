@@ -27,14 +27,16 @@ import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/config";
 import { useRouter } from "next/navigation";
 
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:1937",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 const deleteUser = async (email) => {
   try {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     const response = await axiosInstance.delete(`/user/users?email=${email}`, {
       // Optional headers (e.g., authentication tokens)
     });
@@ -119,16 +121,6 @@ function Individuals() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values, actions) => {
-      // alert(JSON.stringify(values, null, 2));
-      // console.log(JSON.stringify(values, null, 2));
-      // Create an instance of Axios with default headers
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
       // Function to send the POST request
       const sendUserData = async (values) => {
         try {
