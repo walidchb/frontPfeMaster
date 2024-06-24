@@ -43,6 +43,7 @@ import Loader from "@/components/Loader";
 import Link from "next/link";
 import NavBarAuth from "@/components/NavBar/NavBarAuth";
 import React from "react";
+import UserCard from "@/components/Employee/userCard";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { pdfjs, Document, Page } from "react-pdf";
 import { GrValidate } from "react-icons/gr";
@@ -60,6 +61,8 @@ function classNames(...classes) {
 }
 
 const TaskPage = () => {
+  const [showUserCard, setShowUserCard] = useState(false);
+  const [userCardInfo, setUserCardInfo] = useState({});
   const images = [
     {
       original: "/images/team.jpeg",
@@ -244,7 +247,7 @@ const TaskPage = () => {
     setShowUpdateTaskForm(true);
   };
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -935,7 +938,12 @@ const TaskPage = () => {
                             <p className="w-6/12">Assignee</p>
                             {Assigned ? (
                               <div className="flex">
-                                <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                <button
+                                  onClick={() => {
+                                    setUserCardInfo(taskData?.affectedto);
+                                    setShowUserCard(true);
+                                  }}
+                                  className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                   {taskData?.affectedto.nom[0].toUpperCase()}
                                   {taskData?.affectedto.prenom[0].toUpperCase()}
                                 </button>
@@ -1042,6 +1050,10 @@ const TaskPage = () => {
                                 </div>
                               ))}
                             </div>
+                          </div>
+                          <div className="my-2 flex justify-start items-center">
+                            <p className="w-6/12">Team </p>{" "}
+                            <p>{taskData?.team?.Name}</p>
                           </div>
                           <div className="my-2 flex justify-start items-center">
                             <p className="w-6/12">Priority </p>{" "}
@@ -1437,7 +1449,12 @@ const TaskPage = () => {
                           <p className="w-6/12">Assignee</p>
                           {Assigned ? (
                             <div className="flex">
-                              <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                              <button
+                                onClick={() => {
+                                  setUserCardInfo(taskData?.affectedto);
+                                  setShowUserCard(true);
+                                }}
+                                className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                 {taskData?.affectedto.nom[0].toUpperCase()}
                                 {taskData?.affectedto.prenom[0].toUpperCase()}
                               </button>
@@ -1511,7 +1528,12 @@ const TaskPage = () => {
                                 className="border-b-2 border-gray-400   w-full  my-2 rounded-xl flex justify-between items-center p-2    ">
                                 <div className="flex ">
                                   <div className="  flex flex-col justify-center  items-center text-sm font-semibold text-gray-800 ">
-                                    <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <button
+                                      onClick={() => {
+                                        setUserCardInfo(person);
+                                        setShowUserCard(true);
+                                      }}
+                                      className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                       {person.nom[0].toUpperCase()}{" "}
                                       {person.prenom[0].toUpperCase()}
                                     </button>
@@ -1544,7 +1566,10 @@ const TaskPage = () => {
                             ))}
                           </div>
                         </div>
-
+                        <div className="my-2 flex justify-start items-center">
+                          <p className="w-6/12">Team </p>{" "}
+                          <p>{taskData?.team?.Name}</p>
+                        </div>
                         <div className="my-2 flex justify-start items-center">
                           <p className="w-6/12">Priority </p>{" "}
                           <p
@@ -1737,6 +1762,16 @@ const TaskPage = () => {
             </div>
           </div>
         </div>
+
+        {/* user card modal */}
+        {showUserCard ? (
+          <UserCard
+            teamId={taskData?.team?._id}
+            userCardInfo={userCardInfo}
+            showUserCard={showUserCard}
+            setShowUserCard={setShowUserCard}
+          />
+        ) : null}
       </div>
     );
   }

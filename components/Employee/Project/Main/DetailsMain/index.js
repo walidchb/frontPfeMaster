@@ -16,6 +16,8 @@ import {
   FaClock,
   FaClipboardCheck,
 } from "react-icons/fa";
+// import { FaExclamationCircle } from "react-icons/fa";
+
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
 import "./style.css";
@@ -56,7 +58,10 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [doneTasks, setDoneTasks] = useState(0);
+  const [doneTasks, setDoneTasks] = useState([]);
+  const [todoTasks, setTodoTasks] = useState([]);
+  const [inreviewTasks, setInreviewTasks] = useState([]);
+  const [inprogressTasks, setInprogressTasks] = useState([]);
   const [updateProjectModal, setUpdateProjectModal] = useState(false);
   const [showUpdateProjectForm, setShowUpdateProjectForm] = useState(false);
   const [windowSize, setWindowSize] = useState({
@@ -108,8 +113,23 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
     },
   ];
 
+  const [pastDueTasks, setPastDueTasks] = useState(0);
   useEffect(() => {
+    console.log(JSON.stringify(project.tasks));
     setDoneTasks(project.tasks.filter((task) => task.status === "Done"));
+    setTodoTasks(project.tasks.filter((task) => task.status === "Todo"));
+    setInreviewTasks(
+      project.tasks.filter((task) => task.status === "Inreview")
+    );
+    setInprogressTasks(
+      project.tasks.filter((task) => task.status === "Inprogress")
+    );
+    const currentDate = new Date();
+    const count = project.tasks.filter(
+      (task) =>
+        new Date(task.dateFinEstim) < currentDate && task.status !== "Done"
+    ).length;
+    setPastDueTasks(count);
   }, [project]);
 
   useEffect(() => {
@@ -144,6 +164,8 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
     console.log("object");
     window.open(imageUrl, "_blank");
   };
+  const [isOverdue, setisOverdue] = useState(false);
+
   return (
     <div className=" flex w-full">
       <div className="bg-white flex-grow p-4 costumScrollBar ">
@@ -166,23 +188,232 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
           </div>
         </div>
         {ShowTitle ? (
-          <span className="font-bold text-xl flex">{project.Name}</span>
+          <span className="font-bold text-xl flex mb-4">{project.Name}</span>
         ) : null}
 
+        <div className="flex flex-row  justify-center min-w-full">
+          <div className="flex flex-col sm:flex-row justify-around w-full  bg-gray-100 rounded-lg overflow-hidden  shadow-md">
+            <div className="text-center bg-white  w-full sm:w-1/2 py-4 px-2">
+              <div className="text-sm font-medium text-gray-600 ">To Do</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {todoTasks?.length}
+              </div>
+              <div className="text-sm flex  items-center font-medium text-gray-600 justify-around mt-2 ">
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      todoTasks?.filter((task) => task?.priorite === "A")
+                        ?.length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">A</div>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {todoTasks?.filter((task) => task?.priorite === "B").length}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">B</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {todoTasks?.filter((task) => task?.priorite === "C").length}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">C</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {todoTasks?.filter((task) => task?.priorite === "D").length}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">D</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {todoTasks?.filter((task) => task?.priorite === "E").length}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">E</div>
+                </div>
+              </div>
+            </div>
+            <div className="text-center bg-slate-400  w-full sm:w-1/2  py-4 px-2">
+              <div className="text-sm font-medium text-white">In Progress</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {inprogressTasks?.length}
+              </div>
+              <div className="text-sm flex  items-center font-medium text-gray-600 justify-around mt-2 ">
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inprogressTasks?.filter((task) => task?.priorite === "A")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-white">A</div>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inprogressTasks?.filter((task) => task?.priorite === "B")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-white">B</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inprogressTasks?.filter((task) => task?.priorite === "C")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-white">C</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inprogressTasks?.filter((task) => task?.priorite === "D")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-white">D</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inprogressTasks?.filter((task) => task?.priorite === "E")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-white">E</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-around  w-full bg-gray-100 rounded-lg overflow-hidden  shadow-md">
+            <div className="text-center bg-slate-400 sm:bg-white w-full sm:w-1/2 py-4 px-2">
+              <div className="text-sm font-medium text-white sm:text-gray-600">
+                In Review
+              </div>
+              <div className="text-2xl font-bold text-orange-600">
+                {inreviewTasks?.length}
+              </div>
+              <div className="text-sm flex  items-center font-medium text-gray-600 justify-around mt-2 ">
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inreviewTasks?.filter((task) => task?.priorite === "A")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">A</div>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inreviewTasks?.filter((task) => task?.priorite === "B")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">B</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inreviewTasks?.filter((task) => task?.priorite === "C")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">C</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inreviewTasks?.filter((task) => task?.priorite === "D")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">D</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {
+                      inreviewTasks?.filter((task) => task?.priorite === "E")
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm font-medium text-gray-600">E</div>
+                </div>
+              </div>
+            </div>
+            <div className="text-center bg-white sm:bg-slate-400 w-full sm:w-1/2 py-4 px-2">
+              <div className="text-sm font-medium text-gray-600 sm:text-white">
+                Done
+              </div>
+              <div className="text-2xl font-bold text-green-600">
+                {doneTasks?.length}
+              </div>
+              <div className="text-sm flex  items-center font-medium text-gray-600 justify-around mt-2 ">
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {doneTasks?.filter((task) => task?.priorite === "A").length}
+                  </div>
+                  <div className="text-sm font-medium text-white">A</div>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {doneTasks?.filter((task) => task?.priorite === "B").length}
+                  </div>
+                  <div className="text-sm font-medium text-white">B</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {doneTasks?.filter((task) => task?.priorite === "C").length}
+                  </div>
+                  <div className="text-sm font-medium text-white">C</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {doneTasks?.filter((task) => task?.priorite === "D").length}
+                  </div>
+                  <div className="text-sm font-medium text-white">D</div>
+                </div>{" "}
+                <div>
+                  <div className="text-sm font-bold text-blue-600">
+                    {doneTasks?.filter((task) => task?.priorite === "E").length}
+                  </div>
+                  <div className="text-sm font-medium text-white">E</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row justify-around items-center my-4">
-          <div className="bg-gray-800 w-full md:w-fit h-fit lg:mr-6 mb-4 md:mb-0 rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10">
-            <img
-              className="h-24 w-24 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-            <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-              {project.boss.nom} {project.boss.prenom}
-            </h5>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              Project Leader
-            </span>
-            <div className="text-white">{project.boss.email}</div>
+          <div
+            className={`px-4 py-3 rounded relative flex items-center space-x-4 ${
+              pastDueTasks > 0
+                ? "bg-red-100 border border-red-400 text-red-700"
+                : "bg-green-100 border border-green-400 text-green-700"
+            }`}
+            role="alert">
+            {pastDueTasks > 0 ? (
+              <FaExclamationCircle className="text-red-500 text-2xl" />
+            ) : (
+              <FaCheckCircle className="text-green-500 text-2xl" />
+            )}
+            <div>
+              <strong className="font-bold text-lg">
+                {pastDueTasks > 0 ? "Overdue Tasks" : "No Overdue Tasks"}
+              </strong>
+              <p className="text-sm">
+                {pastDueTasks > 0 ? (
+                  <>
+                    there are <span className="font-bold">{pastDueTasks}</span>{" "}
+                    overdue tasks. Please check and complete them.
+                  </>
+                ) : (
+                  "Great job! You have no overdue tasks."
+                )}
+              </p>
+            </div>
           </div>
           <ProgressCircle
             completed={doneTasks?.length}

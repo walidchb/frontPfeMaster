@@ -15,11 +15,12 @@ function BoardEmployee() {
   const [sideBarEmployeeShow, setSideBarEmployeeShow] = useState(true);
   // const [user] = useAuthState(auth);
   const { user, loading } = useAuth();
-
+  const [reloadPage, setReloadPage] = useState(false);
   return (
     // <ProtectedRoute>
     <div className=" bg-white text-black ">
       <NavBarAuth
+        page="BoardEmployee"
         className="flex-none"
         auth={true}
         showOrganisation={true}
@@ -32,6 +33,7 @@ function BoardEmployee() {
           <SideBarEmployee currentPage="Board" fromEmployee={true} />
         ) : null}
         <MainEmployee
+          reloadPage={reloadPage}
           fromEmployee={true}
           sideBarEmployeeShow={sideBarEmployeeShow}
         />

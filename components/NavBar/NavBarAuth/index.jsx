@@ -51,9 +51,10 @@ function NavBarAuth({
   isShowSideBarEmployee,
   setSideBarEmployeeShow,
   sideBarEmployeeShow,
+  page,
 }) {
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -516,8 +517,7 @@ function NavBarAuth({
                               <div
                                 onClick={async () => {
                                   const axiosInstance = axios.create({
-                                    baseURL:
-                                      "https://back-pfe-master.vercel.app",
+                                    baseURL: "http://localhost:1937",
                                     headers: {
                                       "Content-Type": "application/json",
                                     },
@@ -547,9 +547,17 @@ function NavBarAuth({
                                         localStorage.getItem("organization")
                                       )
                                     );
-                                    router.push(
-                                      `/${locale}/Employee/BoardEmployee`
-                                    );
+                                    console.log("1000");
+                                    if (page === "BoardEmployee") {
+                                      window.location.reload();
+                                    } else {
+                                      router.push(
+                                        `/${locale}/Employee/BoardEmployee`
+                                      );
+                                    }
+                                    // router.refresh();
+                                    // setReloadPage(!reloadPage);
+                                    console.log("20000");
                                     setReload(!reload);
                                     // dispatch(setUser(response.data)); // Dispatch action with fetched data
                                   } catch (error) {

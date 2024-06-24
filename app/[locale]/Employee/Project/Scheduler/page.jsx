@@ -51,18 +51,18 @@ function Scheduler() {
   useEffect(() => {
     let Tasks;
     switch (userInfo?.role) {
-      case "employee":
-        Tasks = project.tasks
-          ?.filter((task) => task?.affectedto === userInfo?._id)
-          .map((task) => task);
-        setTasks(Tasks);
-        break;
-      case "teamBoss":
-        Tasks = project.tasks
-          ?.filter((task) => task?.team === teamId)
-          .map((task) => task);
-        setTasks(Tasks);
-        break;
+      // case "employee":
+      //   Tasks = project.tasks
+      //     ?.filter((task) => task?.affectedto === userInfo?._id)
+      //     .map((task) => task);
+      //   setTasks(Tasks);
+      //   break;
+      // case "teamBoss":
+      //   Tasks = project.tasks
+      //     ?.filter((task) => task?.team === teamId)
+      //     .map((task) => task);
+      //   setTasks(Tasks);
+      //   break;
       default:
         console.log("project tasks =", project.tasks);
         Tasks = project.tasks;
@@ -78,7 +78,7 @@ function Scheduler() {
     // }
   }, [project, userInfo, teamId]);
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },

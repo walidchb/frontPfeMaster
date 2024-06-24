@@ -28,7 +28,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function MainEmployee() {
+function MainEmployee({ reloadPage }) {
   const [projects, setProjects] = useState(null);
   const [organizationId, setOrganizationId] = useState("");
   const [settings, setSettings] = useState({});
@@ -59,7 +59,7 @@ function MainEmployee() {
 
   const [seeAllProjectsModal, setSeeAllProjectsModal] = useState(false);
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -145,7 +145,7 @@ function MainEmployee() {
     } else if (userInfo?.role === "teamBoss") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
-          params: { userId: userId },
+          params: { userId: userId, organizationId: organization?._id },
         });
         console.log("responseData = ", response.data);
         setProjects(response.data);
@@ -162,7 +162,7 @@ function MainEmployee() {
     } else if (userInfo?.role === "employee") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
-          params: { userId: userInfo?._id },
+          params: { userId: userInfo?._id, organizationId: organization?._id },
         });
         console.log("responseData = ", response.data);
         setProjects(response.data);
@@ -232,7 +232,8 @@ function MainEmployee() {
     if (userInfo?._id && organization?._id) {
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
-  }, [organization, userInfo, teamId, reload]);
+  }, [organization, userInfo, teamId, reload, reloadPage]);
+
   useEffect(() => {
     function handleResize() {
       // Adjust the number of slides to show based on screen width

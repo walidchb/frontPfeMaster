@@ -5,7 +5,7 @@ import {
   IoAddCircleSharp,
   IoCloseCircleSharp,
 } from "react-icons/io5";
-
+import UserCard from "../userCard";
 import {
   FaEdit,
   FaChevronDown,
@@ -32,6 +32,8 @@ import {
 } from "react-icons/io";
 
 function TeamsPage() {
+  const [showUserCard, setShowUserCard] = useState(false);
+  const [userCardInfo, setUserCardInfo] = useState({});
   const [allPeople, setAllPeople] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
 
@@ -67,7 +69,7 @@ function TeamsPage() {
   useEffect(() => {
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -93,7 +95,7 @@ function TeamsPage() {
   useEffect(() => {
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -121,7 +123,7 @@ function TeamsPage() {
   useEffect(() => {
     const getTeams = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -171,7 +173,7 @@ function TeamsPage() {
   // useEffect(() => {
   //   const getTeams = async (values) => {
   //     const axiosInstance = axios.create({
-  //       baseURL: "https://back-pfe-master.vercel.app",
+  //       baseURL: "http://localhost:1937",
   //       headers: {
   //         "Content-Type": "application/json",
   //       },
@@ -308,7 +310,7 @@ function TeamsPage() {
   useEffect(() => {
     const getPeople = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -341,7 +343,7 @@ function TeamsPage() {
   useEffect(() => {
     const getPeople = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -385,7 +387,7 @@ function TeamsPage() {
   }
   const handleSubmit = async (values, { setSubmitting }) => {
     const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
+      baseURL: "http://localhost:1937",
       headers: {
         "Content-Type": "application/json",
       },
@@ -411,7 +413,7 @@ function TeamsPage() {
   const initialValuesSearchPerson = { email: "" };
   const handleSubmitSearchPerson = async (values, { setSubmitting }) => {
     const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
+      baseURL: "http://localhost:1937",
       headers: {
         "Content-Type": "application/json",
       },
@@ -439,7 +441,7 @@ function TeamsPage() {
   const sendInvitaion = async (person) => {
     console.log(organization);
     const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
+      baseURL: "http://localhost:1937",
       headers: {
         "Content-Type": "application/json",
       },
@@ -465,7 +467,7 @@ function TeamsPage() {
   useEffect(() => {
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -490,7 +492,7 @@ function TeamsPage() {
 
   const makeUserTeamBoss = async (team, person) => {
     const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
+      baseURL: "http://localhost:1937",
       headers: {
         "Content-Type": "application/json",
       },
@@ -628,7 +630,12 @@ function TeamsPage() {
                     teamMembers.map((person, index) => (
                       <li key={index}>
                         <div className="flex items-center gap-x-6 ">
-                          <button className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          <button
+                            onClick={() => {
+                              setUserCardInfo(person);
+                              setShowUserCard(true);
+                            }}
+                            className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             {person?.prenom[0].toUpperCase()}
                             {person?.nom[0].toUpperCase()}
                           </button>
@@ -838,6 +845,16 @@ function TeamsPage() {
           </div>
         </div>
       </div>
+
+      {/* user card  */}
+      {showUserCard ? (
+        <UserCard
+          teamId={team?._id}
+          userCardInfo={userCardInfo}
+          showUserCard={showUserCard}
+          setShowUserCard={setShowUserCard}
+        />
+      ) : null}
     </div>
   );
 }

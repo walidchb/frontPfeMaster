@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       console.log("signed is");
       console.log(email);
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },

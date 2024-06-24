@@ -36,21 +36,22 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
 
   useEffect(() => {
     let taskss;
-    switch (user?.role) {
-      case "employee":
-        taskss =
-          project.tasks?.filter((task) => task.affectedto === user._id) || [];
-        break;
-      case "teamBoss":
-        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
-        break;
-      default:
-        taskss = project.tasks;
-        break;
-    }
-    setTasks(taskss);
+    // switch (user?.role) {
+    //   case "employee":
+    //     taskss = project.tasks;
+    //     // ?.filter((task) => task.affectedto === user._id) || [];
+    //     break;
+    //   case "teamBoss":
+    //     taskss = project.tasks;
+    //     // ?.filter((task) => task.team === teamId) || [];
+    //     break;
+    //   default:
+    //     taskss = project.tasks;
+    //     break;
+    // }
 
-    let filteredTasks = taskss;
+    let filteredTasks = project.tasks;
+    setTasks(filteredTasks);
 
     // Filtrer par statut
     const statusFilters = [
@@ -111,11 +112,12 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
     let taskss;
     switch (user?.role) {
       case "employee":
-        taskss =
-          project.tasks?.filter((task) => task.affectedto === user._id) || [];
+        taskss = project.tasks;
+        // ?.filter((task) => task.affectedto === user._id) || [];
         break;
       case "teamBoss":
-        taskss = project.tasks?.filter((task) => task.team === teamId) || [];
+        taskss = project.tasks;
+        // ?.filter((task) => task.team === teamId) || [];
         break;
       default:
         taskss = project.tasks;

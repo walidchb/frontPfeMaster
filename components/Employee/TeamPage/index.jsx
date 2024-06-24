@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./style.css";
 import { IoSearchCircle } from "react-icons/io5";
 import axios from "axios";
+import UserCard from "../userCard";
 
 function TeamPage() {
   // const findObjectById = (array, id) => {
@@ -12,6 +13,8 @@ function TeamPage() {
   const [team, setTeam] = useState({});
   const [teamId, setTeamId] = useState(null);
   const [people, setPeople] = useState([]);
+  const [userInfo, setUserInfo] = useState({});
+  const [org, setOrg] = useState({});
   useEffect(() => {
     console.log("local storage");
     if (typeof window !== "undefined") {
@@ -21,11 +24,11 @@ function TeamPage() {
         let userJson = JSON.parse(userinfo);
         console.log("userJson");
         console.log(userJson);
-
+        setUserInfo(userJson);
         let orgaJson = JSON.parse(orga);
         console.log("orgaJson");
         console.log(orgaJson);
-
+        setOrg(orgaJson);
         const team = userJson?.team.find(
           (obj) => obj.Organization === orgaJson._id
         );
@@ -38,16 +41,11 @@ function TeamPage() {
   }, []);
 
   // =======
-  const [userInfo, setUserInfo] = useState({});
-  const [org, setOrg] = useState({});
-  // const [team, setteam] = useState({});
 
-  // const team = userInfo?.team.find((obj) => obj.Organization === org._id);
-  // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
   useEffect(() => {
     const getTeams = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -73,7 +71,7 @@ function TeamPage() {
   useEffect(() => {
     const getTeamMembers = async () => {
       const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
+        baseURL: "http://localhost:1937",
         headers: {
           "Content-Type": "application/json",
         },
@@ -97,9 +95,8 @@ function TeamPage() {
     }
   }, [teamId]);
 
-  // =======
-  // }, []);
-
+  const [showUserCard, setShowUserCard] = useState(false);
+  const [userCardInfo, setUserCardInfo] = useState({});
   return (
     <div
       style={{ height: "90vh" }}
@@ -133,7 +130,12 @@ function TeamPage() {
             {people?.map((person, index) => (
               <li key={index}>
                 <div className="flex items-center gap-x-6">
-                  <button className="h-10 w-10 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <button
+                    onClick={() => {
+                      setUserCardInfo(person);
+                      setShowUserCard(true);
+                    }}
+                    className="h-10 w-10 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     {person?.prenom[0].toUpperCase()}{" "}
                     {person?.nom[0].toUpperCase()}
                   </button>
@@ -151,6 +153,14 @@ function TeamPage() {
             ))}
           </ul>
         </div>
+        {showUserCard ? (
+          <UserCard
+            teamId={teamId}
+            userCardInfo={userCardInfo}
+            showUserCard={showUserCard}
+            setShowUserCard={setShowUserCard}
+          />
+        ) : null}
       </div>
     </div>
   );

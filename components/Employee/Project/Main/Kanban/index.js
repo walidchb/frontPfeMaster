@@ -7,7 +7,7 @@ import axios from "axios";
 import Loader from "@/components/Loader";
 const KanbanBoard = ({ project, user, teamId }) => {
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -17,16 +17,16 @@ const KanbanBoard = ({ project, user, teamId }) => {
     const fetchTasks = async () => {
       let taskIds;
       switch (user?.role) {
-        case "employee":
-          taskIds = project.tasks
-            ?.filter((task) => task?.affectedto === user._id)
-            .map((task) => task._id);
-          break;
-        case "teamBoss":
-          taskIds = project.tasks
-            ?.filter((task) => task?.team === teamId)
-            .map((task) => task._id);
-          break;
+        // case "employee":
+        //   taskIds = project.tasks
+        //     ?.filter((task) => task?.affectedto === user._id)
+        //     .map((task) => task._id);
+        //   break;
+        // case "teamBoss":
+        //   taskIds = project.tasks
+        //     ?.filter((task) => task?.team === teamId)
+        //     .map((task) => task._id);
+        //   break;
         default:
           taskIds = project.tasks?.map((task) => task._id);
           break;
