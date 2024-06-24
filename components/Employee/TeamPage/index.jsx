@@ -5,10 +5,12 @@ import { IoSearchCircle } from "react-icons/io5";
 import axios from "axios";
 
 function TeamPage() {
-  // const findObjectById = (array, id) => {
-  //   return array.find((obj) => obj.id === id);
-  // };
-  // <<<<<<< HEAD
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   const [team, setTeam] = useState({});
   const [teamId, setTeamId] = useState(null);
   const [people, setPeople] = useState([]);
@@ -46,12 +48,7 @@ function TeamPage() {
   // >>>>>>> 0a7bc172c82c470bedab789337ac3f50e4b0f3a4
   useEffect(() => {
     const getTeams = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      
       try {
         const response = await axiosInstance.get("/team/teams", {
           params: {
@@ -72,12 +69,7 @@ function TeamPage() {
   }, [teamId]);
   useEffect(() => {
     const getTeamMembers = async () => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      
       try {
         const response = await axiosInstance.get("/user/users", {
           params: {

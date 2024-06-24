@@ -28,15 +28,17 @@ import Select from "react-select";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import Countries from "@/components/Countries";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:1937",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 const deleteUserfromDataBaseAndFireBase = async (email) => {
   const user = auth.currentUser;
   try {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     const response = await axiosInstance.delete(`/user/users?email=${email}`, {
       // Optional headers (e.g., authentication tokens)
     });
@@ -149,12 +151,7 @@ function BusinessUsers() {
     onSubmit: async (values, actions) => {
       try {
         formik.setSubmitting(true);
-        const axiosInstance = axios.create({
-          baseURL: "https://back-pfe-master.vercel.app",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        
   
         // Vérifier si l'organisation existe
         const orgExistsResponse = await axiosInstance.get("/organization/organizations", {

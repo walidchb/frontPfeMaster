@@ -54,7 +54,7 @@ function NavBarAuth({
   sideBarEmployeeShow,
 }) {
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
@@ -428,13 +428,7 @@ function NavBarAuth({
                             {({ active }) => (
                               <div
                                 onClick={async () => {
-                                  const axiosInstance = axios.create({
-                                    baseURL:
-                                      "https://back-pfe-master.vercel.app",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                    },
-                                  });
+                                  
                                   try {
                                     const response = await axiosInstance.get(
                                       "/organization/organizations",

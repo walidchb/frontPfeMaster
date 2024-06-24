@@ -39,6 +39,13 @@ function TeamsPage() {
   const [organization, setOrganization] = useState({}); // State to trigger rerender
   const [userInfo, setUserInfo] = useState({});
 
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const orga = localStorage.getItem("organization");
@@ -66,150 +73,101 @@ function TeamsPage() {
   const [reload, setReload] = useState(false); // State to trigger rerender
   const [invitaions, setInvitaions] = useState([]);
   // get invitations
-  useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
+  const getinvitations = async (values) => {
+    
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    try {
+      const response = await axiosInstance.get("/invitation/invitations", {
+        params: {
+          organisation: organization?._id,
         },
       });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
+      console.log("invitaions");
 
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+      console.log(response.data);
+      setInvitaions(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  useEffect(() => {
     getinvitations();
   }, []);
   useEffect(() => {
-    const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      try {
-        const response = await axiosInstance.get("/invitation/invitations", {
-          params: {
-            organisation: organization?._id,
-          },
-        });
-        console.log("invitaions");
-
-        console.log(response.data);
-        setInvitaions(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
     getinvitations();
   }, [reload]);
 
   //  get jsp
-  useEffect(() => {
-    const getTeams = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const organization = JSON.parse(localStorage.getItem("organization"));
-      if (userRole === "orgBoss") {
-        try {
-          const response = await axiosInstance.get("/team/teams", {
-            params: {
-              Organization: organization?._id,
-            },
-          });
-          console.log("teams from orgboss");
+  const getTeams = async (values) => {
+      
+    const organization = JSON.parse(localStorage.getItem("organization"));
+    if (userRole === "orgBoss") {
+      try {
+        const response = await axiosInstance.get("/team/teams", {
+          params: {
+            Organization: organization?._id,
+          },
+        });
+        console.log("teams from orgboss");
 
-          console.log(response.data);
-          setTeams(response.data);
+        console.log(response.data);
+        setTeams(response.data);
 
-          // Create an array of false values with the same length as response.data
-          const newShowTeam = new Array(response.data.length).fill(false);
-          setShowTeam(newShowTeam);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      } else if (userRole === "prjctBoss") {
-        try {
-          const response = await axiosInstance.get("/team/teamsByBoss", {
-            params: {
-              projectBossId: userInfo?._id,
-            },
-          });
-          console.log("teams");
-
-          console.log(response.data);
-          setTeams(response.data);
-
-          // Create an array of false values with the same length as response.data
-          const newShowTeam = new Array(response.data.length).fill(false);
-          setShowTeam(newShowTeam);
-        } catch (error) {
-          console.error("Error:", error);
-        }
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
       }
-    };
+    } else if (userRole === "prjctBoss") {
+      try {
+        const response = await axiosInstance.get("/team/teamsByBoss", {
+          params: {
+            projectBossId: userInfo?._id,
+          },
+        });
+        console.log("teams");
 
+        console.log(response.data);
+        setTeams(response.data);
+
+        // Create an array of false values with the same length as response.data
+        const newShowTeam = new Array(response.data.length).fill(false);
+        setShowTeam(newShowTeam);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+  useEffect(() => {
     getTeams();
   }, [userInfo, organization, userRole, reload]);
 
   const getPeople = async (values) => {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  
-    const roles = ["prjctBoss", "teamBoss", "employee", "individual"];
-  
+        
+    const roles = ["prjctBoss", "teamBoss", "employee", "individual"]; // Vous pouvez ajuster cette liste selon vos besoins
+    
     try {
       const response = await axiosInstance.get("/user/users", {
         params: {
           roles: roles.join(","),
         },
       });
+      const filterPeopleNotInOrganization = response.data.filter(user => !user.roles.some(role => role.organization && role.organization._id === organization?._id));
+
   
-      // Filtrer les utilisateurs qui n'ont pas de rôle dans l'organisation spécifiée
-      const filteredUsers = response.data.filter(user => {
-        
-        const organizationId = organization?._id;
-        
-        // Vérifier si l'utilisateur n'a aucun rôle dans cette organisation
-        return !user.roles.some(role => role.organization === organizationId);
-      });
-  
-      setAllPeople(filteredUsers);
+      console.log("people ", filterPeopleNotInOrganization);
+      setAllPeople(filterPeopleNotInOrganization);
     } catch (error) {
       console.error("Error:", error);
     }
   };
   
   useEffect(() => {
-
-    getPeople();
-  }, []);
+    if(organization?._id){getPeople()}
+  }, [organization, userInfo, userRole]);
   useEffect(() => {
-    
-    getPeople();
+    if(organization?._id){getPeople()}
   }, [personFetched]);
 
   const [teamLead, setTeamLead] = useState(true);
@@ -224,12 +182,7 @@ function TeamsPage() {
     return array.some((item) => item?.sendto?._id === value);
   }
   const handleSubmit = async (values, { setSubmitting }) => {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     try {
       const response = await axiosInstance.post("/team/teams", {
         Name: values.teamName,
@@ -250,12 +203,7 @@ function TeamsPage() {
 
   const initialValuesSearchPerson = { email: "" };
   const handleSubmitSearchPerson = async (values, { setSubmitting }) => {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     try {
       const response = await axiosInstance.get("/user/users", {
         params: {
@@ -278,12 +226,7 @@ function TeamsPage() {
 
   const sendInvitaion = async (person) => {
     console.log("org send = ", organization);
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
         sendby: organization?.Boss,
@@ -304,12 +247,7 @@ function TeamsPage() {
 
   useEffect(() => {
     const getinvitations = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      
       try {
         const response = await axiosInstance.get("/user/users", {
           params: {
@@ -329,12 +267,7 @@ function TeamsPage() {
   }, [team]);
 
   const makeUserTeamBoss = async (team, person) => {
-    const axiosInstance = axios.create({
-      baseURL: "https://back-pfe-master.vercel.app",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    
     console.log(0);
 
     try {

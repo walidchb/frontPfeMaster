@@ -15,7 +15,7 @@ function Contact() {
       const subject = `Message de votre application`;
 
       const response = await axios.post(
-        "https://back-pfe-master.vercel.app/send-email",
+        "http://localhost:1937/send-email",
         {
           name,
           email,
