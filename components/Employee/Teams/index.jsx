@@ -34,7 +34,7 @@ import {
 function TeamsPage() {
   const [allPeople, setAllPeople] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-
+  const [userRole, setUserRole] = useState("");
   const [personFetched, setPersonFetched] = useState(false);
   const [organization, setOrganization] = useState({}); // State to trigger rerender
   const [userInfo, setUserInfo] = useState({});
@@ -43,6 +43,7 @@ function TeamsPage() {
     if (typeof window !== "undefined") {
       const orga = localStorage.getItem("organization");
       const userinfo = localStorage.getItem("userInfo");
+      const role = localStorage.getItem("userRole");
       console.log("orgaJson");
 
       console.log(orga);
@@ -58,6 +59,7 @@ function TeamsPage() {
         setOrganization(orgaJson);
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
       }
     }
   }, []);
@@ -127,7 +129,7 @@ function TeamsPage() {
         },
       });
       const organization = JSON.parse(localStorage.getItem("organization"));
-      if (userInfo?.role === "orgBoss") {
+      if (userRole === "orgBoss") {
         try {
           const response = await axiosInstance.get("/team/teams", {
             params: {
@@ -145,7 +147,7 @@ function TeamsPage() {
         } catch (error) {
           console.error("Error:", error);
         }
-      } else if (userInfo?.role === "prjctBoss") {
+      } else if (userRole === "prjctBoss") {
         try {
           const response = await axiosInstance.get("/team/teamsByBoss", {
             params: {
@@ -167,208 +169,46 @@ function TeamsPage() {
     };
 
     getTeams();
-  }, [userInfo, organization, reload]);
-  // useEffect(() => {
-  //   const getTeams = async (values) => {
-  //     const axiosInstance = axios.create({
-  //       baseURL: "https://back-pfe-master.vercel.app",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const organization = JSON.parse(localStorage.getItem("organization"));
-  //     if (userInfo?.role === "orgBoss") {
-  //       try {
-  //         const response = await axiosInstance.get("/team/teams", {
-  //           params: {
-  //             Organization: organization?._id,
-  //           },
-  //         });
-  //         console.log("teams");
+  }, [userInfo, organization, userRole, reload]);
 
-  //         console.log(response.data);
-  //         setTeams(response.data);
-
-  //         // Create an array of false values with the same length as response.data
-  //         const newShowTeam = new Array(response.data.length).fill(false);
-  //         setShowTeam(newShowTeam);
-  //       } catch (error) {
-  //         console.error("Error:", error);
-  //       }
-  //     } else {
-  //       try {
-  //         const response = await axiosInstance.get("/team/teamsByBoss", {
-  //           params: {
-  //             projectBossId: userInfo?._id,
-  //           },
-  //         });
-  //         console.log("teams");
-
-  //         console.log(response.data);
-  //         setTeams(response.data);
-
-  //         // Create an array of false values with the same length as response.data
-  //         const newShowTeam = new Array(response.data.length).fill(false);
-  //         setShowTeam(newShowTeam);
-  //       } catch (error) {
-  //         console.error("Error:", error);
-  //       }
-  //     }
-  //   };
-
-  //   getTeams();
-  // }, [reload]);
-  const people = [
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    {
-      name: "Leslie Alexander",
-      role: "Co-Founder / CEO",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    // More people...
-  ];
-  useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
+  const getPeople = async (values) => {
+    const axiosInstance = axios.create({
+      baseURL: "https://back-pfe-master.vercel.app",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  
+    const roles = ["prjctBoss", "teamBoss", "employee", "individual"];
+  
+    try {
+      const response = await axiosInstance.get("/user/users", {
+        params: {
+          roles: roles.join(","),
         },
       });
-      const roles = ["employee", "teamBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
-
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
-
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  
+      // Filtrer les utilisateurs qui n'ont pas de rôle dans l'organisation spécifiée
+      const filteredUsers = response.data.filter(user => {
+        
+        const organizationId = organization?._id;
+        
+        // Vérifier si l'utilisateur n'a aucun rôle dans cette organisation
+        return !user.roles.some(role => role.organization === organizationId);
+      });
+  
+      setAllPeople(filteredUsers);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  useEffect(() => {
 
     getPeople();
   }, []);
   useEffect(() => {
-    const getPeople = async (values) => {
-      const axiosInstance = axios.create({
-        baseURL: "https://back-pfe-master.vercel.app",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const roles = ["employee", "teamBoss", "individual"];
-      // Join the roles array to form a string separated by commas
-      const roleQueryParam = roles.join(",");
-      try {
-        const response = await axiosInstance.get("/user/users", {
-          params: {
-            roles: roleQueryParam,
-          },
-        });
-        console.log("people");
-
-        console.log(response.data);
-        setAllPeople(response.data);
-        // setTeams(response.data);
-
-        // Create an array of false values with the same length as response.data
-        // const newShowTeam = new Array(response.data.length).fill(false);
-        // setShowTeam(newShowTeam);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
+    
     getPeople();
   }, [personFetched]);
 
@@ -381,7 +221,7 @@ function TeamsPage() {
   const [showCreateNewTeam, setShowCreateNewTeam] = useState(false);
   const initialValues = { teamName: "" };
   function invitationSent(array, value) {
-    return array.some((item) => item.sendto._id === value);
+    return array.some((item) => item?.sendto?._id === value);
   }
   const handleSubmit = async (values, { setSubmitting }) => {
     const axiosInstance = axios.create({
@@ -437,7 +277,7 @@ function TeamsPage() {
   };
 
   const sendInvitaion = async (person) => {
-    console.log(organization);
+    console.log("org send = ", organization);
     const axiosInstance = axios.create({
       baseURL: "https://back-pfe-master.vercel.app",
       headers: {
@@ -446,7 +286,7 @@ function TeamsPage() {
     });
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss?._id,
+        sendby: organization?.Boss,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,
@@ -502,7 +342,10 @@ function TeamsPage() {
       const response = await axiosInstance.patch(
         `/user/users?id=${person?._id}`,
         {
-          role: "teamBoss",
+          roles: [{
+            role : "teamBoss",
+            organization : organization?._id
+          }],
         }
       );
       console.log("user updated successfuly");

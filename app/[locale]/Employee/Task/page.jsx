@@ -287,13 +287,16 @@ const TaskPage = () => {
 
   const [userInfo, setUserInfo] = useState(null);
   const [organization, setOrganization] = useState(null);
+  const [userRole, setUserRole] = useState("");
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && role) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
       }
@@ -313,21 +316,34 @@ const TaskPage = () => {
     }
   };
 
-  const fetchTeam = async (teamId) => {
-    try {
-      const response = await axiosInstance.get(
-        `/user/users?team=${teamId}&role=employee`
-      );
-      const teammembers = response.data;
-      console.log("teamMembres = ", response.data);
-      setTeamMembres(teammembers);
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des membres d'équipe :",
-        error
-      );
-    }
-  };
+  const fetchTeam = async (teamId, organizationId) => {
+  try {
+    // Utiliser la requête existante
+    const response = await axiosInstance.get(
+      `/user/users?team=${teamId}&roles.role=employee`
+    );
+    const allTeamMembers = response.data;
+    console.log("Tous les membres d'équipe = ", allTeamMembers);
+
+    // Filtrer côté client pour obtenir les membres spécifiques à l'organisation
+    const filteredTeamMembers = allTeamMembers.filter(user => 
+      user.team.includes(teamId) && // Vérifier que l'utilisateur est dans l'équipe
+      user.roles.some(role => 
+        role.role === 'employee' && 
+        role.organization && 
+        role.organization._id === organizationId
+      )
+    );
+
+    console.log("Membres d'équipe filtrés = ", filteredTeamMembers);
+    setTeamMembres(response.data);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des membres d'équipe :",
+      error
+    );
+  }
+};
   const [reloadAssigned, setReloadAssigned] = useState(false);
   const [reloadComments, setReloadComments] = useState(false);
   const [reloadDelegation, setReloadDelegation] = useState(false);
@@ -347,7 +363,7 @@ const TaskPage = () => {
 
   useEffect(() => {
     if (taskData?.team?._id){ 
-      fetchTeam(taskData?.team?._id);
+      fetchTeam(taskData?.team?._id, organization?._id);
     }
   }, [taskData]);
 
@@ -861,7 +877,7 @@ const TaskPage = () => {
                         {/* <h3 className="text-xl font-bold my-2">Commentaires</h3> */}
                         {ShowComments ? (
                           <div>
-                            {userInfo?.role !== "orgBoss" ? (
+                            {userRole !== "orgBoss" && userRole !== "" ? (
                               <Formik
                                 initialValues={{ comment: "" }}
                                 validationSchema={validationSchema}
@@ -964,7 +980,7 @@ const TaskPage = () => {
                               />
                             </Menu.Button>
                           </div>
-                          {(((userInfo?.role === "employee" && userInfo?._id === taskData?.affectedto._id) || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
+                          {(((userRole === "employee" && userInfo?._id === taskData?.affectedto._id) || userRole === "teamBoss") && taskData?.status !== "Cancel") && (
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-100"
@@ -974,7 +990,7 @@ const TaskPage = () => {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0 scale-95">
                               <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                {(userInfo?.role === "teamBoss" && taskData?.status === "Inreview") && (
+                                {(userRole === "teamBoss" && taskData?.status === "Inreview") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -993,7 +1009,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "employee" && taskData?.status === "Todo") && (
+                                {(userRole === "employee" && taskData?.status === "Todo") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1013,7 +1029,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "employee" && taskData?.status === "Inprogress") && (
+                                {(userRole === "employee" && taskData?.status === "Inprogress") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1033,7 +1049,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "teamBoss" && taskData?.status === "Inreview") && (
+                                {(userRole === "teamBoss" && taskData?.status === "Inreview") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1053,7 +1069,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {userInfo?.role === "teamBoss" && (
+                                {userRole === "teamBoss" && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1077,7 +1093,7 @@ const TaskPage = () => {
                             </Transition>
                           )}
                         </Menu>
-                        {(userInfo?.role === "employee" && taskData?.affectedto?._id === userInfo?._id && (taskData?.priorite === "D" || taskData?.priorite === "E") && taskData?.status === "Todo") ? (
+                        {(userRole === "employee" && taskData?.affectedto?._id === userInfo?._id && (taskData?.priorite === "D" || taskData?.priorite === "E") && taskData?.status === "Todo") ? (
                           <FaShare
                             onClick={() => setShowShareModal(true)}
                             className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
@@ -1265,7 +1281,7 @@ const TaskPage = () => {
                           </div>
                         </div>
                       ) : null}
-                      {userInfo?.role === "prjctBoss" ? (
+                      {userRole === "prjctBoss" ? (
                         <div className="flex justify-end px-2 py-1">
                           <div
                             onClick={handleShowUpdateTaskForm}
@@ -1434,7 +1450,7 @@ const TaskPage = () => {
                       {/* <h3 className="text-xl font-bold my-2">Commentaires</h3> */}
                       {ShowComments ? (
                         <div>
-                          {userInfo?.role !== "orgBoss" ? (
+                          {userRole !== "orgBoss" && userRole !== ""  ? (
                             <Formik
                               initialValues={{ comment: "" }}
                               validationSchema={validationSchema}
@@ -1532,7 +1548,7 @@ const TaskPage = () => {
                             />
                           </Menu.Button>
                         </div>
-                        {(((userInfo?.role === "employee" && userInfo?._id === taskData?.affectedto?._id) || userInfo?.role === "teamBoss") && taskData?.status !== "Cancel") && (
+                        {(((userRole === "employee" && userInfo?._id === taskData?.affectedto?._id) || userRole === "teamBoss") && taskData?.status !== "Cancel") && (
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-100"
@@ -1542,7 +1558,7 @@ const TaskPage = () => {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0 scale-95">
                               <Menu.Items className="cursor-pointer absolute left-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                {(userInfo?.role === "teamBoss" && taskData?.status === "Inreview") && (
+                                {(userRole === "teamBoss" && taskData?.status === "Inreview") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1561,7 +1577,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "employee" && taskData?.status === "Todo") && (
+                                {(userRole === "employee" && taskData?.status === "Todo") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1581,7 +1597,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "employee" && taskData?.status === "Inprogress") && (
+                                {(userRole === "employee" && taskData?.status === "Inprogress") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1601,7 +1617,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {(userInfo?.role === "teamBoss" && taskData?.status === "Inreview") && (
+                                {(userRole === "teamBoss" && taskData?.status === "Inreview") && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1621,7 +1637,7 @@ const TaskPage = () => {
                                     )}
                                   </Menu.Item>
                                 )}
-                                {userInfo?.role === "teamBoss" && (
+                                {userRole === "teamBoss" && (
                                   <Menu.Item>
                                     {({ active }) => (
                                       <div
@@ -1645,7 +1661,7 @@ const TaskPage = () => {
                             </Transition>
                           )}
                       </Menu>
-                      {(userInfo?.role === "employee" && taskData?.affectedto?._id === userInfo?._id && (taskData?.priorite === "D" || taskData?.priorite === "E") && taskData?.status === "Todo") ? (
+                      {(userRole === "employee" && taskData?.affectedto?._id === userInfo?._id && (taskData?.priorite === "D" || taskData?.priorite === "E") && taskData?.status === "Todo") ? (
                         <FaShare
                           onClick={() => setShowShareModal(true)}
                           className="h-6 w-6 cursor-pointer text-blue-500 hover:text-blue-600 hover:transform hover:scale-110"
@@ -1833,7 +1849,7 @@ const TaskPage = () => {
                         </div>
                       </div>
                     ) : null}
-                    {userInfo?.role === "prjctBoss" ? (
+                    {userRole === "prjctBoss" ? (
                       <div className="flex justify-end px-2 py-1">
                         <div
                           onClick={handleShowUpdateTaskForm}

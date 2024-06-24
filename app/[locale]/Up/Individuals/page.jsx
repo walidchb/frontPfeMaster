@@ -136,7 +136,7 @@ function Individuals() {
             nom: values.firstName,
             prenom: values.lastName,
             email: values.email,
-            role: "individual",
+            roles: [{role : "individual", organization : null}],
             phoneNumber: values.phoneNumber,
             gender: values.gender,
             password: values.password,
@@ -157,8 +157,13 @@ function Individuals() {
           createUserWithEmailAndPassword(auth, values.email, values.password)
             .then(async (res) => {
               console.log("sucess");
+              localStorage.removeItem("organization");
+              localStorage.removeItem("user");
+              localStorage.removeItem("userInfo");
+              localStorage.removeItem("userRole");
               localStorage.setItem("user", true);
               await localStorage.setItem("userInfo", JSON.stringify(userInfo));
+              await localStorage.setItem("userRole", "individual");
               dispatch(setUserInfo(userInfo));
 
               console.log(res);

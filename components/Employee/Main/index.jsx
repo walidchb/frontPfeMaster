@@ -69,13 +69,15 @@ function MainEmployee() {
 
   const [userInfo, setUserInfo] = useState({});
   const [organization, setOrganization] = useState({});
+  const [userRole, setUserRole] = useState("");
   const [teamId, setTeamId] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && role) {
         console.log("userinfoooooooooooooooooooooooooooo");
 
         let userJson = JSON.parse(userinfo);
@@ -83,6 +85,7 @@ function MainEmployee() {
         setUserInfo(userJson);
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
+        setUserRole(role);
 
         const team = userJson?.team?.find(
           (obj) => obj.Organization === orgaJson._id
@@ -92,7 +95,7 @@ function MainEmployee() {
     }
   }, []);
   const fetchProjectsAndTasks = async (organizationId, userId) => {
-    if (userInfo?.role === "orgBoss") {
+    if (userInfo && userRole === "orgBoss") {
       try {
         const response = await axiosInstance.get(
           `/project/projects?organization=${organizationId}`
@@ -112,7 +115,7 @@ function MainEmployee() {
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
-    } else if (userInfo?.role === "prjctBoss") {
+    } else if (userInfo && userRole === "prjctBoss") {
       try {
         // Récupérer les projets
         const projectsResponse = await axiosInstance.get(
@@ -144,7 +147,7 @@ function MainEmployee() {
           error
         );
       }
-    } else if (userInfo?.role === "teamBoss") {
+    } else if (userInfo && userRole === "teamBoss") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
           params: { userId: userId },
@@ -161,7 +164,7 @@ function MainEmployee() {
       } catch (error) {
         console.error("Erreur lors de la récupération des équipes :", error);
       }
-    } else if (userInfo?.role === "employee") {
+    } else if (userInfo && userRole === "employee") {
       try {
         const response = await axiosInstance.get(`/user/userProjects`, {
           params: { userId: userInfo?._id },
@@ -172,6 +175,7 @@ function MainEmployee() {
         const tasksResponse = await axiosInstance.get(`/user/userTasks`, {
           params: {
             userId: userId,
+            organizationId: organization?._id,
             teamId: teamId,
           },
         });
@@ -183,44 +187,7 @@ function MainEmployee() {
       }
     }
   };
-  const fetchProject = async (organizationId) => {
-    if (userInfo?.role === "orgBoss") {
-      try {
-        const response = await axiosInstance.get(
-          `/project/projects?organization=${organizationId}`
-        );
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    } else if (userInfo?.role === "prjctBoss") {
-      try {
-        const response = await axiosInstance.get(
-          `/project/projects?organization=${organizationId}&boss=${userInfo?._id}`
-        );
-        const response1 = await axiosInstance.get(
-          `/task/userTasks?userId=${userId}`
-        );
-        setAllTasks(response1.data);
-        filterTasks(response1.data);
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    } else {
-      try {
-        const response = await axiosInstance.get(`/user/userProjects`, {
-          params: { userId: userInfo?._id },
-        });
-        console.log("responseData = ", response.data);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des équipes :", error);
-      }
-    }
-  };
+  
 
   // useEffect(() => {
   //   if (userInfo?._id) {
@@ -234,7 +201,7 @@ function MainEmployee() {
     if (userInfo?._id && organization?._id) {
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
-  }, [organization, userInfo, teamId, reload]);
+  }, [organization, userInfo, userRole, teamId, reload]);
   useEffect(() => {
     function handleResize() {
       // Adjust the number of slides to show based on screen width

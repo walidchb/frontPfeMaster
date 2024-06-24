@@ -62,6 +62,7 @@ function NavBarAuth({
   // <<<<<<< HEAD
   const [reload, setReload] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [organization, setOrganization] = useState(null);
   useEffect(() => {
     console.log("yawwwww rani hnaaa");
@@ -69,21 +70,7 @@ function NavBarAuth({
     if (typeof window !== "undefined") {
       const userinfo = localStorage.getItem("userInfo");
       const orga = localStorage.getItem("organization");
-      if (userinfo && orga) {
-        let userJson = JSON.parse(userinfo);
-        console.log("userJson");
-
-        console.log(userJson);
-        setUserInfo(userJson);
-        let orgaJson = JSON.parse(orga);
-        setOrganization(orgaJson);
-      }
-    }
-  }, []);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userinfo = localStorage.getItem("userInfo");
-      const orga = localStorage.getItem("organization");
+      const role = localStorage.getItem("userRole");
       if (userinfo) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
@@ -91,6 +78,29 @@ function NavBarAuth({
       if (orga) {
         let orgaJson = JSON.parse(orga);
         setOrganization(orgaJson);
+      }
+      if (role) {
+        setUserRole(role);
+        console.log("role = ", role)
+      }
+      
+    }
+  }, []);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userinfo = localStorage.getItem("userInfo");
+      const orga = localStorage.getItem("organization");
+      const role = localStorage.getItem("userRole");
+      if (userinfo) {
+        let userJson = JSON.parse(userinfo);
+        setUserInfo(userJson);
+      }
+      if (orga) {
+        let orgaJson = JSON.parse(orga);
+        setOrganization(orgaJson);
+      }
+      if (role) {
+        setUserRole(role);
       }
     }
   }, [reload]);
@@ -127,7 +137,7 @@ function NavBarAuth({
     }
   };
   const getNotifications = async () => {
-    if(userInfo?.role === "individual"){
+    if(userRole === "individual"){
       try {
         
         if (userInfo) {
@@ -175,23 +185,23 @@ function NavBarAuth({
     }
   };
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userRole) {
       getNotifications();
       getinvitations();
     }
-  }, [userInfo]);
+  }, [userInfo, userRole]);
   useEffect(() => {
     
-    if (userInfo) {
+    if (userInfo && userRole) {
       getNotifications();
       getinvitations();
     }
   }, [reload]);
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userRole) {
       getNotifications();
     }
-  }, [userInfo, organization]);
+  }, [userInfo, organization, userRole]);
 
   useEffect(() => {
     if(notifications && invitaions){
@@ -363,7 +373,7 @@ function NavBarAuth({
               </div>
             ) : null}
             <div className="  flex max-w-min items-center justify-start sm:items-stretch sm:justify-start">
-              {userInfo?.role != "orgBoss" ? (
+              {userRole != "orgBoss" ? (
                 <Menu
                   as="div"
                   className="z-20 relative sm:ml-4  md:w-6/12 lg:w-3/12 ">
@@ -406,7 +416,7 @@ function NavBarAuth({
                       }}
                       className="absolute right-50 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {/* <<<<<<< HEAD */}
-                      {userInfo?.organizations?.map((item, index) => {
+                      {userInfo?.roles?.map((item, index) => {
                         // =======
                         {
                           /* {userInfo?.organizations.map((item, index) => { */
@@ -430,7 +440,7 @@ function NavBarAuth({
                                       "/organization/organizations",
                                       {
                                         params: {
-                                          _id: item._id || item,
+                                          _id: item.organization._id || item.organization,
                                         },
                                       }
                                     );
@@ -443,6 +453,8 @@ function NavBarAuth({
                                       "organization",
                                       JSON.stringify(response.data[0])
                                     );
+                                    localStorage.removeItem("userRole");
+                                    localStorage.setItem("userRole", item.role);
                                     console.log("local storage now ");
 
                                     console.log(
@@ -469,7 +481,7 @@ function NavBarAuth({
                                 <MdBusinessCenter className={`h-5 w-5 mr-2 `} />
 
                                 <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                  {item?.Name}
+                                  {item.organization?.Name}
                                 </span>
                               </div>
                             )}

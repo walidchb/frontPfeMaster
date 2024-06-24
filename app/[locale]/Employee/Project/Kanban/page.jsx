@@ -18,6 +18,7 @@ function Kanban() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [projectId, setProjectId] = useState(null);
   const [userInfo, setUserInfo] = useState({});
+  const [userRole, setUserRole] = useState("");
   const [project, setProject] = useState({});
   const [reload, setReload] = useState(false);
   const [organization, setOrganization] = useState({});
@@ -31,9 +32,11 @@ function Kanban() {
       const orga = localStorage.getItem("organization");
       const projectinfo = localStorage.getItem("project");
       const userinfo = localStorage.getItem("userInfo");
-      if (userinfo && orga && projectinfo) {
+      const role = localStorage.getItem("userRole");
+      if (userinfo && orga && projectinfo && role) {
         let userJson = JSON.parse(userinfo);
         setUserInfo(userJson);
+        setUserRole(role);
         let projectJson = JSON.parse(projectinfo);
         setProjectId(projectJson?._id);
         let orgaJson = JSON.parse(orga);
@@ -89,7 +92,7 @@ function Kanban() {
         <div className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={1} />
           {Object.keys(project).length > 0 ? (
-            <KanbanBoard project={project} user={userInfo} teamId={teamId} />
+            <KanbanBoard project={project} user={userInfo} teamId={teamId} role={userRole}/>
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
           )}

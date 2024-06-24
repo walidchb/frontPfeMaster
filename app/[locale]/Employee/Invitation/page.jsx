@@ -48,14 +48,30 @@ const Invitation = () => {
 
     try {
       console.log(1);
-      const response = await axiosInstance.patch(
-        `/user/users?id=${userInfo?._id}`,
-        {
-          role: invitation?.roleinvitedto,
-          team: invitation?.team?._id, // New team value to be pushed
-          organizations: invitation?.organisation._id,
-        }
-      );
+      let response;
+      if(invitation?.team){
+        response = await axiosInstance.patch(
+          `/user/users?id=${userInfo?._id}`,
+          {
+            roles: [{
+              role : invitation?.roleinvitedto,
+              organization : invitation?.organisation._id
+            }], 
+            team: [invitation?.team?._id], // New team value to be pushed
+          }
+        );
+      } else {
+          response = await axiosInstance.patch(
+          `/user/users?id=${userInfo?._id}`,
+          {
+            roles: [{
+              role : invitation?.roleinvitedto,
+              organization : invitation?.organisation._id
+            }], 
+          }
+        );
+      }
+      
       console.log(3);
 
       try {
@@ -63,11 +79,13 @@ const Invitation = () => {
           params: { _id: response?.data?._id },
         });
         console.log("userInfo after accept invtation to dispatch");
-        // localStorage.removeItem("userInfo");
+        localStorage.removeItem("userInfo");
         localStorage.setItem(
           "userInfo",
           JSON.stringify(UserFetchResponse.data[0])
         );
+        localStorage.removeItem("userRole");
+        localStorage.setItem("userRole", invitation?.roleinvitedto);
         dispatch(setUserInfo(UserFetchResponse.data[0])); // Dispatch action with fetched data
       } catch (error) {
         console.error("Error:", error);
@@ -86,7 +104,7 @@ const Invitation = () => {
         );
 
         console.log(response.data[0]);
-        // localStorage.removeItem("organization");
+        localStorage.removeItem("organization");
         localStorage.setItem("organization", JSON.stringify(response.data[0]));
         dispatch(setOrganization(response.data[0]));
       } catch (error) {
