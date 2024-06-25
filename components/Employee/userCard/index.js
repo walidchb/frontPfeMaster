@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard }) {
+function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard, organization }) {
   const [user, setuser] = useState({});
   const [todoTasks, setTodoTasks] = useState([]);
   const [inprogressTasks, setInProgressTasks] = useState([]);
@@ -25,6 +25,7 @@ function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard }) {
         const tasksResponse = await axiosInstance.get(`/user/userTasks`, {
           params: {
             userId: userCardInfo?._id,
+            organizationId: organization?._id,
             teamId: teamId,
           },
         });
@@ -69,13 +70,13 @@ function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard }) {
           <div className="bg-gradient-to-r  from-blue-500 to-teal-500 p-6 flex flex-col items-center">
             {/* <div className=""> */}
             <button className="bg-white text-2xl rounded-full h-20 w-20 flex items-center justify-center mb-4 shadow-md">
-              {userCardInfo?.prenom[0]?.toUpperCase()}{" "}
-              {userCardInfo?.nom[0]?.toUpperCase()}
+              {userCardInfo?.nom[0]?.toUpperCase()}{" "}
+              {userCardInfo?.prenom[0]?.toUpperCase()}
             </button>
             {/* </div> */}
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white">
-                {userCardInfo?.prenom} {userCardInfo?.nom}
+                {userCardInfo?.nom} {userCardInfo?.prenom}
               </h2>
               <p className="text-white opacity-75">{userCardInfo?.email} </p>
             </div>

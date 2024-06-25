@@ -45,28 +45,34 @@ const Invitation = () => {
       },
     });
     console.log(0);
+    console.log("invit userInfo = ", userInfo)
+    console.log("invit role = ", invitation?.roleinvitedto)
+    console.log("invit org = ", invitation?.organisation)
 
     try {
       console.log(1);
       let response;
       if(invitation?.team){
+        console.log("invit with team ")
+        console.log("invit team = ", invitation?.team)
         response = await axiosInstance.patch(
           `/user/users?id=${userInfo?._id}`,
           {
             roles: [{
               role : invitation?.roleinvitedto,
-              organization : invitation?.organisation._id
+              organization : invitation?.organisation?._id
             }], 
             team: [invitation?.team?._id], // New team value to be pushed
           }
         );
       } else {
+          console.log("invit with not team ")
           response = await axiosInstance.patch(
           `/user/users?id=${userInfo?._id}`,
           {
             roles: [{
               role : invitation?.roleinvitedto,
-              organization : invitation?.organisation._id
+              organization : invitation?.organisation?._id
             }], 
           }
         );
