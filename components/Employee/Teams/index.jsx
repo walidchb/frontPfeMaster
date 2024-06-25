@@ -362,7 +362,7 @@ function TeamsPage() {
   const sendInvitaion = async (person) => {
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss,
+        sendby: organization?.Boss?._id,
         sendto: person._id,
         roleinvitedto: "employee",
         team: team._id,
@@ -535,41 +535,43 @@ function TeamsPage() {
                   className=" mb-8 w-full overflow-auto costumScrollBar grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
                   {teamMembers.length > 0 ? (
                     teamMembers.map((person, index) => (
-                      <li key={index}>
-                        <div className="flex items-center gap-x-6 ">
-                          <button
-                            onClick={() => {
-                              setUserCardInfo(person);
-                              setShowUserCard(true);
-                            }}
-                            className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                            {person?.prenom[0].toUpperCase()}
-                            {person?.nom[0].toUpperCase()}
-                          </button>
-                          <div>
-                            <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
-                              {person?.prenom} {person?.nom}
-                            </h3>
-                            <p className="text-sm font-semibold leading-6 text-indigo-600">
-                              {person?.email}
-                            </p>
-                            {!team.Boss ? (
-                              <button
-                                onClick={() => makeUserTeamBoss(team, person)}
-                                className="px-2 py-1 
-                           rounded-md font-medium bg-green-400 text-center text-white shadow-sm flex justify-between">
-                                <img
-                                  src="/images/leader.png"
-                                  className="h-6 w-6 mr-2"
-                                  alt=""
-                                  // srcset=""
-                                />
-                                <span>Make it Boss</span>
-                              </button>
-                            ) : null}
+                      person._id !== team?.Boss?._id && (
+                        <li key={index}>
+                          <div className="flex items-center gap-x-6 ">
+                            <button
+                              onClick={() => {
+                                setUserCardInfo(person);
+                                setShowUserCard(true);
+                              }}
+                              className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                              {person?.nom[0].toUpperCase()}
+                              {person?.prenom[0].toUpperCase()}
+                            </button>
+                            <div>
+                              <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
+                                {person?.nom} {person?.prenom} 
+                              </h3>
+                              <p className="text-sm font-semibold leading-6 text-indigo-600">
+                                {person?.email}
+                              </p>
+                              {!team.Boss ? (
+                                <button
+                                  onClick={() => makeUserTeamBoss(team, person)}
+                                  className="px-2 py-1 
+                            rounded-md font-medium bg-green-400 text-center text-white shadow-sm flex justify-between">
+                                  <img
+                                    src="/images/leader.png"
+                                    className="h-6 w-6 mr-2"
+                                    alt=""
+                                    // srcset=""
+                                  />
+                                  <span>Make it Boss</span>
+                                </button>
+                              ) : null}
+                            </div>
                           </div>
-                        </div>
-                      </li>
+                        </li>
+                      )
                     ))
                   ) : (
                     <div className="w-full  my-2 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
@@ -756,6 +758,7 @@ function TeamsPage() {
       {/* user card  */}
       {showUserCard ? (
         <UserCard
+          organization={organization}
           teamId={team?._id}
           userCardInfo={userCardInfo}
           showUserCard={showUserCard}

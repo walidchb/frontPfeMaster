@@ -90,6 +90,13 @@ const TaskPage = () => {
         seen: [{ userId: userId, seen: false }],
       });
       console.log("Notif après accept = ", reponse2.data);
+      const reponse4 = await axiosInstance.patch(
+        `delegation/delegations/updateDelegations/${taskData?._id}/${userId}`,
+        {
+          annuler: true,
+          accepted: false,
+        }
+      );
       const reponse3 = await axiosInstance.patch(
         `delegation/delegations/${idDelegation}`,
         {
@@ -98,13 +105,7 @@ const TaskPage = () => {
         }
       );
       console.log("accepter = ", reponse3.data);
-      const reponse4 = await axiosInstance.patch(
-        `delegation/delegations/updateDelegations/${taskData?._id}/${userId}`,
-        {
-          annuler: true,
-          accepted: false,
-        }
-      );
+      
       setShowDelegationRequest(false);
       setReload(!reload);
     } catch (error) {
@@ -452,6 +453,7 @@ const TaskPage = () => {
       try {
         const response = await axiosInstance.get(`/delegation/delegations`, {
           params: {
+            sendby: userInfo?._id,
             sendto: person._id,
             task: taskData?._id,
           },
@@ -1770,12 +1772,7 @@ const TaskPage = () => {
                                 className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                 {taskData?.affectedto.nom[0].toUpperCase()}
                                 {taskData?.affectedto.prenom[0].toUpperCase()}
-                              </button>
-
-                              <button className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                                {taskData?.affectedto?.nom[0].toUpperCase()}
-                                {taskData?.affectedto?.prenom[0].toUpperCase()}
-                              </button>
+                              </button>                           
                               <p>
                                 {taskData?.affectedto?.nom}{" "}
                                 {taskData?.affectedto?.prenom}
@@ -2131,6 +2128,7 @@ const TaskPage = () => {
         {/* user card modal */}
         {showUserCard ? (
           <UserCard
+            organization={organization}
             teamId={taskData?.team?._id}
             userCardInfo={userCardInfo}
             showUserCard={showUserCard}
