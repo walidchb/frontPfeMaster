@@ -51,6 +51,7 @@ function SchedulerEmployee() {
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
               params: {
+                organizationId: organization?._id,
                 userId: userInfo._id,
                 teamId: teamId,
               },
@@ -64,6 +65,8 @@ function SchedulerEmployee() {
           try {
             const response = await axiosInstance.get(`/user/userTasks`, {
               params: {
+                organizationId: organization?._id,
+
                 userId: userInfo._id,
                 teamId: teamId,
               },
@@ -102,10 +105,12 @@ function SchedulerEmployee() {
       }
     };
 
-    fetchTasks();
+    if (userInfo && teamId && organization) {
+      fetchTasks();
+    }
   }, [userInfo, teamId, organization]);
   const axiosInstance = axios.create({
-    baseURL: "https://back-pfe-master.vercel.app",
+    baseURL: "http://localhost:1937",
     headers: {
       "Content-Type": "application/json",
     },
