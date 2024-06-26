@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard, organization }) {
+function UserCard({
+  userCardInfo,
+  teamId,
+  showUserCard,
+  setShowUserCard,
+  organization,
+}) {
   const [user, setuser] = useState({});
   const [todoTasks, setTodoTasks] = useState([]);
   const [inprogressTasks, setInProgressTasks] = useState([]);
@@ -16,7 +22,7 @@ function UserCard({ userCardInfo, teamId, showUserCard, setShowUserCard, organiz
   useEffect(() => {
     const fetchUserTasks = async () => {
       const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
+        baseURL: "https://back-pfe-master.vercel.app",
         headers: {
           "Content-Type": "application/json",
         },

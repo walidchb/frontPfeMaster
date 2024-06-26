@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:1937",
+  baseURL: "https://back-pfe-master.vercel.app",
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,13 +34,14 @@ const fetchUsers = async (organizationId) => {
       },
     });
     const users = response.data;
-    
+
     // Filtrage côté client
-    const filteredUsers = users.filter(user => 
-      user.roles.some(role => 
-        role.role === "prjctBoss" && 
-        role.organization && 
-        role.organization._id === organizationId
+    const filteredUsers = users.filter((user) =>
+      user.roles.some(
+        (role) =>
+          role.role === "prjctBoss" &&
+          role.organization &&
+          role.organization._id === organizationId
       )
     );
 

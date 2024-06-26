@@ -50,7 +50,7 @@ function Kanban() {
     }
   }, []);
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -92,7 +92,12 @@ function Kanban() {
         <div className="w-full overflow-auto costumScrollBar">
           <MenuProject activePageIndex={1} />
           {Object.keys(project).length > 0 ? (
-            <KanbanBoard project={project} user={userInfo} teamId={teamId} role={userRole}/>
+            <KanbanBoard
+              project={project}
+              user={userInfo}
+              teamId={teamId}
+              role={userRole}
+            />
           ) : (
             <Loader /> // Afficher le composant Loader si le projet n'est pas récupéré
           )}

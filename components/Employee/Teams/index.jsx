@@ -42,7 +42,7 @@ function TeamsPage() {
   const [userInfo, setUserInfo] = useState({});
 
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -79,7 +79,7 @@ function TeamsPage() {
   // useEffect(() => {
   //   const getinvitations = async (values) => {
   // const axiosInstance = axios.create({
-  //   baseURL: "http://localhost:1937",
+  //   baseURL: "https://back-pfe-master.vercel.app",
   //   headers: {
   //     "Content-Type": "application/json",
   // =======
@@ -108,7 +108,7 @@ function TeamsPage() {
     // <<<<<<< HEAD
     const getinvitations = async (values) => {
       const axiosInstance = axios.create({
-        baseURL: "http://localhost:1937",
+        baseURL: "https://back-pfe-master.vercel.app",
         headers: {
           "Content-Type": "application/json",
         },
@@ -139,7 +139,7 @@ function TeamsPage() {
   // useEffect(() => {
   //   const getTeams = async (values) => {
   //     const axiosInstance = axios.create({
-  //       baseURL: "http://localhost:1937",
+  //       baseURL: "https://back-pfe-master.vercel.app",
   //       headers: {
   //         "Content-Type": "application/json",
   //       },
@@ -202,7 +202,7 @@ function TeamsPage() {
   // useEffect(() => {
   //   const getTeams = async (values) => {
   //     const axiosInstance = axios.create({
-  //       baseURL: "http://localhost:1937",
+  //       baseURL: "https://back-pfe-master.vercel.app",
   //       headers: {
   //         "Content-Type": "application/json",
   //       },
@@ -253,7 +253,7 @@ function TeamsPage() {
   //   useEffect(() => {
   //     // const getPeople = async (values) => {
   //     //   const axiosInstance = axios.create({
-  //     //     baseURL: "http://localhost:1937",
+  //     //     baseURL: "https://back-pfe-master.vercel.app",
   //     //     headers: {
   //     //       "Content-Type": "application/json",
   // // =======
@@ -311,7 +311,7 @@ function TeamsPage() {
   const handleSubmit = async (values, { setSubmitting }) => {
     // <<<<<<< HEAD
     //     const axiosInstance = axios.create({
-    //       baseURL: "http://localhost:1937",
+    //       baseURL: "https://back-pfe-master.vercel.app",
     //       headers: {
     //         "Content-Type": "application/json",
     //       },
@@ -534,45 +534,48 @@ function TeamsPage() {
                   role="list"
                   className=" mb-8 w-full overflow-auto costumScrollBar grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
                   {teamMembers.length > 0 ? (
-                    teamMembers.map((person, index) => (
-                      person._id !== team?.Boss?._id && (
-                        <li key={index}>
-                          <div className="flex items-center gap-x-6 ">
-                            <button
-                              onClick={() => {
-                                setUserCardInfo(person);
-                                setShowUserCard(true);
-                              }}
-                              className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                              {person?.nom[0].toUpperCase()}
-                              {person?.prenom[0].toUpperCase()}
-                            </button>
-                            <div>
-                              <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
-                                {person?.nom} {person?.prenom} 
-                              </h3>
-                              <p className="text-sm font-semibold leading-6 text-indigo-600">
-                                {person?.email}
-                              </p>
-                              {!team.Boss ? (
-                                <button
-                                  onClick={() => makeUserTeamBoss(team, person)}
-                                  className="px-2 py-1 
+                    teamMembers.map(
+                      (person, index) =>
+                        person._id !== team?.Boss?._id && (
+                          <li key={index}>
+                            <div className="flex items-center gap-x-6 ">
+                              <button
+                                onClick={() => {
+                                  setUserCardInfo(person);
+                                  setShowUserCard(true);
+                                }}
+                                className="h-10 w-10 text-xl mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                                {person?.nom[0].toUpperCase()}
+                                {person?.prenom[0].toUpperCase()}
+                              </button>
+                              <div>
+                                <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
+                                  {person?.nom} {person?.prenom}
+                                </h3>
+                                <p className="text-sm font-semibold leading-6 text-indigo-600">
+                                  {person?.email}
+                                </p>
+                                {!team.Boss ? (
+                                  <button
+                                    onClick={() =>
+                                      makeUserTeamBoss(team, person)
+                                    }
+                                    className="px-2 py-1 
                             rounded-md font-medium bg-green-400 text-center text-white shadow-sm flex justify-between">
-                                  <img
-                                    src="/images/leader.png"
-                                    className="h-6 w-6 mr-2"
-                                    alt=""
-                                    // srcset=""
-                                  />
-                                  <span>Make it Boss</span>
-                                </button>
-                              ) : null}
+                                    <img
+                                      src="/images/leader.png"
+                                      className="h-6 w-6 mr-2"
+                                      alt=""
+                                      // srcset=""
+                                    />
+                                    <span>Make it Boss</span>
+                                  </button>
+                                ) : null}
+                              </div>
                             </div>
-                          </div>
-                        </li>
-                      )
-                    ))
+                          </li>
+                        )
+                    )
                   ) : (
                     <div className="w-full  my-2 py-2 text-gray-00 flex justify-center items-center border-gray-600 border-2 border-dashed">
                       there are no members in this team yet{" "}

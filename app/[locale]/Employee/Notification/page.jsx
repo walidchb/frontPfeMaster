@@ -20,8 +20,6 @@ import React, { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 
-
-
 const Notification = () => {
   const [notifications, setNotifications] = useState(null);
   const [reload, setReload] = useState(false);
@@ -30,9 +28,9 @@ const Notification = () => {
   const [organization, setOrganization] = useState(null);
   const locale = useLocale();
   const router = useRouter();
-  
+
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -191,7 +189,11 @@ const Notification = () => {
         </div>
         {notifications?.length > 0 ? (
           notifications?.map((notification, index) => (
-            <NotificationListElement key={index} notification={notification} GotoNotifacations={GotoNotifacations}/>
+            <NotificationListElement
+              key={index}
+              notification={notification}
+              GotoNotifacations={GotoNotifacations}
+            />
           ))
         ) : (
           <div className="w-full rounded-sm  my-4 py-2 text-gray-00 flex justify-center items-center text-gray-500 border-gray-600  border-2 border-dashed">

@@ -39,45 +39,49 @@ const Invitation = () => {
   const accepteInvitation = async () => {
     setSubmitting(true);
     const axiosInstance = axios.create({
-      baseURL: "http://localhost:1937",
+      baseURL: "https://back-pfe-master.vercel.app",
       headers: {
         "Content-Type": "application/json",
       },
     });
     console.log(0);
-    console.log("invit userInfo = ", userInfo)
-    console.log("invit role = ", invitation?.roleinvitedto)
-    console.log("invit org = ", invitation?.organisation)
+    console.log("invit userInfo = ", userInfo);
+    console.log("invit role = ", invitation?.roleinvitedto);
+    console.log("invit org = ", invitation?.organisation);
 
     try {
       console.log(1);
       let response;
-      if(invitation?.team){
-        console.log("invit with team ")
-        console.log("invit team = ", invitation?.team)
+      if (invitation?.team) {
+        console.log("invit with team ");
+        console.log("invit team = ", invitation?.team);
         response = await axiosInstance.patch(
           `/user/users?id=${userInfo?._id}`,
           {
-            roles: [{
-              role : invitation?.roleinvitedto,
-              organization : invitation?.organisation?._id
-            }], 
+            roles: [
+              {
+                role: invitation?.roleinvitedto,
+                organization: invitation?.organisation?._id,
+              },
+            ],
             team: [invitation?.team?._id], // New team value to be pushed
           }
         );
       } else {
-          console.log("invit with not team ")
-          response = await axiosInstance.patch(
+        console.log("invit with not team ");
+        response = await axiosInstance.patch(
           `/user/users?id=${userInfo?._id}`,
           {
-            roles: [{
-              role : invitation?.roleinvitedto,
-              organization : invitation?.organisation?._id
-            }], 
+            roles: [
+              {
+                role: invitation?.roleinvitedto,
+                organization: invitation?.organisation?._id,
+              },
+            ],
           }
         );
       }
-      
+
       console.log(3);
 
       try {

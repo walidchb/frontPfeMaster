@@ -15,15 +15,18 @@ function Contact() {
       const subject = `Message de votre application`;
 
       // <<<<<<< HEAD
-      const response = await axios.post("http://localhost:1937/send-email", {
-        name,
-        email,
-        subject,
-        message,
-      });
+      const response = await axios.post(
+        "https://back-pfe-master.vercel.app/send-email",
+        {
+          name,
+          email,
+          subject,
+          message,
+        }
+      );
       // =======
       // const response = await axios.post(
-      //   "http://localhost:1937/send-email",
+      //   "https://back-pfe-master.vercel.app/send-email",
       //   {
       //     name,
       //     email,

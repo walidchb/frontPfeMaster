@@ -105,7 +105,7 @@ const TaskPage = () => {
         }
       );
       console.log("accepter = ", reponse3.data);
-      
+
       setShowDelegationRequest(false);
       setReload(!reload);
     } catch (error) {
@@ -295,7 +295,7 @@ const TaskPage = () => {
     setShowUpdateTaskForm(true);
   };
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -1772,7 +1772,7 @@ const TaskPage = () => {
                                 className="h-8 w-8 text-l mr-2 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                 {taskData?.affectedto.nom[0].toUpperCase()}
                                 {taskData?.affectedto.prenom[0].toUpperCase()}
-                              </button>                           
+                              </button>
                               <p>
                                 {taskData?.affectedto?.nom}{" "}
                                 {taskData?.affectedto?.prenom}
