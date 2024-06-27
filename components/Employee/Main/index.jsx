@@ -95,7 +95,9 @@ function MainEmployee({ reloadPage }) {
     }
   }, []);
   const fetchProjectsAndTasks = async (organizationId, userId) => {
+    console.log("ghjkjhh");
     if (userInfo && userRole === "orgBoss") {
+      console.log("fetch project orgggg");
       try {
         const response = await axiosInstance.get(
           `/project/projects?organization=${organizationId}`
@@ -197,8 +199,10 @@ function MainEmployee({ reloadPage }) {
     setReload(!a);
   };
   useEffect(() => {
-    if (userInfo?._id && organization?._id && userRole && teamId) {
+    console.log("use effect oneeee");
 
+    if (userInfo?._id && organization?._id && userRole) {
+      console.log("use effect");
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
     // <<<<<<< HEAD
@@ -349,7 +353,7 @@ function MainEmployee({ reloadPage }) {
         className={"  w-screen overflow-auto costumScrollBar pb-40"}>
         <div className="p-4 sm:p-10    ">
           <h1 className="w-10/12 border-b-2 py-3   ">
-            Company &nbsp;&nbsp; &#x276F; &nbsp;&nbsp;  &nbsp;&nbsp;
+            Company &nbsp;&nbsp; &#x276F; &nbsp;&nbsp; &nbsp;&nbsp;
           </h1>
 
           <div className=" mt-10 w-full  flex justify-between items-center">

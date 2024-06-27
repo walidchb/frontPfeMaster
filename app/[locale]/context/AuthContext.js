@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     // =======
     try {
       setLoading(true);
+      console.log("oneeeee");
       await signInWithEmailAndPassword(auth, email, password);
       console.log("signed in");
 
