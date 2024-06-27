@@ -15,7 +15,7 @@ import {
   FaTasks,
   FaClock,
   FaClipboardCheck,
-  FaTrash
+  FaTrash,
 } from "react-icons/fa";
 // import { FaExclamationCircle } from "react-icons/fa";
 import axios from "axios";
@@ -53,7 +53,7 @@ import UpdateProjectForm from "../../UpdateProjectForm";
 
 const ProjectDetails = ({ project, reloadpage, reload }) => {
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:1937",
+    baseURL: "https://back-pfe-master.vercel.app",
     headers: {
       "Content-Type": "application/json",
     },
@@ -69,8 +69,8 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    const role= localStorage.getItem('userRole')
-    setUserRole(role)
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
   }, []);
   // <<<<<<< HEAD
   const [doneTasks, setDoneTasks] = useState([]);
@@ -102,15 +102,15 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
 
   const handleDeleteDocument = async (documentName) => {
     try {
-      const response = await axiosInstance.patch(`/project/deleteDocument/${project?._id}`, {
-        fileName : documentName
-      })
+      const response = await axiosInstance.patch(
+        `/project/deleteDocument/${project?._id}`,
+        {
+          fileName: documentName,
+        }
+      );
       console.log(`Deleting document: ${documentName}`);
       reloadpage();
-    } catch (error) {
-      
-    }
-    
+    } catch (error) {}
   };
 
   const [pastDueTasks, setPastDueTasks] = useState(0);
@@ -451,11 +451,10 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
                 {project.documents.map((document, index) => (
                   <div
                     key={index}
-                    className="text-black border-2 flex flex-col justify-between items-center"
-                  >
+                    className="text-black border-2 flex flex-col justify-between items-center">
                     <div className="overflow-hidden sm:h-32 h-20 w-full">
                       <iframe
-                        src={`http://localhost:1937/uploads/${document}`}
+                        src={`https://back-pfe-master.vercel.app/uploads/${document}`}
                         className="w-full h-full"
                         frameBorder="0"
                       />
@@ -466,10 +465,14 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
                       </p>
                       <div className="flex">
                         <FaCircleDown
-                          onClick={() => handleDownload(`http://localhost:1937/uploads/${document}`)}
+                          onClick={() =>
+                            handleDownload(
+                              `https://back-pfe-master.vercel.app/uploads/${document}`
+                            )
+                          }
                           className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer mr-2"
                         />
-                        {userRole === 'orgBoss' && (
+                        {userRole === "orgBoss" && (
                           <FaTrash
                             onClick={() => handleDeleteDocument(document)}
                             className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer"
@@ -481,7 +484,7 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
                 ))}
               </div>
             )}
-            
+
             <button className="btn" onClick={() => setShowMore(!showMore)}>
               {showMore ? "" : "..."}
               <span className="text-sm text-blue-600">
