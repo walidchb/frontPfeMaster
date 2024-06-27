@@ -49,8 +49,6 @@ function CalendrierView({ tasks }) {
           <Toolbar />
           <ViewSwitcher />
           <MonthView />
-          <WeekView startDayHour={8} endDayHour={17} excludedDays={[5, 6]} />
-          <DayView startDayHour={8} endDayHour={17} />
           <Appointments />
           <AppointmentTooltip />
 

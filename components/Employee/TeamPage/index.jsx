@@ -99,12 +99,13 @@ function TeamPage() {
           {team?.Boss ? (
             <div className="bg-gray-800 w-fit h-fit lg:mr-6 mb-4  rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10 ">
               <button className="h-20 w-20 text-3xl relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                {team?.Boss?.prenom[0].toUpperCase()}{" "}
-                {team?.Boss?.nom[0].toUpperCase()}
+              {team?.Boss?.nom[0].toUpperCase()}{" "}
+              {team?.Boss?.prenom[0].toUpperCase()}
               </button>
               <h5 className="mb-1 text-center text-xl font-medium text-gray-900 dark:text-white">
-                {team?.Boss?.prenom}
-                {team?.Boss?.nom}
+                
+              {team?.Boss?.nom} {team?.Boss?.prenom}
+                
               </h5>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Team Leader
@@ -126,13 +127,14 @@ function TeamPage() {
                       setShowUserCard(true);
                     }}
                     className="h-10 w-10 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                    {person?.prenom[0].toUpperCase()}{" "}
-                    {person?.nom[0].toUpperCase()}
+                    
+                    {person?.nom[0].toUpperCase()}{" "}
+                    {person?.prenom[0].toUpperCase()}
                   </button>
                   <div>
                     <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
-                      {person?.prenom}
-                      {person?.nom}
+                      {person?.nom} {person?.prenom}
+                      
                     </h3>
                     <p className="text-sm font-semibold leading-6 text-indigo-600">
                       {person?.email}

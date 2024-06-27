@@ -15,8 +15,10 @@ import {
   FaTasks,
   FaClock,
   FaClipboardCheck,
+  FaTrash
 } from "react-icons/fa";
 // import { FaExclamationCircle } from "react-icons/fa";
+import axios from "axios";
 
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
@@ -50,6 +52,12 @@ import ProgressCircle from "@/components/Employee/components/ProgressCercle";
 import UpdateProjectForm from "../../UpdateProjectForm";
 
 const ProjectDetails = ({ project, reloadpage, reload }) => {
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:1937",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   let text =
     "Import trace for requested module:Import trace for requestedmodule: Import trace for requested module:Import trace forrequested module:Import trace for requested module:Import tracefor requested module:Import trace for requested module:Importtrace for requested module:Import trace for requestedmodule:Import trace for requested module:Import trace forrequested module:Import trace for requested module:";
   const [ShowDescription, setShowDescription] = useState(true);
@@ -58,6 +66,12 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const role= localStorage.getItem('userRole')
+    setUserRole(role)
+  }, []);
   // <<<<<<< HEAD
   const [doneTasks, setDoneTasks] = useState([]);
   const [todoTasks, setTodoTasks] = useState([]);
@@ -85,38 +99,19 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
   const onDocumentLoadSuccess = ({ nextNumPages }) => {
     setNumPages(nextNumPages);
   };
-  const images = [
-    {
-      original: "/images/team.jpeg",
-      thumbnail: "/team.jpeg",
-    },
-    {
-      original: "https://picsum.photos/id/1015/1000/600/",
-      thumbnail: "https://picsum.photos/id/1015/250/150/",
-    },
-    {
-      original: "https://picsum.photos/id/1019/1000/600/",
-      thumbnail: "https://picsum.photos/id/1019/250/150/",
-    },
-    {
-      original: "/images/team.jpeg",
-      thumbnail: "/team.jpeg",
-    },
-    {
-      original: "https://picsum.photos/id/1015/1000/600/",
-      thumbnail: "https://picsum.photos/id/1015/250/150/",
-    },
-    {
-      original: "https://picsum.photos/id/1019/1000/600/",
-      thumbnail: "https://picsum.photos/id/1019/250/150/",
-    },
-  ];
-  const Docs = [
-    {
-      original: "/walid.pdf",
-      thumbnail: "/walid.pdf",
-    },
-  ];
+
+  const handleDeleteDocument = async (documentName) => {
+    try {
+      const response = await axiosInstance.patch(`/project/deleteDocument/${project?._id}`, {
+        fileName : documentName
+      })
+      console.log(`Deleting document: ${documentName}`);
+      reloadpage();
+    } catch (error) {
+      
+    }
+    
+  };
 
   const [pastDueTasks, setPastDueTasks] = useState(0);
   useEffect(() => {
@@ -169,9 +164,12 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  const handleDownload = (imageUrl) => {
-    console.log("object");
-    window.open(imageUrl, "_blank");
+  const handleDownload = (fileUrl) => {
+    if (fileUrl) {
+      window.open(fileUrl, "_blank");
+    } else {
+      console.error("URL du fichier non disponible");
+    }
   };
   const [isOverdue, setisOverdue] = useState(false);
 
@@ -189,12 +187,14 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
             )}{" "}
             Title :
           </span>
-          <div
-            onClick={handleShowUpdateProjectForm}
-            className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline">
-            <MdEditDocument className="h-6 w-6 mr-1" />
-            <p className="text-2xl">Edit</p>
-          </div>
+          {userRole === "orgBoss" && (
+            <div
+              onClick={handleShowUpdateProjectForm}
+              className="flex justify-center items-center mx-2 underline text-blue-700 cursor-pointer hover:no-underline">
+              <MdEditDocument className="h-6 w-6 mr-1" />
+              <p className="text-2xl">Edit</p>
+            </div>
+          )}
         </div>
         {ShowTitle ? (
           <span className="font-bold text-xl flex mb-4">{project.Name}</span>
@@ -448,56 +448,40 @@ const ProjectDetails = ({ project, reloadpage, reload }) => {
               : `${project.Description?.substring(0, 250)}`}
             {showMore && (
               <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {images.map((child, index) => (
+                {project.documents.map((document, index) => (
                   <div
                     key={index}
-                    className="text-black border-2 flex flex-col justify-between items-center">
-                    <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                      <img className="" src={child.original} frameBorder="0" />
+                    className="text-black border-2 flex flex-col justify-between items-center"
+                  >
+                    <div className="overflow-hidden sm:h-32 h-20 w-full">
+                      <iframe
+                        src={`http://localhost:1937/uploads/${document}`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                      />
                     </div>
                     <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                      <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                        {child.original.split("/").pop()
-                          ? child.original.split("/").pop()
-                          : `photo dfgdfgdf ${index}`}
+                      <p className="w-8/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                        {document}
                       </p>
-                      <FaCircleDown
-                        onClick={() => handleDownload(child.original)}
-                        className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                      />
+                      <div className="flex">
+                        <FaCircleDown
+                          onClick={() => handleDownload(`http://localhost:1937/uploads/${document}`)}
+                          className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer mr-2"
+                        />
+                        {userRole === 'orgBoss' && (
+                          <FaTrash
+                            onClick={() => handleDeleteDocument(document)}
+                            className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-            {showMore && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {Docs.map((child, index) => (
-                  <div
-                    key={index}
-                    className="text-black border-2 flex flex-col justify-between items-center">
-                    <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                      <Document
-                        file={child.original}
-                        onLoadSuccess={onDocumentLoadSuccess}>
-                        <Page pageNumber={pageNumber} width={100} />
-                      </Document>
-                    </div>
-                    <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                      <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                        {child.original.split("/").pop()
-                          ? child.original.split("/").pop()
-                          : `PDF ${index}`}
-                      </p>
-                      <FaCircleDown
-                        onClick={() => handleDownload(child.original)}
-                        className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            
             <button className="btn" onClick={() => setShowMore(!showMore)}>
               {showMore ? "" : "..."}
               <span className="text-sm text-blue-600">
