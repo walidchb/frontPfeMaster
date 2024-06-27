@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaFileUpload } from "react-icons/fa";
 import * as Yup from "yup";
 import axios from "axios";
 
@@ -68,14 +68,25 @@ const AddTaskForm = ({
     setSubmitting(true);
 
     try {
-      const response = await axiosInstance.post("/task/tasks", {
-        Name: values.taskName,
-        Description: values.description,
-        priorite: values.priority,
-        dateDebutEstim: values.startDate,
-        dateFinEstim: values.dueDate,
-        projet: parentProject?._id,
-        team: values.assignedTo,
+      const formData = new FormData();
+      formData.append("Name", values.taskName);
+      formData.append("Description", values.description);
+      formData.append("priorite", values.priority);
+      formData.append("dateDebutEstim", values.startDate);
+      formData.append("dateFinEstim", values.dueDate);
+      formData.append("projet", parentProject?._id);
+      formData.append("team", values.assignedTo);
+
+      if (values.documents) {
+        for (let i = 0; i < values.documents.length; i++) {
+          formData.append("documents", values.documents[i]);
+        }
+      }
+
+      const response = await axiosInstance.post("/task/tasks", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       console.log("respons = ", response.data);
 
@@ -130,6 +141,10 @@ const AddTaskForm = ({
     dueDate: Yup.date().required("Due Date is required"),
     priority: Yup.string().required("Priority is required"),
     assignedTo: Yup.string().required("Assigned Team is required"),
+    documents: Yup.mixed().test("fileSize", "File size is too large", (value) => {
+      if (!value) return true; // If no file is selected, it's valid
+      return value && value[0] && value[0].size <= 5000000; // 5MB max
+    }),
   });
 
   const formik = useFormik({
@@ -140,6 +155,7 @@ const AddTaskForm = ({
       dueDate: "",
       priority: "",
       assignedTo: "",
+      documents: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -356,6 +372,26 @@ const AddTaskForm = ({
               formik.errors.assignedTo}
           </p>
         </div>
+        <div className="w-full">
+        <p className="text-l">Upload Documents :</p>
+        <div className="flex justify-start items-center px-2 border-b border-[#314155] h-10">
+          <FaFileUpload className="w-5 h-5" />
+          <input
+            className="px-4 w-full focus:outline-none"
+            type="file"
+            name="documents"
+            multiple
+            onChange={(event) => {
+              formik.setFieldValue("documents", event.currentTarget.files);
+            }}
+          />
+        </div>
+        <p className="mb-4 text-red-500">
+          {formik.errors.documents &&
+            formik.touched.documents &&
+            formik.errors.documents}
+        </p>
+      </div>
 
         <button
           className="bg-[#314155] m-auto hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md mt-12 w-1/2 flex items-center justify-center"

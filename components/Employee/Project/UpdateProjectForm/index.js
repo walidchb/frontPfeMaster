@@ -85,9 +85,6 @@ const UpdateProjectForm = ({
     }
   }, [project]);
 
-  // const organizationId = "665ee35842437a997e99797b";
-  // const projectId = "6663a0343f2a480100ca8d6d";
-
   const fetchProjectToUpdate = async (projectId) => {
     try {
       const response = await axiosInstance.get(
@@ -411,53 +408,7 @@ const UpdateProjectForm = ({
       setSubmitting(false);
     }
   };
-  // const sendProjectData = async (values, setSubmitting) => {
-  //   console.log("paaaaatchhhhh");
-  //   setSubmitting(true);
-
-  //   try {
-  //     const response = await axiosInstance.patch(
-  //       `/project/projects/${project?._id}`,
-  //       {
-  //         Name: values.projectName,
-  //         Description: values.description,
-  //         dateDebutEstim: values.startDate,
-  //         dateFinEstim: values.dueDate,
-  //         boss: values.projectManager,
-  //         teams: values.teams,
-  //       }
-  //     );
-  //     console.log(response.data);
-
-  //      const teamIds = values.teams.join(',');
-  //       console.log("ids team = ", teamIds)
-  //       const response2 = await axiosInstance.get(`/user/users?team=${teamIds}`);
-  //       const membersToNotify = response2.data.map(user => user._id);
-  //       const usersToNotify = [values.projectManager, ...membersToNotify];
-  //       const notificationContent = {
-  //         message: `Un nouveau projet "${values.projectName}" a été créé.`,
-  //         url: JSON.stringify(response.data), // Ajoutez l'URL appropriée pour accéder au projet
-  //       };
-  //       // Utilisez usersToNotify pour envoyer les notifications
-  //       console.log('Users to notify:', usersToNotify);
-  //       const response1 = await axiosInstance.post("/notification/notifications", {
-  //         recipients: usersToNotify,
-  //         content: notificationContent,
-  //         type: 'project',
-  //         organization: organization?._id,
-  //         seen: usersToNotify.map(userId => ({ userId, seen: false }))
-  //       })
-  //       console.log("notif = ", response1.data)
-  //     showPopupMessage("Project updated successfully!");
-  //     formik.resetForm();
-  //   } catch (error) {
-  //     console.error("Error from backend:");
-  //     console.log(error);
-  //     showPopupMessage("An error occurred while updating the project.");
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
+  
   const loginDiv = {
     boxShadow:
       "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",

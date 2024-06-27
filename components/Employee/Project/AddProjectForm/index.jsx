@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaFileUpload } from "react-icons/fa";
 import * as Yup from "yup";
 import axios from "axios";
 import Loader from "@/components/Loader";
@@ -119,22 +119,45 @@ const AddProjectForm = ({
     dueDate: Yup.date().required("Required"),
     teams: Yup.array().min(1, "At least one team is required"),
     projectManager: Yup.string().required("Required"),
+    documents: Yup.mixed().test(
+      "fileSize",
+      "File size is too large",
+      (value) => {
+        if (!value) return true; // Si aucun fichier n'est sélectionné, c'est valide
+        return value && value[0] && value[0].size <= 5000000; // 5MB max
+      }
+    ),
   });
 
   const sendProjectData = async (values, setSubmitting) => {
     setSubmitting(true);
 
     try {
-      const response = await axiosInstance.post("/project/projects", {
-        Name: values.projectName,
-        Description: values.description,
-        dateDebutEstim: values.startDate,
-        dateFinEstim: values.dueDate,
-        organization: organization?._id,
-        boss: values.projectManager,
-        teams: values.teams,
+      const formData = new FormData();
+      formData.append("Name", values.projectName);
+      formData.append("Description", values.description);
+      formData.append("dateDebutEstim", values.startDate);
+      formData.append("dateFinEstim", values.dueDate);
+      formData.append("organization", organization?._id);
+      formData.append("boss", values.projectManager);
+
+      // Assurez-vous que teams est toujours un tableau
+      const teamsArray = Array.isArray(values.teams)
+        ? values.teams
+        : [values.teams];
+      teamsArray.forEach((team) => formData.append("teams", team));
+
+      if (values.documents) {
+        for (let i = 0; i < values.documents.length; i++) {
+          formData.append("documents", values.documents[i]);
+        }
+      }
+
+      const response = await axiosInstance.post("/project/projects", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      console.log("sendproject", response.data);
 
       const teamIds = values.teams.join(",");
       console.log("ids team = ", teamIds);
@@ -179,6 +202,7 @@ const AddProjectForm = ({
       dueDate: "",
       teams: [],
       projectManager: "",
+      documents: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -212,7 +236,7 @@ const AddProjectForm = ({
     console.log(organization);
     try {
       const response = await axiosInstance.post("/invitation/invitations", {
-        sendby: organization?.Boss,
+        sendby: organization?.Boss?._id,
         sendto: person._id,
         roleinvitedto: "prjctBoss",
         organisation: organization?._id,
@@ -255,41 +279,8 @@ const AddProjectForm = ({
   useEffect(() => {
     getinvitations();
   }, []);
-  //   useEffect(() => {
-  // <<<<<<< HEAD
-  //     const getinvitations = async (values) => {
-  //       const axiosInstance = axios.create({
-  //         baseURL: "https://back-pfe-master.vercel.app",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       const organization = JSON.parse(localStorage.getItem("organization"));
-  //       try {
-  //         const response = await axiosInstance.get("/invitation/invitations", {
-  //           params: {
-  //             organisation: organization?._id,
-  //           },
-  //         });
-  //         console.log("invitaions");
-
-  //         console.log(response.data);
-  //         setInvitaions(response.data);
-  //       } catch (error) {
-  //         console.error("Error:", error);
-  //       }
-  //     };
-
-  //     getinvitations();
-  //   }, [reloadInvit]);
 
   useEffect(() => {
-    //     const getPeople = async (values) => {
-    //       const axiosInstance = axios.create({
-    //         baseURL: "https://back-pfe-master.vercel.app",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    // =======
     getinvitations();
   }, [reloadInvit]);
 
@@ -300,7 +291,6 @@ const AddProjectForm = ({
       const response = await axiosInstance.get("/user/users", {
         params: {
           roles: roles.join(","),
-          // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
         },
       });
       const filterPeopleNotInOrganization = response.data.filter(
@@ -583,6 +573,29 @@ const AddProjectForm = ({
                 {formik.errors.teams &&
                   formik.touched.teams &&
                   formik.errors.teams}
+              </p>
+            </div>
+            <div className="w-full">
+              <p className="text-l">Upload Documents :</p>
+              <div className="flex justify-start items-center px-2 border-b border-[#314155] h-10">
+                <FaFileUpload className="w-5 h-5" />
+                <input
+                  className="px-4 w-full focus:outline-none"
+                  type="file"
+                  name="documents"
+                  multiple
+                  onChange={(event) => {
+                    formik.setFieldValue(
+                      "documents",
+                      event.currentTarget.files
+                    );
+                  }}
+                />
+              </div>
+              <p className="mb-4 text-red-500">
+                {formik.errors.documents &&
+                  formik.touched.documents &&
+                  formik.errors.documents}
               </p>
             </div>
             <button

@@ -40,6 +40,7 @@ function TeamsPage() {
   const [personFetched, setPersonFetched] = useState(false);
   const [organization, setOrganization] = useState({}); // State to trigger rerender
   const [userInfo, setUserInfo] = useState({});
+  const [showteamtoInvite, setShowteamtoInvite] = useState("")
 
   const axiosInstance = axios.create({
     baseURL: "https://back-pfe-master.vercel.app",
@@ -454,12 +455,14 @@ function TeamsPage() {
           {/* &nbsp;&nbsp; &#x276F; &nbsp;&nbsp; departement &nbsp;&nbsp;
           &#x276F; &nbsp;&nbsp; project Name{" "} */}
         </h1>
-        <div
-          onClick={() => setShowCreateNewTeam(true)}
-          className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
-          <IoMdAddCircle className="w-6 h-6" />{" "}
-          <span className="mx-2 font-semibold ">Create new Team</span>
-        </div>
+        {userRole === "orgBoss" && (
+          <div
+            onClick={() => setShowCreateNewTeam(true)}
+            className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
+            <IoMdAddCircle className="w-6 h-6" />{" "}
+            <span className="mx-2 font-semibold ">Create new Team</span>
+          </div>
+        )}
       </div>
       {teams.length > 0 ? (
         teams.map((team, index) => (
@@ -493,10 +496,10 @@ function TeamsPage() {
             </span>{" "} */}
               </span>
               {/* <h1 className="sm:text-2xl text-xl font-bold    ">Team (A) :</h1> */}
-              {showTeam[index] ? (
+              {showTeam[index] ? (userRole === "orgBoss") && (
                 <button
                   onClick={() => {
-                    //   setShowAddProjectFrom(false);
+                    setShowteamtoInvite(team.Name);
                     setShowInvitePeopleModal(true);
                   }}
                   className="text-2xl underline text-blue-600 hover:no-underline">
@@ -504,8 +507,8 @@ function TeamsPage() {
                 </button>
               ) : team.Boss ? (
                 <button className="h-8 w-8 relative flex justify-center items-center rounded-full bg-orange-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  {team.Boss.prenom[0].toUpperCase()}{" "}
-                  {team.Boss.nom[0].toUpperCase()}
+                  {team?.Boss?.nom[0].toUpperCase()}{" "}
+                  {team?.Boss?.prenom[0].toUpperCase()}
                 </button>
               ) : (
                 <FaUserCircle className=" rounded-full w-8 h-8 mr-2" />
@@ -516,11 +519,11 @@ function TeamsPage() {
                 {team.Boss ? (
                   <div className="bg-gray-800 w-fit h-fit lg:mr-6 mb-4  rounded-lg flex flex-col items-center justify-center py-20 px-4 sm:px-10 ">
                     <button className="my-2 text-2xl h-14 w-14 relative flex justify-center items-center rounded-full bg-orange-800  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                      {team.Boss.prenom[0].toUpperCase()}{" "}
-                      {team.Boss.nom[0].toUpperCase()}
+                      {team.Boss.nom[0].toUpperCase()}{" "}
+                      {team.Boss.prenom[0].toUpperCase()}
                     </button>
                     <h5 className="mb-1 text-xl font-medium text-center text-gray-900 dark:text-white">
-                      {team.Boss.prenom} {team.Boss.nom}
+                      {team.Boss.nom} {team.Boss.prenom} 
                     </h5>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       Team Leader
@@ -623,7 +626,7 @@ function TeamsPage() {
           <div
             style={{ height: "80vh" }}
             className=" flex flex-col justify-start items-center ">
-            <h1 className="text-4xl font-bold py-6">Team A</h1>
+            <h1 className="text-4xl font-bold py-6">{showteamtoInvite}</h1>
 
             <h1 className="text-3xl pb-6">Invite people to your team</h1>
             <div className="w-10/12">

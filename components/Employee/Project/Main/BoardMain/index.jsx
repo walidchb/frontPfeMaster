@@ -35,6 +35,12 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
   const initialValuesSearchTask = { Name: "" };
   const [inputTaskValue, setInputTaskValue] = useState("");
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
+  }, []);
 
   useEffect(() => {
     let taskss;
@@ -260,13 +266,14 @@ function BoardMain({ project, user, teamId, reloadpage, reload }) {
           your backlog is emptry
         </div>
       ) : null} */}
-
-      <div
-        onClick={handleShowAddTaskForm}
-        className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
-        <IoMdAddCircle className="w-6 h-6" />{" "}
-        <span className="mx-2 font-semibold ">Create issue</span>
-      </div>
+      {userRole === "prjctBoss" && (
+        <div
+          onClick={handleShowAddTaskForm}
+          className="flex p-4 cursor-pointer hover:text-blue-400 text-blue-600 items-center">
+          <IoMdAddCircle className="w-6 h-6" />{" "}
+          <span className="mx-2 font-semibold ">Create issue</span>
+        </div>
+      )}
 
       <div
         style={{

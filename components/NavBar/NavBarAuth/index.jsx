@@ -62,9 +62,9 @@ function NavBarAuth({
   });
   // <<<<<<< HEAD
   const [reload, setReload] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [organization, setOrganization] = useState(null);
+  const [userInfo, setUserInfo] = useState({});
+  const [userRole, setUserRole] = useState("");
+  const [organization, setOrganization] = useState({});
   useEffect(() => {
     console.log("yawwwww rani hnaaa");
     console.log("localstor = ", localStorage);
@@ -181,19 +181,19 @@ function NavBarAuth({
     }
   };
   useEffect(() => {
-    if (userInfo && userRole) {
+    if (userInfo?._id && userRole) {
       getNotifications();
       getinvitations();
     }
   }, [userInfo, userRole]);
   useEffect(() => {
-    if (userInfo && userRole) {
+    if (userInfo?._id && userRole) {
       getNotifications();
       getinvitations();
     }
   }, [reload]);
   useEffect(() => {
-    if (userInfo && userRole) {
+    if (userInfo?._id && userRole) {
       getNotifications();
     }
   }, [userInfo, organization, userRole]);
@@ -812,19 +812,6 @@ function NavBarAuth({
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95">
                     <Menu.Items className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              " px-4 py-2 text-sm text-gray-700 flex justify-start items-center "
-                            )}>
-                            <IoPersonCircle className="h-6 w-6 mr-2" />
-                            <span> Your Profile</span>
-                          </a>
-                        )}
-                      </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
                           <a

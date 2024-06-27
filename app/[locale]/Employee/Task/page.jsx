@@ -19,6 +19,7 @@ import {
   FaClock,
   FaClipboardCheck,
   FaCheck,
+  FaTrash
 } from "react-icons/fa";
 import { MdDelete, MdEditDocument } from "react-icons/md";
 import { useSearchParams } from "next/navigation";
@@ -127,40 +128,7 @@ const TaskPage = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-  // >>>>>>> 08227d00de8ebe0fbfd06a9e056f0ad17d262c57
-  const images = [
-    {
-      original: "/images/team.jpeg",
-      thumbnail: "/team.jpeg",
-    },
-    {
-      original: "https://picsum.photos/id/1015/1000/600/",
-      thumbnail: "https://picsum.photos/id/1015/250/150/",
-    },
-    {
-      original: "https://picsum.photos/id/1019/1000/600/",
-      thumbnail: "https://picsum.photos/id/1019/250/150/",
-    },
-    {
-      original: "/images/team.jpeg",
-      thumbnail: "/team.jpeg",
-    },
-    {
-      original: "https://picsum.photos/id/1015/1000/600/",
-      thumbnail: "https://picsum.photos/id/1015/250/150/",
-    },
-    {
-      original: "https://picsum.photos/id/1019/1000/600/",
-      thumbnail: "https://picsum.photos/id/1019/250/150/",
-    },
-  ];
-  const Docs = [
-    {
-      original: "/walid.pdf",
-      thumbnail: "/walid.pdf",
-    },
-  ];
+  };  
   const [delegationStatus, setDelegationStatus] = useState({});
   const [Details, setDetails] = useState(false);
   const [showPopUp, setShowPopUp] = useState(false);
@@ -251,6 +219,18 @@ const TaskPage = () => {
 
   const onDocumentLoadSuccess = ({ nextNumPages }) => {
     setNumPages(nextNumPages);
+  };
+  const handleDeleteDocument = async (documentName) => {
+    try {
+      const response = await axiosInstance.patch(`/task/deleteDocument/${taskData?._id}`, {
+        fileName : documentName
+      })
+      console.log(`Deleting document: ${documentName}`);
+      setReload(!reload);
+    } catch (error) {
+      
+    }
+    
   };
   const locale = useLocale();
 
@@ -427,7 +407,7 @@ const TaskPage = () => {
       const delegDat = response.data;
       console.log("demande delegation = ", response.data);
       const notificationContent = {
-        message: `"${person.nom} ${person.prenom}" vous a envoyé une demande pour vous déléguer la tâche "${taskData?.Name}".`,
+        message: `"${userInfo?.nom} ${userInfo?.prenom}" vous a envoyé une demande pour vous déléguer la tâche "${taskData?.Name}".`,
         url: JSON.stringify(taskData), // Ajoutez l'URL appropriée pour accéder au projet
       };
       const response1 = await axiosInstance.post(
@@ -486,9 +466,41 @@ const TaskPage = () => {
     // }
   };
 
+  const getDelegationForUser = async () => {
+    for (const person of teamMembres) {
+      try {
+        const response = await axiosInstance.get(`/delegation/delegations`, {
+          params: {
+            sendby: person._id,
+            sendto: userInfo?._id,
+            task: taskData?._id,
+          },
+        });
+        if (
+          response.data.length > 0 &&
+          response.data[0].accepted === false &&
+          response.data[0].annuler === false
+        ) {
+          const fullName = `${response.data[0].sendby.nom} ${response.data[0].sendby.prenom}`;
+          setUserFullName(fullName);
+          setUserId(response.data[0].sendby._id);
+          setIdDelegation(response.data[0]._id);
+          setShowDelegationRequest(true);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération du statut de délégation :",
+          error
+        );
+      }
+    }
+    
+  };
+
   useEffect(() => {
     if (teamMembres && taskData) {
       loadDelegationStatuses();
+      getDelegationForUser();
     }
   }, [teamMembres, taskData]);
 
@@ -823,62 +835,34 @@ const TaskPage = () => {
                             : `${taskData.Description?.substring(0, 250)}`}
                           {showMore && (
                             <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                              {images.map((child, index) => (
+                              {taskData?.documents.map((document, index) => (
                                 <div
                                   key={index}
-                                  className="text-black border-2 flex flex-col justify-between items-center">
-                                  <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                                    <img
-                                      className=""
-                                      src={child.original}
+                                  className="text-black border-2 flex flex-col justify-between items-center"
+                                >
+                                  <div className="overflow-hidden sm:h-32 h-20 w-full">
+                                    <iframe
+                                      src={`http://localhost:1937/uploads/${document}`}
+                                      className="w-full h-full"
                                       frameBorder="0"
                                     />
                                   </div>
                                   <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                      {child.original.split("/").pop()
-                                        ? child.original.split("/").pop()
-                                        : `photo dfgdfgdf ${index}`}
+                                    <p className="w-8/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                      {document}
                                     </p>
-                                    <FaCircleDown
-                                      onClick={() =>
-                                        handleDownload(child.original)
-                                      }
-                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          {showMore && (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                              {Docs.map((child, index) => (
-                                <div
-                                  key={index}
-                                  className="text-black border-2 flex flex-col justify-between items-center">
-                                  <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                                    <Document
-                                      file={child.original}
-                                      onLoadSuccess={onDocumentLoadSuccess}>
-                                      <Page
-                                        pageNumber={pageNumber}
-                                        width={100}
+                                    <div className="flex">
+                                      <FaCircleDown
+                                        onClick={() => handleDownload(`http://localhost:1937/uploads/${document}`)}
+                                        className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer mr-2"
                                       />
-                                    </Document>
-                                  </div>
-                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                    <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                      {child.original.split("/").pop()
-                                        ? child.original.split("/").pop()
-                                        : `PDF ${index}`}
-                                    </p>
-                                    <FaCircleDown
-                                      onClick={() =>
-                                        handleDownload(child.original)
-                                      }
-                                      className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                    />
+                                      {userRole === 'prjctBoss' && (
+                                        <FaTrash
+                                          onClick={() => handleDeleteDocument(document)}
+                                          className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer"
+                                        />
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               ))}
@@ -1191,7 +1175,7 @@ const TaskPage = () => {
                                       : "Unassigned"}
                                   </p>
                                 </div>
-                                {!showAssigneeModal ? (
+                                {!showAssigneeModal ? (userRole === "teamBoss" && taskData?.team.Boss === userInfo?._id) && (
                                   <p
                                     onClick={() => setShowAssigneeModal(true)}
                                     className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">
@@ -1427,65 +1411,40 @@ const TaskPage = () => {
                           ? taskData?.Description
                           : `${taskData?.Description?.substring(0, 250)}`}
                         {showMore && (
-                          <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {images.map((child, index) => (
-                              <div
-                                key={index}
-                                className="text-black border-2 flex flex-col justify-between items-center">
-                                <div className="overflow-hidden sm:h-32 h-20 w-50 flex justify-center items-center">
-                                  <img
-                                    className=""
-                                    src={child.original}
-                                    frameBorder="0"
-                                  />
+                            <div className="my-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                              {taskData?.documents.map((document, index) => (
+                                <div
+                                  key={index}
+                                  className="text-black border-2 flex flex-col justify-between items-center"
+                                >
+                                  <div className="overflow-hidden sm:h-32 h-20 w-full">
+                                    <iframe
+                                      src={`http://localhost:1937/uploads/${document}`}
+                                      className="w-full h-full"
+                                      frameBorder="0"
+                                    />
+                                  </div>
+                                  <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
+                                    <p className="w-8/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                      {document}
+                                    </p>
+                                    <div className="flex">
+                                      <FaCircleDown
+                                        onClick={() => handleDownload(`http://localhost:1937/uploads/${document}`)}
+                                        className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer mr-2"
+                                      />
+                                      {userRole === 'prjctBoss' && (
+                                        <FaTrash
+                                          onClick={() => handleDeleteDocument(document)}
+                                          className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer"
+                                        />
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `photo dfgdfgdf ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                    onClick={() =>
-                                      handleDownload(child.original)
-                                    }
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {showMore && (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {Docs.map((child, index) => (
-                              <div
-                                key={index}
-                                className="text-black border-2 flex flex-col justify-between items-center">
-                                <div className="overflow-hidden h-20 w-50 flex justify-center items-center">
-                                  <Document
-                                    file={child.original}
-                                    onLoadSuccess={onDocumentLoadSuccess}>
-                                    <Page pageNumber={pageNumber} width={100} />
-                                  </Document>
-                                </div>
-                                <div className="px-2 py-2 border-t-2 w-full flex justify-between items-center">
-                                  <p className="w-10/12 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                                    {child.original.split("/").pop()
-                                      ? child.original.split("/").pop()
-                                      : `PDF ${index}`}
-                                  </p>
-                                  <FaCircleDown
-                                    onClick={() =>
-                                      handleDownload(child.original)
-                                    }
-                                    className="text-black hover:text-blue-400 download w-6 h-6 cursor-pointer"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                              ))}
+                            </div>
+                          )}
                         <button
                           className="btn"
                           onClick={() => setShowMore(!showMore)}>
@@ -1788,7 +1747,8 @@ const TaskPage = () => {
                                     : "Unassigned"}
                                 </p>
                               </div>
-                              {!showAssigneeModal ? (
+                              {!showAssigneeModal ? (userRole === "teamBoss" && taskData?.team?.Boss === userInfo?._id) && (
+                                
                                 <p
                                   onClick={() => setShowAssigneeModal(true)}
                                   className=" flex justify-center items-center px-1 rounded-xl text-blue-700 hover:underline cursor-pointer text-sm     ">

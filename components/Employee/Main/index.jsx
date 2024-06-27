@@ -197,7 +197,8 @@ function MainEmployee({ reloadPage }) {
     setReload(!a);
   };
   useEffect(() => {
-    if (userInfo?._id && organization?._id) {
+    if (userInfo?._id && organization?._id && userRole && teamId) {
+
       fetchProjectsAndTasks(organization._id, userInfo._id);
     }
     // <<<<<<< HEAD
@@ -348,7 +349,7 @@ function MainEmployee({ reloadPage }) {
         className={"  w-screen overflow-auto costumScrollBar pb-40"}>
         <div className="p-4 sm:p-10    ">
           <h1 className="w-10/12 border-b-2 py-3   ">
-            Company &nbsp;&nbsp; &#x276F; &nbsp;&nbsp; departement &nbsp;&nbsp;
+            Company &nbsp;&nbsp; &#x276F; &nbsp;&nbsp;  &nbsp;&nbsp;
           </h1>
 
           <div className=" mt-10 w-full  flex justify-between items-center">
@@ -516,13 +517,15 @@ function MainEmployee({ reloadPage }) {
                       className="mr-4 text-xl font-medium text-gray-900 flex items-center">
                       All Projects ({projects?.length})
                     </h3>
-                    <button
-                      onClick={() => handleShowAddProjectForm()}
-                      className="flex items-center my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
-                      type="submit">
-                      <IoMdAddCircle className="w-6 h-6 mr-2" />
-                      <span>Add Project</span>
-                    </button>
+                    {userRole === "orgBoss" && (
+                      <button
+                        onClick={() => handleShowAddProjectForm()}
+                        className="flex items-center my-4 rounded border-b-4 border-violet-700 bg-violet-500 px-4 py-2 font-bold text-white hover:border-violet-500 hover:bg-violet-400"
+                        type="submit">
+                        <IoMdAddCircle className="w-6 h-6 mr-2" />
+                        <span>Add Project</span>
+                      </button>
+                    )}
                   </div>
                   <button
                     type="button"
