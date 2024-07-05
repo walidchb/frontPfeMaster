@@ -68,7 +68,13 @@ const UpdateTaskForm = ({ task, organization, handleCachUpdateTaskForm }) => {
   useEffect(() => {
     const fetchData = async () => {
       const teams = await fetchTeams(organization?._id);
-      setAvailableTeams(teams);
+      const filteredTeams = teams.filter(team => 
+        task.projet.teams.includes(team._id)
+      );
+    
+      console.log("Filtered teams = ", filteredTeams);
+    
+      setAvailableTeams(filteredTeams);
     };
 
     fetchData();
