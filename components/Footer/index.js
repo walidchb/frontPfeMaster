@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { useTranslations, useLocale } from "next-intl";
 
+
 function Footer() {
   const [isMobile, setIsMobile] = useState(false);
   const [btnAboutDown, setBtnAboutDown] = useState(false);
