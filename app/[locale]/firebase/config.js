@@ -2,13 +2,13 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_apiKey,
-  authDomain: process.env.NEXT_PUBLIC_authDomain,
-  projectId: process.env.NEXT_PUBLIC_projectId,
-  storageBucket: process.env.NEXT_PUBLIC_storageBucket,
-  messagingSenderId: process.env.NEXT_PUBLIC_messagingSenderId,
-  appId: process.env.NEXT_PUBLIC_appId,
-  measurementId: process.env.NEXT_PUBLIC_measurementId,
+  apiKey: "AIzaSyC9pgkmlVmeYlqhghR1v1R5OHkE2-SxYtQ",
+  authDomain: "pfe-master-c1682.firebaseapp.com",
+  projectId: "pfe-master-c1682",
+  storageBucket: "pfe-master-c1682.appspot.com",
+  messagingSenderId: "651626107211",
+  appId: "1:651626107211:web:f9bb141aec81910092d8ce",
+  measurementId: "G-7DRQEZW9Y0"
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();

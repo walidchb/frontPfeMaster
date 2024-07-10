@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://back-pfe-master.vercel.app",
+  baseURL: "http://localhost:1937",
   headers: {
     "Content-Type": "application/json",
   },
@@ -58,7 +58,13 @@ const AddTaskForm = ({
       const teams = await fetchTeams(parentProject?.organization?._id);
       console.log("teams = ", teams);
 
-      setAvailableTeams(teams);
+      const filteredTeams = teams.filter(team => 
+        parentProject.teams.includes(team._id)
+      );
+    
+      console.log("Filtered teams = ", filteredTeams);
+    
+      setAvailableTeams(filteredTeams);
     };
 
     fetchData();
