@@ -54,6 +54,7 @@ const AddTaskForm = ({
   // const organizationId = "66609ae2a974839772c60e7b";
   // const projectId = "666357fcb6ef230e0e262884";
   useEffect(() => {
+    console.log("parent project = ", parentProject)
     const fetchData = async () => {
       const teams = await fetchTeams(parentProject?.organization?._id);
       console.log("teams = ", teams);
